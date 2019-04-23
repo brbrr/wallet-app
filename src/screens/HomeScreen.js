@@ -11,60 +11,47 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { WebBrowser } from 'expo';
+import { connect } from 'react-redux';
+import { Card } from 'react-native-elements';
 
 /**
  * Internal dependencies
  */
-import { MonoText } from '../components/StyledText';
+import { CardSection, MonoText } from '../components';
+import { RecordsList } from '../components/RecordsList';
 
-export default class HomeScreen extends React.Component {
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+class HomeScreen extends React.Component {
 	static navigationOptions = {
-		header: null,
+		// header: null,
+		title: 'Home',
 	};
 
 	render() {
+		const { records } = this.props;
+
+		const total = records.reduce( ( acc, curr ) => {
+			switch ( curr.type ) {
+				case 'expense':
+					return acc + ( -1 * curr.amount );
+				default:
+					return acc + curr.amount;
+			}
+		}, 0 );
 		return (
-			<View style={ styles.container }>
-				<ScrollView style={ styles.container } contentContainerStyle={ styles.contentContainer }>
-					<View style={ styles.welcomeContainer }>
-						<Image
-							source={
-								__DEV__ ?
-									require( '../assets/images/robot-dev.png' ) :
-									require( '../assets/images/robot-prod.png' )
-							}
-							style={ styles.welcomeImage }
-						/>
-					</View>
-
-					<View style={ styles.getStartedContainer }>
-						{ this._maybeRenderDevelopmentModeWarning() }
-
-						<Text style={ styles.getStartedText }>Get started by opening</Text>
-
-						<View style={ [ styles.codeHighlightContainer, styles.homeScreenFilename ] }>
-							<MonoText style={ styles.codeHighlightText }>screens/HomeScreen.js</MonoText>
-						</View>
-
-						<Text style={ styles.getStartedText }>
-							Change this text and your app will automatically reload.
-						</Text>
-					</View>
-
-					<View style={ styles.helpContainer }>
-						<TouchableOpacity onPress={ this._handleHelpPress } style={ styles.helpLink }>
-							<Text style={ styles.helpLinkText }>Help, it didn’t automatically reload!</Text>
-						</TouchableOpacity>
-					</View>
-				</ScrollView>
-
-				<View style={ styles.tabBarInfoContainer }>
-					<Text style={ styles.tabBarInfoText }>This is a tab bar. You can edit it in:</Text>
-
-					<View style={ [ styles.codeHighlightContainer, styles.navigationFilename ] }>
-						<MonoText style={ styles.codeHighlightText }>navigation/MainTabNavigator.js</MonoText>
-					</View>
+			<View style={ {
+				flex: 1,
+				flexDirection: 'column',
+				justifyContent: 'space-between',
+			} }>
+				<View style={ { flex: 1 } }>
+					<Text> Total spent: { total } </Text>
+				</View>
+				<View style={ { flex: 3 } }>
+					<ScrollView>
+						<RecordsList records={ records } />
+					</ScrollView>
 				</View>
 			</View>
 		);
@@ -91,17 +78,29 @@ export default class HomeScreen extends React.Component {
 			</Text>
 		);
 	}
-
-	_handleLearnMorePress = () => {
-		WebBrowser.openBrowserAsync( 'https://docs.expo.io/versions/latest/guides/development-mode' );
-	};
-
-	_handleHelpPress = () => {
-		WebBrowser.openBrowserAsync(
-			'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-		);
-	};
 }
+
+const mapStateToProps = ( state, ownProps ) => {
+	console.log( state );
+
+	const records = Object.values( state.records.byId );
+
+	return {
+		// active: ownProps.filter === state.visibilityFilter,
+		records,
+	};
+};
+
+const mapDispatchToProps = ( dispatch ) => {
+	return {
+		test: 'test',
+	};
+};
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)( HomeScreen );
 
 const styles = StyleSheet.create( {
 	container: {

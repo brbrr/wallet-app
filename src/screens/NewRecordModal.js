@@ -2,81 +2,147 @@
  * External dependencies
  */
 import React from 'react';
-import {
-	Image,
-	Platform,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-	Button,
-	Picker,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { Input } from 'react-native-elements';
-import PouchDB from 'pouchdb';
+import { View, Button, Text } from 'react-native';
+import { Button as ElButton, Input, Card } from 'react-native-elements';
+import { connect } from 'react-redux';
 
-export default class NewRecordModal extends React.Component {
-	static navigationOptions = {
-		header: null,
-	};
+/**
+ * Internal dependencies
+ */
+import { CardSection, LoadingCardSection } from '../components';
+import { createNewRecord } from '../actions/records';
+
+class NewRecordModal extends React.Component {
+	static navigationOptions = ( { navigation } ) => ( {
+		title: 'Add record',
+		headerRight: (
+			<Button
+				onPress={ () => navigation.state.params.handleSave() }
+				title="Done"
+			/>
+		),
+		headerLeft: (
+			<Button
+				// FIXME: goBack to the previous route instead of default `Home` route
+				// onPress={ () => this.props.navigation.goBack(null) }
+				onPress={ () => navigation.navigate( 'Main' ) }
+				title="Dismiss"
+			/>
+		),
+	} );
 
 	constructor( props ) {
 		super( props );
-		this.state = { text: 'amount', currency: '', realm: null, category: 'default' };
+		this.state = { text: 'amount', currency: '', realm: null, category: 'default', account: 'Cash' };
+		this.props.navigation.setParams( { handleSave: this._createNewRecord.bind( this ) } );
 	}
 
-	createNewRecord() {
+	shouldComponentUpdate( nextProps ) {
+		if ( this.props.navigation !== nextProps.navigation ) {
+			return false;
+		}
+		return true;
+	}
 
+	componentDidUpdate( prevProps, prevState ) {
+		Object.entries( this.props ).forEach( ( [ key, val ] ) =>
+			prevProps[ key ] !== val && console.log( `Prop '${ key }' changed` )
+		);
+		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
+			prevState[ key ] !== val && console.log( `State '${ key }' changed` )
+		);
+	}
+
+	renderNewRecordForm() {
+		// const { onCreateEventClick, session, navigation } = this.props;
+		const { amount, currency, category, account } = this.state;
+		const { draftRecord, categories } = this.props;
+
+		const cat = categories.byId[ draftRecord.categoryId ].name;
+
+		return (
+			<Card>
+				<CardSection>
+					<Input
+						label="Amount"
+						value={ amount }
+						placeholder="0.0"
+						onChangeText={ ( amnt ) => this.setState( { amount: amnt } ) }
+					/>
+				</CardSection>
+
+				{ /* // TODO: Use modal picker here */ }
+				<CardSection>
+					<Input
+						label="Currency"
+						value={ currency }
+						placeholder="USD"
+						onChangeText={ ( curr ) => this.setState( { currency: curr } ) }
+					/>
+				</CardSection>
+
+				{ /* // TODO: Use modal picker here */ }
+				<CardSection>
+					{ /* <Input
+						label="Category"
+						value={ category }
+						placeholder="Default"
+						onChangeText={ ( cat ) => this.setState( { category: cat } ) }
+					/> */ }
+					<Text onPress={ () => this.props.navigation.navigate( 'Categories' ) }>{ cat }</Text>
+				</CardSection>
+
+				{ /* // TODO: Use modal picker here */ }
+				<CardSection>
+					<Input
+						label="Account"
+						value={ account }
+						placeholder="Cash"
+						onChangeText={ ( acnt ) => this.setState( { account: acnt } ) }
+					/>
+				</CardSection>
+
+				<LoadingCardSection loading={ false }>
+					<ElButton title="Create New Record" onPress={ () => this._createNewRecord() } />
+				</LoadingCardSection>
+			</Card>
+		);
+	}
+
+	_createNewRecord() {
+		const { onClick, navigation } = this.props;
+		onClick();
+		navigation.navigate( 'Main' );
 	}
 
 	render() {
-		const info = this.state.realm ?
-			'Number of dogs in this Realm: ' + this.state.realm.objects( 'Dog' ).length :
-			'Loading...';
-
 		return (
 			<View style={ { flex: 1, alignItems: 'center', justifyContent: 'center' } }>
-				<Text>
-					{ info }
-				</Text>
-				<Text style={ { fontSize: 30 } }>This is a modal!</Text>
-				<Button
-					// FIXME: goBack to the previous route instead of default `Home` route
-					// onPress={ () => this.props.navigation.goBack(null) }
-					onPress={ () => this.props.navigation.navigate( 'Main' ) }
-
-					title="Dismiss"
-				/>
-				<Input
-					onChangeText={ ( text ) => this.setState( { text } ) }
-					value={ this.state.text }
-				/>
-				{ /* // TODO: Use modal picker here */ }
-				<Input
-					placeholder="currency"
-					onChangeText={ ( currency ) => this.setState( { currency } ) }
-					value={ this.state.currency }
-				/>
-				<Input
-					placeholder="category"
-					onChangeText={ ( category ) => this.setState( { category } ) }
-					value={ this.state.category }
-				/>
-
-				<Button
-					title="addTodo"
-					onPress={ this.addTodo }
-				/>
-
-				<Button
-					title="showTodos"
-					onPress={ this.showTodos }
-				/>
-
+				{ this.renderNewRecordForm() }
 			</View>
 		);
 	}
 }
+
+const mapStateToProps = ( state, ownProps ) => {
+	const { records, draftRecord, categories } = state;
+	return {
+		records,
+		draftRecord,
+		categories,
+	};
+};
+
+const mapDispatchToProps = ( dispatch ) => {
+	return {
+		onClick: ( amount, currency, category ) => {
+			dispatch( createNewRecord( amount, currency, category ) );
+		},
+	};
+};
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)( NewRecordModal );
 
