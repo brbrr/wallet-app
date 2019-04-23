@@ -2,15 +2,16 @@
  * External dependencies
  */
 import React from 'react';
-import { Platform, View } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import { Platform, View, Text } from 'react-native';
+import { createStackNavigator, createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation';
+import { Header } from 'react-navigation';
+import { TabBar } from 'react-native-tab-view';
 
 /**
  * Internal dependencies
  */
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import NewRecordModal from '../screens/NewRecordModal';
 
@@ -32,20 +33,6 @@ HomeStack.navigationOptions = {
 	),
 };
 
-// const LinksStack = createStackNavigator({
-//   Links: LinksScreen,
-// });
-
-// LinksStack.navigationOptions = {
-//   tabBarLabel: 'Links',
-//   tabBarIcon: ({ focused }) => (
-//     <TabBarIcon
-//       focused={focused}
-//       name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'}
-//     />
-//   ),
-// };
-
 const SettingsStack = createStackNavigator( {
 	Settings: SettingsScreen,
 } );
@@ -60,20 +47,103 @@ SettingsStack.navigationOptions = {
 	),
 };
 
-const NewRecordStack = createStackNavigator( {
-	NewRecord: NewRecordModal,
+const TabScreen = ( props ) => {
+	return (
+		<View>
+			<View>
+				<Text>{ 'props: ' + JSON.stringify( props ) }</Text>
+			</View>
+			<View>
+				<Text>{ 'entries: ' + Object.entries( props.navigation ) }</Text>
+			</View>
+			<View>
+				<Text>{ 'idx: ' + JSON.stringify( props.navigation.index ) }</Text>
+			</View>
+		</View>
+	);
+};
+
+const TestTabBar = createMaterialTopTabNavigator( {
+	Tab1: TabScreen,
+	Tab2: TabScreen,
+	Tab3: TabScreen,
 } );
 
-NewRecordStack.navigationOptions = {
-	tabBarLabel: 'New Record',
+TestTabBar.navigationOptions = {
+	tabBarLabel: 'Test tabs',
 	tabBarIcon: ( { focused } ) => (
 		<TabBarIcon
 			focused={ focused }
-			name={ Platform.OS === 'ios' ? 'ios-add' : 'md-add' }
+			name={ Platform.OS === 'ios' ? 'ios-options' : 'md-options' }
 		/>
 	),
-	tabBarOnPress: ( { navigation } ) => navigation.navigate( 'Modal' ),
+	tabBarVisible: false,
+	header: () => null,
 };
+
+import { StyleSheet, Dimensions } from 'react-native';
+import { TabView, SceneMap } from 'react-native-tab-view';
+
+const FirstRoute = () => (
+	<View style={ [ styles.scene, { backgroundColor: '#ff4081' } ] } />
+);
+const SecondRoute = () => {
+	console.log( 'SECOND' );
+
+	return <View style={ [ styles.scene, { backgroundColor: '#673ab7' } ] } />;
+};
+
+class TabViewExample extends React.Component {
+	state = {
+		index: 0,
+		routes: [
+			{ key: 'first', title: 'First' },
+			{ key: 'second', title: 'Second' },
+		],
+	};
+
+	render() {
+		console.log( '!!!!!!!!!!!!' );
+
+		return (
+			<TabView
+				navigationState={ this.state }
+				renderScene={ SceneMap( {
+					first: FirstRoute,
+					second: SecondRoute,
+				} ) }
+				onIndexChange={ ( index ) => this.setState( { index } ) }
+				initialLayout={ { width: Dimensions.get( 'window' ).width } }
+				renderTabBar={ ( props ) => <TabBar { ...props } /> }
+
+			/>
+		);
+	}
+}
+
+const exampleInView = ( props ) => (
+	<View>
+		<TabViewExample />
+	</View>
+);
+
+exampleInView.navigationOptions = {
+	tabBarLabel: 'Test tabs',
+	tabBarIcon: ( { focused } ) => (
+		<TabBarIcon
+			focused={ focused }
+			name={ Platform.OS === 'ios' ? 'ios-options' : 'md-options' }
+		/>
+	),
+	// tabBarVisible: false,
+	// header: () => null,
+};
+
+const styles = StyleSheet.create( {
+	scene: {
+		flex: 1,
+	},
+} );
 
 export default createBottomTabNavigator( {
 	HomeStack,
@@ -86,9 +156,12 @@ export default createBottomTabNavigator( {
 					focused={ focused }
 					name={ Platform.OS === 'ios' ? 'ios-add' : 'md-add' }
 				/>
+
 			),
-			tabBarOnPress: () => navigation.navigate( 'Modal' ),
+			tabBarOnPress: () => navigation.navigate( 'NewRecord' ),
 		} ),
 	},
 	SettingsStack,
+	TestTabBar,
+	exampleInView: { screen: exampleInView },
 } );
