@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { ADD_NEW_RECORD } from '../actions/records';
+import { addNewItem } from '../utils/reducerHelper';
 
 const initialState = {
 	byId: {
@@ -30,15 +31,11 @@ const initialState = {
 };
 
 export default function records( state = initialState, action ) {
+	console.log( action );
+
 	switch ( action.type ) {
 		case ADD_NEW_RECORD:
-			const lastId = state.allIds.slice( -1 )[ 0 ] || 0;
-			const newId = lastId + 1;
-			const record = Object.assign( {}, { id: newId }, action.record );
-			return {
-				byId: { [ newId ]: record, ...state.byId },
-				allIds: [ ...state.allIds, newId ],
-			};
+			return addNewItem( action.record, state );
 		default:
 			return state;
 	}
