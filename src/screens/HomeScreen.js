@@ -3,28 +3,21 @@
  */
 import React from 'react';
 import {
-	Image,
 	Platform,
 	ScrollView,
 	StyleSheet,
 	Text,
-	TouchableOpacity,
 	View,
 } from 'react-native';
 import { connect } from 'react-redux';
-import { Card } from 'react-native-elements';
 
 /**
  * Internal dependencies
  */
-import { CardSection, MonoText } from '../components';
 import { RecordsList } from '../components/RecordsList';
-
-import Icon from 'react-native-vector-icons/FontAwesome';
 
 class HomeScreen extends React.Component {
 	static navigationOptions = {
-		// header: null,
 		title: 'Home',
 	};
 
@@ -44,6 +37,7 @@ class HomeScreen extends React.Component {
 				flex: 1,
 				flexDirection: 'column',
 				justifyContent: 'space-between',
+				backgroundColor: '#f9f9f9',
 			} }>
 				<View style={ { flex: 1 } }>
 					<Text> Total spent: { total } </Text>
@@ -86,7 +80,6 @@ const mapStateToProps = ( state, ownProps ) => {
 	const records = Object.values( state.records.byId );
 
 	return {
-		// active: ownProps.filter === state.visibilityFilter,
 		records,
 	};
 };

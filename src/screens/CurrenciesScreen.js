@@ -8,12 +8,12 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { selectRecordCategory } from '../actions';
+import { selectRecordCurrency } from '../actions';
 import RecordOptionSelector from '../components/RecordOptionSelector';
 
-class CategoriesScreen extends React.Component {
+class CurrenciesScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
-		title: 'Categories',
+		title: 'Currencies',
 		headerRight: (
 			<Button
 				onPress={ () => {} }
@@ -29,11 +29,11 @@ class CategoriesScreen extends React.Component {
 	} );
 
 	render() {
-		const { categories, selectItem, navigation } = this.props;
+		const { currencies, selectItem, navigation } = this.props;
 
 		return (
 			<RecordOptionSelector
-				items={ Object.values( categories.byId ) }
+				items={ Object.values( currencies.byId ) }
 				selectItem={ selectItem }
 				navigation={ navigation }
 			/>
@@ -42,21 +42,21 @@ class CategoriesScreen extends React.Component {
 }
 
 const mapStateToProps = ( state ) => {
-	const { categories } = state;
+	const { currencies } = state;
 
 	return {
-		categories,
+		currencies,
 	};
 };
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {
-		selectItem: ( id ) => dispatch( selectRecordCategory( id ) ),
+		selectItem: ( id ) => dispatch( selectRecordCurrency( id ) ),
 	};
 };
 
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)( CategoriesScreen );
+)( CurrenciesScreen );
 

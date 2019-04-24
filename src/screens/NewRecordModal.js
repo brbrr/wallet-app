@@ -2,14 +2,13 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Button, Text } from 'react-native';
-import { Button as ElButton, Input, Card } from 'react-native-elements';
+import { View, Button, Text, StyleSheet } from 'react-native';
+import { Input, ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
 
 /**
  * Internal dependencies
  */
-import { CardSection, LoadingCardSection } from '../components';
 import { createNewRecord } from '../actions/records';
 
 class NewRecordModal extends React.Component {
@@ -17,7 +16,7 @@ class NewRecordModal extends React.Component {
 		title: 'Add record',
 		headerRight: (
 			<Button
-				onPress={ () => navigation.state.params.handleSave() }
+				onPress={ () => navigation.state.params.createNewRecordAndGoBack() }
 				title="Done"
 			/>
 		),
@@ -34,7 +33,7 @@ class NewRecordModal extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.state = { text: 'amount', currency: '', realm: null, category: 'default', account: 'Cash' };
-		this.props.navigation.setParams( { handleSave: this._createNewRecord.bind( this ) } );
+		this.props.navigation.setParams( { createNewRecordAndGoBack: this.createNewRecordAndGoBack.bind( this ) } );
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -53,89 +52,99 @@ class NewRecordModal extends React.Component {
 		);
 	}
 
-	renderNewRecordForm() {
-		// const { onCreateEventClick, session, navigation } = this.props;
-		const { amount, currency, category, account } = this.state;
-		const { draftRecord, categories } = this.props;
-
-		const cat = categories.byId[ draftRecord.categoryId ].name;
-
-		return (
-			<Card>
-				<CardSection>
-					<Input
-						label="Amount"
-						value={ amount }
-						placeholder="0.0"
-						onChangeText={ ( amnt ) => this.setState( { amount: amnt } ) }
-					/>
-				</CardSection>
-
-				{ /* // TODO: Use modal picker here */ }
-				<CardSection>
-					<Input
-						label="Currency"
-						value={ currency }
-						placeholder="USD"
-						onChangeText={ ( curr ) => this.setState( { currency: curr } ) }
-					/>
-				</CardSection>
-
-				{ /* // TODO: Use modal picker here */ }
-				<CardSection>
-					{ /* <Input
-						label="Category"
-						value={ category }
-						placeholder="Default"
-						onChangeText={ ( cat ) => this.setState( { category: cat } ) }
-					/> */ }
-					<Text onPress={ () => this.props.navigation.navigate( 'Categories' ) }>{ cat }</Text>
-				</CardSection>
-
-				{ /* // TODO: Use modal picker here */ }
-				<CardSection>
-					<Input
-						label="Account"
-						value={ account }
-						placeholder="Cash"
-						onChangeText={ ( acnt ) => this.setState( { account: acnt } ) }
-					/>
-				</CardSection>
-
-				<LoadingCardSection loading={ false }>
-					<ElButton title="Create New Record" onPress={ () => this._createNewRecord() } />
-				</LoadingCardSection>
-			</Card>
-		);
-	}
-
-	_createNewRecord() {
-		const { onClick, navigation } = this.props;
-		onClick();
+	createNewRecordAndGoBack() {
+		const { _createNewRecord, navigation, draftRecord } = this.props;
+		_createNewRecord();
 		navigation.navigate( 'Main' );
 	}
 
 	render() {
+		const { amount } = this.state;
+		const { draftRecord, categories, currencies, accounts } = this.props;
+
+		const category = categories.byId[ draftRecord.categoryId ];
+		const currency = currencies.byId[ draftRecord.currencyId ];
+		const account = accounts.byId[ draftRecord.accountId ];
+
 		return (
-			<View style={ { flex: 1, alignItems: 'center', justifyContent: 'center' } }>
-				{ this.renderNewRecordForm() }
+			<View style={ { backgroundColor: '#f9f9f9' } }>
+				<ListItem
+					containerStyle={ styles.iconContainer }
+					title="Amount"
+					titleStyle={ styles.amountTitle }
+					subtitle={
+						<Input
+							containerStyle={ { paddingHorizontal: 0 } }
+							inputContainerStyle={ { borderBottomWidth: 0 } }
+							inputStyle={ styles.amountInput }
+							value={ amount }
+							placeholder="0.0"
+							onChangeText={ ( amnt ) => this.setState( { amount: amnt } ) }
+						/>
+					}
+					bottomDivider={ true }
+					topDivider={ true }
+					leftElement={
+						<Text
+							onPress={ () => this.props.navigation.navigate( 'Currencies' ) }
+							style={ styles.currencyButton }
+						>
+							{ currency.name }
+						</Text>
+					}
+				/>
+
+				<ListItem
+					containerStyle={ styles.iconContainer }
+					title={ category.name }
+					bottomDivider={ true }
+					topDivider={ true }
+					leftIcon={ {
+						name: category.icon,
+						type: 'font-awesome',
+						reverse: true,
+						reverseColor: 'white',
+						color: 'red',
+						size: 20,
+						containerStyle: { margin: -4 },
+					} }
+					onPress={ () => this.props.navigation.navigate( 'Categories' ) }
+				/>
+
+				<ListItem
+					containerStyle={ styles.iconContainer }
+					title={ account.name }
+					bottomDivider={ true }
+					topDivider={ true }
+					leftIcon={ {
+						name: 'ios-wallet',
+						type: 'ionicon',
+						size: 25,
+						containerStyle: { paddingLeft: 15, paddingRight: 14 },
+					} }
+					onPress={ () => this.props.navigation.navigate( 'Accounts' ) }
+				/>
 			</View>
 		);
 	}
 }
 
 const mapStateToProps = ( state, ownProps ) => {
-	const { records, draftRecord, categories } = state;
+	console.log( state );
+
+	const { records, draftRecord, categories, currencies, accounts } = state;
 	return {
 		records,
 		draftRecord,
 		categories,
+		currencies,
+		accounts,
 	};
 };
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {
-		onClick: ( amount, currency, category ) => {
+		_createNewRecord: ( amount, currency, category ) => {
 			dispatch( createNewRecord( amount, currency, category ) );
 		},
 	};
@@ -145,4 +154,24 @@ export default connect(
 	mapStateToProps,
 	mapDispatchToProps
 )( NewRecordModal );
+
+const styles = StyleSheet.create( {
+	iconContainer: {
+		paddingTop: 3,
+		paddingBottom: 3,
+		height: 55,
+	},
+	currencyButton: {
+		color: 'grey',
+		padding: 3,
+		borderWidth: 1,
+		borderColor: 'grey',
+		borderRadius: 3,
+		backgroundColor: '#f9f9f9',
+		marginLeft: 7,
+		marginRight: 9,
+	},
+	amountTitle: { fontSize: 12, marginTop: 2 },
+	amountInput: { fontSize: 20, color: 'black' },
+} );
 
