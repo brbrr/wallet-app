@@ -2,17 +2,10 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Image, Text } from 'react-native';
-import { Button, Input, Card, ListItem, Avatar } from 'react-native-elements';
+import { View, Text } from 'react-native';
+import { Icon, ListItem } from 'react-native-elements';
 
-const categoriesMapping = {
-	general: 'shopping-basket',
-	groceries: 'shopping-basket',
-	cafe: 'coffee',
-	restaurant: 'utensils',
-};
-
-function getAmount( { currency, amount, type } ) {
+function getAmount( currency, amount, type ) {
 	switch ( type ) {
 		case 'expense':
 			return `-${ currency }${ amount }`;
@@ -29,7 +22,8 @@ function getTime( timestamp ) {
 }
 
 export const RecordsList = ( props ) => {
-	const { records } = props;
+	const { records, accounts, categories, currencies } = props;
+
 	records.sort( ( a, b ) => a.id < b.id );
 
 	if ( records.length === 0 ) {
@@ -41,28 +35,56 @@ export const RecordsList = ( props ) => {
 	return (
 		<View>
 			{
-				records.map( ( record, idx ) => (
-					<ListItem
-						containerStyle={ { paddingTop: 3, paddingBottom: 3 } }
-						key={ idx }
-						title={ record.category }
+				records.map( ( record, idx ) => {
+					const category = categories[ record.categoryId ];
+					const currency = currencies[ record.currencyId ];
+					const amount = getAmount( currency.name, record.amount, record.type );
+					const account = accounts[ record.accountId ];
 
-						rightContentContainerStyle={ { flex: 1 } }
+					return (
+						<ListItem
+							containerStyle={ { paddingTop: 3, paddingBottom: 3 } }
+							key={ idx }
+							title={ category.name }
 
-						rightTitle={ getAmount( record ) }
-						rightTitleStyle={ { fontWeight: 'bold', color: 'black' } }
+							rightContentContainerStyle={ { flex: 1 } }
 
-						subtitle={ record.description }
-						subtitleStyle={ { fontSize: 12 } }
+							rightTitle={ amount }
+							rightTitleStyle={ { fontWeight: 'bold', color: 'black' } }
 
-						rightSubtitle={ getTime( record.createdAt ) }
-						rightSubtitleStyle={ { fontSize: 12 } }
+							subtitle={ record.description }
+							subtitleStyle={ { fontSize: 12 } }
 
-						leftIcon={ { name: categoriesMapping[ record.category.toLowerCase() ],
-							type: 'font-awesome', reverse: true, reverseColor: 'white', color: 'red', size: 20 } }
-						bottomDivider={ true }
-					/>
-				) )
+							rightSubtitle={ getTime( record.createdAt ) }
+							rightSubtitleStyle={ { fontSize: 12 } }
+							bottomDivider={ true }
+							leftIcon={
+								<View >
+									<Icon
+										name={ category.icon }
+										type="font-awesome"
+										reverse
+										reverseColor="white"
+										color="red"
+										size={ 20 }
+									/>
+									<View style={
+										{
+											width: 10,
+											height: 10,
+											borderRadius: 10 / 2,
+											backgroundColor: account.color,
+											position: 'absolute',
+											bottom: 8,
+											zIndex: 5,
+											left: 41,
+										}
+									} />
+								</View>
+							}
+						/>
+					);
+				} )
 			}
 		</View>
 	);
