@@ -25,3 +25,9 @@ export function selectRecordAccount( id ) {
 	return { type: SELECT_RECORD_ACCOUNT, id };
 }
 
+export const SELECT_RECORD_TYPE = 'SELECT_RECORD_TYPE';
+
+export function selectRecordType( id ) {
+	return { type: SELECT_RECORD_TYPE, id };
+}
+

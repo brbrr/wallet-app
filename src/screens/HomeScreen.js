@@ -25,8 +25,8 @@ class HomeScreen extends React.Component {
 		const { records, accounts, categories, currencies } = this.props;
 
 		const totalSpent = records.reduce( ( acc, curr ) => {
-			switch ( curr.type ) {
-				case 'expense':
+			switch ( curr.typeId ) {
+				case 0:
 					return acc + ( -1 * curr.amount );
 				default:
 					return acc + curr.amount;

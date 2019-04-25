@@ -7,7 +7,7 @@ import { Icon, ListItem } from 'react-native-elements';
 
 function getAmount( currency, amount, type ) {
 	switch ( type ) {
-		case 'expense':
+		case 0:
 			return `-${ currency }${ amount }`;
 		default:
 			return `${ currency }${ amount }`;
@@ -38,8 +38,9 @@ export const RecordsList = ( props ) => {
 				records.map( ( record, idx ) => {
 					const category = categories[ record.categoryId ];
 					const currency = currencies[ record.currencyId ];
-					const amount = getAmount( currency.name, record.amount, record.type );
 					const account = accounts[ record.accountId ];
+
+					const amount = getAmount( currency.name, record.amount, record.typeId );
 
 					return (
 						<ListItem

@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import { createNewRecord } from '../actions/records';
+import { selectRecordType } from '../actions';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
@@ -36,7 +37,6 @@ class NewRecordModal extends React.Component {
 			amount: null,
 			selectedIndex: 2,
 		};
-		this.updateIndex = this.updateIndex.bind( this );
 		this.props.navigation.setParams(
 			{ createNewRecordAndGoBack: this.createNewRecordAndGoBack.bind( this ) }
 		);
@@ -58,10 +58,6 @@ class NewRecordModal extends React.Component {
 		);
 	}
 
-	updateIndex( selectedIndex ) {
-		this.setState( { selectedIndex } );
-	}
-
 	createNewRecordAndGoBack() {
 		const { amount } = this.state;
 		const { _createNewRecord, navigation, draftRecord } = this.props;
@@ -76,20 +72,20 @@ class NewRecordModal extends React.Component {
 	}
 
 	render() {
-		const { amount, selectedIndex } = this.state;
-		const { draftRecord, categories, currencies, accounts } = this.props;
+		const { amount } = this.state;
+		const { draftRecord, categories, currencies, accounts, _selectRecordType } = this.props;
 
 		const category = categories.byId[ draftRecord.categoryId ];
 		const currency = currencies.byId[ draftRecord.currencyId ];
 		const account = accounts.byId[ draftRecord.accountId ];
 
-		const buttons = [ 'Hello', 'World', 'Buttons' ];
+		const buttons = [ 'expense', 'income', 'transfer' ];
 
 		return (
 			<View style={ { backgroundColor: '#f9f9f9' } }>
 				<ButtonGroup
-					onPress={ this.updateIndex }
-					selectedIndex={ selectedIndex }
+					onPress={ ( id ) => _selectRecordType( id ) }
+					selectedIndex={ draftRecord.typeId }
 					buttons={ buttons }
 					containerStyle={ { borderRadius: 5, height: 20 } }
 				/>
@@ -106,6 +102,7 @@ class NewRecordModal extends React.Component {
 							value={ amount }
 							placeholder="0.0"
 							onChangeText={ ( amnt ) => this.setState( { amount: amnt } ) }
+							autoFocus
 						/>
 					}
 					bottomDivider={ true }
@@ -169,9 +166,8 @@ const mapStateToProps = ( state ) => {
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {
-		_createNewRecord: ( draftRecord ) => {
-			dispatch( createNewRecord( draftRecord ) );
-		},
+		_createNewRecord: ( draftRecord ) => dispatch( createNewRecord( draftRecord ) ),
+		_selectRecordType: ( id ) => dispatch( selectRecordType( id ) ),
 	};
 };
 
