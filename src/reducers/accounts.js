@@ -9,10 +9,12 @@ const initialState = {
 		1: {
 			name: 'Cash',
 			id: 1,
+			color: 'green',
 		},
 		2: {
 			name: 'Bank',
 			id: 2,
+			color: 'blue',
 		},
 	},
 	allIds: [ 1, 2 ],

@@ -22,9 +22,9 @@ class HomeScreen extends React.Component {
 	};
 
 	render() {
-		const { records } = this.props;
+		const { records, accounts, categories, currencies } = this.props;
 
-		const total = records.reduce( ( acc, curr ) => {
+		const totalSpent = records.reduce( ( acc, curr ) => {
 			switch ( curr.type ) {
 				case 'expense':
 					return acc + ( -1 * curr.amount );
@@ -40,36 +40,19 @@ class HomeScreen extends React.Component {
 				backgroundColor: '#f9f9f9',
 			} }>
 				<View style={ { flex: 1 } }>
-					<Text> Total spent: { total } </Text>
+					<Text> Total spent: { totalSpent } </Text>
 				</View>
 				<View style={ { flex: 3 } }>
 					<ScrollView>
-						<RecordsList records={ records } />
+						<RecordsList
+							records={ records }
+							accounts={ accounts }
+							categories={ categories }
+							currencies={ currencies }
+						/>
 					</ScrollView>
 				</View>
 			</View>
-		);
-	}
-
-	_maybeRenderDevelopmentModeWarning() {
-		if ( __DEV__ ) {
-			const learnMoreButton = (
-				<Text onPress={ this._handleLearnMorePress } style={ styles.helpLinkText }>
-					Learn more
-				</Text>
-			);
-
-			return (
-				<Text style={ styles.developmentModeText }>
-					Development mode is enabled, your app will be slower but you can use useful development
-					tools. { learnMoreButton }
-				</Text>
-			);
-		}
-		return (
-			<Text style={ styles.developmentModeText }>
-					You are not in development mode, your app will run at full speed.
-			</Text>
 		);
 	}
 }
@@ -78,9 +61,11 @@ const mapStateToProps = ( state, ownProps ) => {
 	console.log( state );
 
 	const records = Object.values( state.records.byId );
-
 	return {
 		records,
+		accounts: state.accounts.byId,
+		categories: state.categories.byId,
+		currencies: state.currencies.byId,
 	};
 };
 

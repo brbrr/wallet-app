@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { View, Button, Text, StyleSheet } from 'react-native';
-import { Input, ListItem } from 'react-native-elements';
+import { Input, ListItem, ButtonGroup } from 'react-native-elements';
 import { connect } from 'react-redux';
 
 /**
@@ -32,8 +32,14 @@ class NewRecordModal extends React.Component {
 
 	constructor( props ) {
 		super( props );
-		this.state = { text: 'amount', currency: '', realm: null, category: 'default', account: 'Cash' };
-		this.props.navigation.setParams( { createNewRecordAndGoBack: this.createNewRecordAndGoBack.bind( this ) } );
+		this.state = {
+			amount: null,
+			selectedIndex: 2,
+		};
+		this.updateIndex = this.updateIndex.bind( this );
+		this.props.navigation.setParams(
+			{ createNewRecordAndGoBack: this.createNewRecordAndGoBack.bind( this ) }
+		);
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -52,24 +58,44 @@ class NewRecordModal extends React.Component {
 		);
 	}
 
+	updateIndex( selectedIndex ) {
+		this.setState( { selectedIndex } );
+	}
+
 	createNewRecordAndGoBack() {
+		const { amount } = this.state;
 		const { _createNewRecord, navigation, draftRecord } = this.props;
-		_createNewRecord();
+		const record = Object.assign( {
+			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ),
+			createdAt: Date.now(),
+			description: 'test',
+			type: 'expense',
+		}, draftRecord );
+		_createNewRecord( record );
 		navigation.navigate( 'Main' );
 	}
 
 	render() {
-		const { amount } = this.state;
+		const { amount, selectedIndex } = this.state;
 		const { draftRecord, categories, currencies, accounts } = this.props;
 
 		const category = categories.byId[ draftRecord.categoryId ];
 		const currency = currencies.byId[ draftRecord.currencyId ];
 		const account = accounts.byId[ draftRecord.accountId ];
 
+		const buttons = [ 'Hello', 'World', 'Buttons' ];
+
 		return (
 			<View style={ { backgroundColor: '#f9f9f9' } }>
+				<ButtonGroup
+					onPress={ this.updateIndex }
+					selectedIndex={ selectedIndex }
+					buttons={ buttons }
+					containerStyle={ { borderRadius: 5, height: 20 } }
+				/>
+
 				<ListItem
-					containerStyle={ styles.iconContainer }
+					containerStyle={ Object.assign( {}, styles.iconContainer, { height: 70 } ) }
 					title="Amount"
 					titleStyle={ styles.amountTitle }
 					subtitle={
@@ -129,12 +155,11 @@ class NewRecordModal extends React.Component {
 	}
 }
 
-const mapStateToProps = ( state, ownProps ) => {
+const mapStateToProps = ( state ) => {
 	console.log( state );
 
-	const { records, draftRecord, categories, currencies, accounts } = state;
+	const { draftRecord, categories, currencies, accounts } = state;
 	return {
-		records,
 		draftRecord,
 		categories,
 		currencies,
@@ -144,8 +169,8 @@ const mapStateToProps = ( state, ownProps ) => {
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {
-		_createNewRecord: ( amount, currency, category ) => {
-			dispatch( createNewRecord( amount, currency, category ) );
+		_createNewRecord: ( draftRecord ) => {
+			dispatch( createNewRecord( draftRecord ) );
 		},
 	};
 };
