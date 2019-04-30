@@ -127,7 +127,7 @@ class NewRecordModal extends React.Component {
 						type: 'font-awesome',
 						reverse: true,
 						reverseColor: 'white',
-						color: 'red',
+						color: category.color,
 						size: 20,
 						containerStyle: { margin: -4 },
 					} }

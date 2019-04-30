@@ -13,15 +13,15 @@ export default class RecordOptionSelector extends React.Component {
 		navigation.goBack();
 	}
 
-	getIconConfiguration( icon ) {
+	getIconConfiguration( item ) {
 		let iconConfiguration = null;
-		if ( icon ) {
+		if ( item.icon ) {
 			iconConfiguration = {
-				name: icon,
+				name: item.icon,
 				type: 'font-awesome',
 				reverse: true,
 				reverseColor: 'white',
-				color: 'red',
+				color: item.color,
 				size: 20,
 				containerStyle: { margin: -2 },
 			};
@@ -49,7 +49,7 @@ export default class RecordOptionSelector extends React.Component {
 								title={ item.name }
 								bottomDivider={ true }
 								topDivider={ true }
-								leftIcon={ this.getIconConfiguration( item.icon ) }
+								leftIcon={ this.getIconConfiguration( item ) }
 								onPress={ () => this.selectItemAndGoBack( item.id ) }
 							/>
 						);

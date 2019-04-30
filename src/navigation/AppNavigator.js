@@ -7,7 +7,6 @@ import { createAppContainer, createStackNavigator } from 'react-navigation';
  * Internal dependencies
  */
 import MainTabNavigator from './MainTabNavigator';
-import NewRecordModal from '../screens/NewRecordModal';
 import NewRecordNavigator from './NewRecordNavigator';
 
 // export const ModalStack = createStackNavigator( {

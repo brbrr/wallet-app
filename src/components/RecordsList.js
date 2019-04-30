@@ -66,7 +66,7 @@ export const RecordsList = ( props ) => {
 										type="font-awesome"
 										reverse
 										reverseColor="white"
-										color="red"
+										color={ category.color }
 										size={ 20 }
 									/>
 									<View style={
