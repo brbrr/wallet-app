@@ -16,13 +16,13 @@ class CategoriesScreen extends React.Component {
 		title: 'Categories',
 		headerRight: (
 			<Button
-				onPress={ () => {} }
+				onPress={ () => navigation.navigate( 'NewCategory' ) }
 				title="Add"
 			/>
 		),
 		headerLeft: (
 			<Button
-				onPress={ () => navigation.goBack() }
+				onPress={ () => navigation.goBack( null ) }
 				title="Back"
 			/>
 		),

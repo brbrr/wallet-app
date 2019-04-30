@@ -9,16 +9,19 @@ const initialState = {
 		1: {
 			name: 'General',
 			icon: 'shopping-basket',
+			color: 'red',
 			id: 1,
 		},
 		2: {
 			name: 'Home',
 			icon: 'home',
+			color: 'green',
 			id: 2,
 		},
 		3: {
 			name: 'Cafe',
 			icon: 'coffee',
+			color: 'blue',
 			id: 3,
 		},
 	},
