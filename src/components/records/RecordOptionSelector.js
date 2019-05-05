@@ -10,7 +10,7 @@ export default class RecordOptionSelector extends React.Component {
 	selectItemAndGoBack( id ) {
 		const { selectItem, navigation } = this.props;
 		selectItem( id );
-		navigation.goBack();
+		navigation.goBack( null );
 	}
 
 	getIconConfiguration( item ) {

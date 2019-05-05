@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import { selectRecordCurrency } from '../actions';
-import RecordOptionSelector from '../components/RecordOptionSelector';
+import RecordOptionSelector from '../components/records/RecordOptionSelector';
 
 class CurrenciesScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {

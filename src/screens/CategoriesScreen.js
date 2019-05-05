@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import { selectRecordCategory } from '../actions';
-import RecordOptionSelector from '../components/RecordOptionSelector';
+import RecordOptionSelector from '../components/records/RecordOptionSelector';
 
 class CategoriesScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
