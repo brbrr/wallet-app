@@ -9,20 +9,20 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import { selectRecordAccount } from '../actions';
-import RecordOptionSelector from '../components/RecordOptionSelector';
+import RecordOptionSelector from '../components/records/RecordOptionSelector';
 
 class AccountsScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
-		title: 'Currencies',
+		title: 'Accounts',
 		headerRight: (
 			<Button
-				onPress={ () => {} }
+				onPress={ () => navigation.navigate( 'NewAccount' ) }
 				title="Add"
 			/>
 		),
 		headerLeft: (
 			<Button
-				onPress={ () => navigation.goBack() }
+				onPress={ () => navigation.goBack( null ) }
 				title="Back"
 			/>
 		),

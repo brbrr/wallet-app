@@ -31,3 +31,6 @@ export function selectRecordType( id ) {
 	return { type: SELECT_RECORD_TYPE, id };
 }
 
+export function addNewAccount( account ) {
+	return { type: ADD_NEW_ACCOUNT, account };
+}

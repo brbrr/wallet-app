@@ -13,6 +13,7 @@ import AccountsScreen from '../screens/AccountsScreen';
 import NewCategoryScreen from '../screens/NewCategoryScreen';
 import IconSelector from '../components/IconSelector';
 import ColorSelector from '../components/ColorSelector';
+import NewAccountScreen from '../screens/NewAccountScreen';
 
 const CategoriesStack = createStackNavigator( {
 	CategoriesList: { screen: CategoriesScreen },
@@ -21,13 +22,16 @@ const CategoriesStack = createStackNavigator( {
 	ColorSelector: { screen: ColorSelector },
 } );
 
+const AccountsStack = createStackNavigator( {
+	AccountsList: { screen: AccountsScreen },
+	NewAccount: { screen: NewAccountScreen },
+	IconSelector: { screen: IconSelector },
+	ColorSelector: { screen: ColorSelector },
+} );
+
 export default createStackNavigator( {
 	New: { screen: NewRecordModal },
 	Currencies: { screen: CurrenciesScreen },
-	Accounts: { screen: AccountsScreen },
+	Accounts: { screen: AccountsStack, navigationOptions: { header: null } },
 	Categories: { screen: CategoriesStack, navigationOptions: { header: null } },
-	// Categories: { screen: CategoriesScreen },
-	// NewCategory: { screen: NewCategoryScreen },
-	// IconSelector: { screen: IconSelectorScreen },
-	// ColorSelector: { screen: ColorSelectorScreen },
 } );

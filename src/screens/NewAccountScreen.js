@@ -2,22 +2,21 @@
  * External dependencies
  */
 import React from 'react';
-import { Button, StyleSheet } from 'react-native';
+import { Button, StyleSheet, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import { ListItem, Input } from 'react-native-elements';
-import { ScrollView } from 'react-native-gesture-handler';
 
 /**
  * Internal dependencies
  */
-import { addNewCategory } from '../actions/categories';
+import { addNewAccount } from '../actions';
 
-export class NewCategoryScreen extends React.Component {
+class NewAccountScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
-		title: 'New Category',
+		title: 'New Account',
 		headerRight: (
 			<Button
-				onPress={ () => navigation.state.params.createNewCategoryAndGoBack() }
+				onPress={ () => navigation.state.params.createNewAccountAndGoBack() }
 				title="Add"
 			/>
 		),
@@ -33,27 +32,31 @@ export class NewCategoryScreen extends React.Component {
 		super( props );
 		this.state = {
 			name: null,
+			balance: null,
 		};
 		this.props.navigation.setParams(
-			{ createNewCategoryAndGoBack: this.createNewCategoryAndGoBack.bind( this ) }
+			{ createNewAccountAndGoBack: this.createNewAccountAndGoBack.bind( this ) }
 		);
 	}
 
-	createNewCategoryAndGoBack() {
-		const { name } = this.state;
-		const { navigation, _addNewCategory } = this.props;
+	createNewAccountAndGoBack() {
+		const { name, balance } = this.state;
+		const { navigation, _addNewAccount } = this.props;
 		const color = navigation.getParam( 'colorCode', 'blue' );
 		const icon = navigation.getParam( 'iconName', 'car' );
-		_addNewCategory( { name, color, icon } );
+		const currencyId = navigation.getParam( 'currencyId', 1 );
+
+		_addNewAccount( { name, color, icon, currencyId, balance } );
 		navigation.goBack();
 	}
 
 	render() {
-		const { name } = this.state;
-		const colorCode = this.props.navigation.getParam( 'colorCode', 'blue' );
-		const iconName = this.props.navigation.getParam( 'iconName', 'car' );
+		const { name, balance } = this.state;
+		const { navigation } = this.props;
+		const colorCode = navigation.getParam( 'colorCode', 'blue' );
+		const iconName = navigation.getParam( 'iconName', 'car' );
 		return (
-			<ScrollView style={ styles.container }>
+			<ScrollView style={ styles.container } keyboardShouldPersistTaps="always" >
 				<ListItem
 					containerStyle={ styles.iconContainer }
 					title="Name"
@@ -61,9 +64,26 @@ export class NewCategoryScreen extends React.Component {
 						inputContainerStyle={ { borderBottomWidth: 0 } }
 						inputStyle={ styles.amountInput }
 						value={ name }
-						placeholder="Category name"
+						placeholder="Account name"
 						onChangeText={ ( n ) => this.setState( { name: n } ) }
 						autoFocus
+					/> }
+					contentContainerStyle={ { flex: 2 } }
+					rightContentContainerStyle={ { flex: 4 } }
+					bottomDivider={ true }
+					topDivider={ true }
+				/>
+
+				<ListItem
+					containerStyle={ styles.iconContainer }
+					title="Balance"
+					rightTitle={ <Input
+						inputContainerStyle={ { borderBottomWidth: 0 } }
+						inputStyle={ styles.amountInput }
+						value={ balance }
+						placeholder="0.0"
+						keyboardType="numeric"
+						onChangeText={ ( b ) => this.setState( { balance: b } ) }
 					/> }
 					contentContainerStyle={ { flex: 2 } }
 					rightContentContainerStyle={ { flex: 4 } }
@@ -81,13 +101,13 @@ export class NewCategoryScreen extends React.Component {
 					leftIcon={ {
 						name: 'circle',
 						type: 'font-awesome',
-						color: colorCode ? colorCode : 'blue',
+						color: colorCode,
 						size: 42,
 						containerStyle: { margin: -2 },
 					} }
 					chevron
 					rightTitle={ 'Select' }
-					onPress={ () => this.props.navigation.navigate( 'ColorSelector', { parent: 'NewCategory' } ) }
+					onPress={ () => navigation.navigate( 'ColorSelector', { parent: 'NewAccount' } ) }
 				/>
 
 				<ListItem
@@ -107,7 +127,7 @@ export class NewCategoryScreen extends React.Component {
 					} }
 					chevron
 					rightTitle={ 'Select' }
-					onPress={ () => this.props.navigation.navigate( 'IconSelector', { parent: 'NewCategory' } ) }
+					onPress={ () => navigation.navigate( 'IconSelector', { parent: 'NewAccount' } ) }
 				/>
 			</ScrollView>
 		);
@@ -116,14 +136,14 @@ export class NewCategoryScreen extends React.Component {
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {
-		_addNewCategory: ( category ) => dispatch( addNewCategory( category ) ),
+		_addNewAccount: ( account ) => dispatch( addNewAccount( account ) ),
 	};
 };
 
 export default connect(
 	() => ( {} ),
 	mapDispatchToProps
-)( NewCategoryScreen );
+)( NewAccountScreen );
 
 const styles = StyleSheet.create( {
 	container: { backgroundColor: '#f9f9f9', flex: 1 },
