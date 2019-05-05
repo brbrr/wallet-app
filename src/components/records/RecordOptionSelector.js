@@ -7,6 +7,10 @@ import { ListItem } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default class RecordOptionSelector extends React.Component {
+	static defaultProps = {
+		nameValue: 'name',
+	}
+
 	selectItemAndGoBack( id ) {
 		const { selectItem, navigation } = this.props;
 		selectItem( id );
@@ -31,7 +35,8 @@ export default class RecordOptionSelector extends React.Component {
 	}
 
 	render() {
-		const { items } = this.props;
+		const { items, nameValue } = this.props;
+
 		if ( items.length === 0 ) {
 			return (
 				<Text>{ 'No items yet.' }</Text>
@@ -46,7 +51,7 @@ export default class RecordOptionSelector extends React.Component {
 							<ListItem
 								containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55, marginTop: idx === 0 ? 20 : 0 } }
 								key={ idx }
-								title={ item.name }
+								title={ item[ nameValue ] }
 								bottomDivider={ true }
 								topDivider={ true }
 								leftIcon={ this.getIconConfiguration( item ) }

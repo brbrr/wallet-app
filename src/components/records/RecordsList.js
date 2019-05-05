@@ -76,7 +76,7 @@ export const RecordsList = ( { records, accounts, categories, currencies } ) => 
 	// 	const category = categories[ record.categoryId ];
 	// 	const currency = currencies[ record.currencyId ];
 	// 	const account = accounts[ record.accountId ];
-	// 	const amount = getAmount( currency.name, record.amount, record.typeId );
+	// 	const amount = getAmount( currency.code, record.amount, record.typeId );
 	// 	const niceDate = new Date( record.createdAt ).toISOString().split( 'T' )[ 0 ];
 	// 	if ( ! prevDate || ! prevDate.isSame( moment( record.createdAt ), 'day' ) ) {
 	// 		prevDate = moment( record.createdAt );

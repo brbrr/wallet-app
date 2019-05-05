@@ -7,15 +7,18 @@ import { addNewItem } from '../utils/reducerHelper';
 const initialState = {
 	byId: {
 		1: {
-			name: 'USD',
+			code: 'USD',
+			name: 'United States Dollar',
 			id: 1,
 		},
 		2: {
-			name: 'UAH',
+			code: 'UAH',
+			name: 'Ukrainian Hryvnia',
 			id: 2,
 		},
 		3: {
-			name: 'EUR',
+			code: 'EUR',
+			name: 'Euro',
 			id: 3,
 		},
 	},

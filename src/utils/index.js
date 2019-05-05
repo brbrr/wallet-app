@@ -2,9 +2,9 @@ export function getRecordAmountWithCurrency( { currencyId, amount, typeId }, cur
 	const currency = currencies[ currencyId ];
 	switch ( typeId ) {
 		case 0:
-			return `-${ currency.name }${ amount }`;
+			return `-${ currency.code }${ amount }`;
 		default:
-			return `${ currency.name }${ amount }`;
+			return `${ currency.code }${ amount }`;
 	}
 }
 

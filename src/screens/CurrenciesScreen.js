@@ -16,7 +16,7 @@ class CurrenciesScreen extends React.Component {
 		title: 'Currencies',
 		headerRight: (
 			<Button
-				onPress={ () => {} }
+				onPress={ () => navigation.navigate( 'NewCurrency' ) }
 				title="Add"
 			/>
 		),
@@ -36,6 +36,7 @@ class CurrenciesScreen extends React.Component {
 				items={ Object.values( currencies.byId ) }
 				selectItem={ selectItem }
 				navigation={ navigation }
+				nameValue="code"
 			/>
 		);
 	}
