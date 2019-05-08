@@ -71,8 +71,14 @@ class NewRecordModal extends React.Component {
 		navigation.navigate( 'Main' );
 	}
 
+	renderAdditionalInfo() {
+		return (
+			<Text> RENDERED! </Text>
+		);
+	}
+
 	render() {
-		const { amount } = this.state;
+		const { amount, show } = this.state;
 		const { draftRecord, categories, currencies, accounts, _selectRecordType } = this.props;
 
 		const category = categories.byId[ draftRecord.categoryId ];
@@ -87,11 +93,11 @@ class NewRecordModal extends React.Component {
 					onPress={ ( id ) => _selectRecordType( id ) }
 					selectedIndex={ draftRecord.typeId }
 					buttons={ buttons }
-					containerStyle={ { borderRadius: 5, height: 20 } }
+					containerStyle={ { borderRadius: 5, height: 25 } }
 				/>
 
 				<ListItem
-					containerStyle={ Object.assign( {}, styles.iconContainer, { height: 70 } ) }
+					containerStyle={ Object.assign( {}, styles.iconContainer, { height: 100 } ) }
 					title="Amount"
 					titleStyle={ styles.amountTitle }
 					subtitle={
@@ -112,7 +118,7 @@ class NewRecordModal extends React.Component {
 							onPress={ () => this.props.navigation.navigate( 'Currencies' ) }
 							style={ styles.currencyButton }
 						>
-							{ currency.name }
+							{ currency.code }
 						</Text>
 					}
 				/>
@@ -147,6 +153,16 @@ class NewRecordModal extends React.Component {
 					} }
 					onPress={ () => this.props.navigation.navigate( 'Accounts' ) }
 				/>
+
+				<ListItem
+					containerStyle={ styles.iconContainer }
+					title="Additional info"
+					bottomDivider={ true }
+					topDivider={ true }
+					onPress={ () => this.setState( { show: ! show } ) }
+				/>
+
+				{ show ? this.renderAdditionalInfo() : null }
 			</View>
 		);
 	}
@@ -192,7 +208,7 @@ const styles = StyleSheet.create( {
 		marginLeft: 7,
 		marginRight: 9,
 	},
-	amountTitle: { fontSize: 12, marginTop: 2 },
-	amountInput: { fontSize: 20, color: 'black' },
+	amountTitle: { fontSize: 14, marginTop: 2 },
+	amountInput: { fontSize: 26, color: 'black' },
 } );
 

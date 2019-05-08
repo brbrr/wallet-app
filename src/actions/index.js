@@ -34,3 +34,7 @@ export function selectRecordType( id ) {
 export function addNewAccount( account ) {
 	return { type: ADD_NEW_ACCOUNT, account };
 }
+
+export function addNewCurrency( currency ) {
+	return { type: ADD_NEW_CURRENCY, currency };
+}
