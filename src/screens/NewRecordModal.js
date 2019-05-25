@@ -3,14 +3,16 @@
  */
 import React from 'react';
 import { View, Button, Text, StyleSheet } from 'react-native';
-import { Input, ListItem, ButtonGroup } from 'react-native-elements';
+import { Input, ListItem, ButtonGroup, Button as EButton } from 'react-native-elements';
 import { connect } from 'react-redux';
+import moment from 'moment';
 
 /**
  * Internal dependencies
  */
+import DatePicker from '../components/DatePickerModal';
 import { createNewRecord } from '../actions/records';
-import { selectRecordType } from '../actions';
+import { selectRecordType, selectRecordDate } from '../actions';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
@@ -36,6 +38,7 @@ class NewRecordModal extends React.Component {
 		this.state = {
 			amount: null,
 			selectedIndex: 2,
+			description: '',
 		};
 		this.props.navigation.setParams(
 			{ createNewRecordAndGoBack: this.createNewRecordAndGoBack.bind( this ) }
@@ -59,26 +62,62 @@ class NewRecordModal extends React.Component {
 	}
 
 	createNewRecordAndGoBack() {
-		const { amount } = this.state;
+		const { amount, description } = this.state;
 		const { _createNewRecord, navigation, draftRecord } = this.props;
 		const record = Object.assign( {
 			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ),
-			createdAt: Date.now(),
-			description: 'test',
+			description,
 			type: 'expense',
 		}, draftRecord );
 		_createNewRecord( record );
 		navigation.navigate( 'Main' );
 	}
 
-	renderAdditionalInfo() {
+	renderDatePicker() {
+		const { draftRecord, _selectRecordDate } = this.props;
+		const isToday = moment( draftRecord.createdAt ).isSame( Date.now(), 'day' );
+		const dateTitle = isToday ? 'Today' : moment( draftRecord.createdAt ).format( 'dddd, D MMM' );
+
 		return (
-			<Text> RENDERED! </Text>
+			<>
+				<DatePicker
+					startDate={ new Date( draftRecord.createdAt ) }
+					renderDate={ () => (
+						<ListItem
+							containerStyle={ styles.iconContainer }
+							title={ dateTitle }
+							bottomDivider={ true }
+							topDivider={ true }
+							leftIcon={ {
+								name: 'ios-calendar',
+								type: 'ionicon',
+								size: 25,
+								containerStyle: { paddingLeft: 15, paddingRight: 14 },
+							} }
+							rightElement={
+								<EButton
+									title={ isToday ? 'Yesterday?' : 'Today?' }
+									type="clear"
+									titleStyle={ { fontSize: 13 } }
+									onPress={ () => {
+										let d = new Date(); // Today!
+										if ( isToday ) {
+											d = d.setDate( d.getDate() - 1 ); // Yesterday
+										}
+										return _selectRecordDate( d );
+									} }
+								/>
+							}
+						/>
+					) }
+					onDateChanged={ ( { date } ) => _selectRecordDate( Date.parse( date ) ) }
+				/>
+			</>
 		);
 	}
 
 	render() {
-		const { amount, show } = this.state;
+		const { amount, description } = this.state;
 		const { draftRecord, categories, currencies, accounts, _selectRecordType } = this.props;
 
 		const category = categories.byId[ draftRecord.categoryId ];
@@ -154,15 +193,28 @@ class NewRecordModal extends React.Component {
 					onPress={ () => this.props.navigation.navigate( 'Accounts' ) }
 				/>
 
+				{ this.renderDatePicker() }
+
 				<ListItem
-					containerStyle={ styles.iconContainer }
-					title="Additional info"
+					containerStyle={ Object.assign( {}, styles.iconContainer, { height: 70 } ) }
+					title={
+						<Input
+							containerStyle={ { paddingHorizontal: 0 } }
+							inputContainerStyle={ { borderBottomWidth: 0 } }
+							value={ description }
+							placeholder="Description"
+							onChangeText={ ( desc ) => this.setState( { description: desc } ) }
+						/>
+					}
 					bottomDivider={ true }
 					topDivider={ true }
-					onPress={ () => this.setState( { show: ! show } ) }
+					leftIcon={ {
+						name: 'md-text',
+						type: 'ionicon',
+						size: 25,
+						containerStyle: { paddingLeft: 15, paddingRight: 14 },
+					} }
 				/>
-
-				{ show ? this.renderAdditionalInfo() : null }
 			</View>
 		);
 	}
@@ -184,6 +236,7 @@ const mapDispatchToProps = ( dispatch ) => {
 	return {
 		_createNewRecord: ( draftRecord ) => dispatch( createNewRecord( draftRecord ) ),
 		_selectRecordType: ( id ) => dispatch( selectRecordType( id ) ),
+		_selectRecordDate: ( date ) => dispatch( selectRecordDate( date ) ),
 	};
 };
 
