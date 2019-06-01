@@ -4,7 +4,6 @@
 import React from 'react';
 import {
 	Platform,
-	ScrollView,
 	StyleSheet,
 	Text,
 	View,
@@ -14,24 +13,53 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { RecordsList } from '../components/RecordsList';
+import { RecordsList } from '../components/records/RecordsList';
+import { getTotalSpent } from '../utils';
+import { updateDraftWithRecord } from '../actions';
+
+// import Carousel from 'react-native-snap-carousel';
+
+// export default class MyCarousel extends React.Component {
+// 	constructor() {
+// 		super();
+// 		this.state = { entries: [ 'first', 'second', 'third' ] };
+// 	}
+
+// 	_renderItem( { type } ) {
+// 		return ( <Zzz type={ type } /> );
+// 	}
+
+// 	render() {
+// 		const { height, width } = Dimensions.get( 'window' );
+// 		return (
+// 			<Carousel
+// 				ref={ ( c ) => {
+// 					this._carousel = c;
+// 				} }
+// 				data={ this.state.entries }
+// 				renderItem={ this._renderItem }
+// 				sliderWidth={ width }
+// 				itemWidth={ width - 10 }
+// 			/>
+// 		);
+// 	}
+// }
 
 class HomeScreen extends React.Component {
 	static navigationOptions = {
 		title: 'Home',
 	};
 
+	navigateEditRecordScreen = ( record ) => {
+		const { navigation, _updateDraftWithRecord } = this.props;
+		_updateDraftWithRecord( record );
+		navigation.navigate( 'NewRecord', { record, isEdit: true } );
+	}
+
 	render() {
 		const { records, accounts, categories, currencies } = this.props;
 
-		const totalSpent = records.reduce( ( acc, curr ) => {
-			switch ( curr.typeId ) {
-				case 0:
-					return acc + ( -1 * curr.amount );
-				default:
-					return acc + curr.amount;
-			}
-		}, 0 );
+		const totalSpent = getTotalSpent( records );
 		return (
 			<View style={ {
 				flex: 1,
@@ -39,26 +67,25 @@ class HomeScreen extends React.Component {
 				justifyContent: 'space-between',
 				backgroundColor: '#f9f9f9',
 			} }>
-				<View style={ { flex: 1 } }>
+				<View style={ { flex: 1, backgroundColor: '#8B9FBB' } }>
 					<Text> Total spent: { totalSpent } </Text>
 				</View>
 				<View style={ { flex: 3 } }>
-					<ScrollView>
-						<RecordsList
-							records={ records }
-							accounts={ accounts }
-							categories={ categories }
-							currencies={ currencies }
-						/>
-					</ScrollView>
+					<RecordsList
+						records={ records }
+						accounts={ accounts }
+						categories={ categories }
+						currencies={ currencies }
+						navigateEditRecordScreen={ this.navigateEditRecordScreen }
+					/>
 				</View>
 			</View>
 		);
 	}
 }
 
-const mapStateToProps = ( state, ownProps ) => {
-	console.log( state );
+const mapStateToProps = ( state ) => {
+	// console.log( state );
 
 	const records = Object.values( state.records.byId );
 	return {
@@ -71,7 +98,7 @@ const mapStateToProps = ( state, ownProps ) => {
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {
-		test: 'test',
+		_updateDraftWithRecord: ( record ) => dispatch( updateDraftWithRecord( record ) ),
 	};
 };
 

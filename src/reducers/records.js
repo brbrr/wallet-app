@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { ADD_NEW_RECORD } from '../actions/records';
+import { ADD_NEW_RECORD, UPDATE_RECORD } from '../actions/records';
 import { addNewItem } from '../utils/reducerHelper';
 
 const initialState = {
@@ -104,6 +104,11 @@ export default function records( state = initialState, action ) {
 	switch ( action.type ) {
 		case ADD_NEW_RECORD:
 			return addNewItem( action.record, state );
+		case UPDATE_RECORD:
+			return {
+				byId: { ...state.byId, [ action.record.id ]: action.record },
+				allIds: [ ...state.allIds ],
+			};
 		default:
 			return state;
 	}

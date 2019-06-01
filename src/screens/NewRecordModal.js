@@ -11,37 +11,46 @@ import moment from 'moment';
  * Internal dependencies
  */
 import DatePicker from '../components/DatePickerModal';
-import { createNewRecord } from '../actions/records';
+import { createNewRecord, updateRecord } from '../actions/records';
 import { selectRecordType, selectRecordDate } from '../actions';
 
 class NewRecordModal extends React.Component {
-	static navigationOptions = ( { navigation } ) => ( {
-		title: 'Add record',
-		headerRight: (
-			<Button
-				onPress={ () => navigation.state.params.createNewRecordAndGoBack() }
-				title="Done"
-			/>
-		),
-		headerLeft: (
-			<Button
-				// FIXME: goBack to the previous route instead of default `Home` route
-				// onPress={ () => this.props.navigation.goBack(null) }
-				onPress={ () => navigation.navigate( 'Main' ) }
-				title="Dismiss"
-			/>
-		),
-	} );
+	static navigationOptions = ( { navigation } ) => {
+		const title = navigation.state.params && navigation.state.params.isEdit ? 'Edit' : 'Done';
+
+		return {
+			title: 'Add record',
+			headerRight: (
+				<Button
+					onPress={ () => navigation.state.params.createNewRecordAndGoBack() }
+					title={ title }
+				/>
+			),
+			headerLeft: (
+				<Button
+					// FIXME: goBack to the previous route instead of default `Home` route
+					// onPress={ () => this.props.navigation.goBack(null) }
+					onPress={ () => navigation.navigate( 'Main' ) }
+					title="Dismiss"
+				/>
+			),
+		};
+	};
 
 	constructor( props ) {
 		super( props );
+
+		const draftRecord = this.props.draftRecord;
 		this.state = {
-			amount: null,
+			amount: draftRecord.amount ? `${ draftRecord.amount }` : null,
 			selectedIndex: 2,
-			description: '',
+			description: draftRecord.description ? draftRecord.description : '',
 		};
 		this.props.navigation.setParams(
-			{ createNewRecordAndGoBack: this.createNewRecordAndGoBack.bind( this ) }
+			{
+				createNewRecordAndGoBack: this.createNewRecordAndGoBack.bind( this ),
+				isEdit: this.props.navigation.getParam( 'isEdit', null ),
+			}
 		);
 	}
 
@@ -63,56 +72,59 @@ class NewRecordModal extends React.Component {
 
 	createNewRecordAndGoBack() {
 		const { amount, description } = this.state;
-		const { _createNewRecord, navigation, draftRecord } = this.props;
-		const record = Object.assign( {
-			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ),
+		const { _createNewRecord, _updateRecord, navigation, draftRecord } = this.props;
+		const record = Object.assign( draftRecord, {
+			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
 			description,
 			type: 'expense',
-		}, draftRecord );
-		_createNewRecord( record );
+		} );
+
+		if ( ! record.id ) {
+			_createNewRecord( record );
+		} else {
+			_updateRecord( record );
+		}
 		navigation.navigate( 'Main' );
 	}
 
 	renderDatePicker() {
-		const { draftRecord, _selectRecordDate } = this.props;
+		const { _selectRecordDate, draftRecord } = this.props;
 		const isToday = moment( draftRecord.createdAt ).isSame( Date.now(), 'day' );
 		const dateTitle = isToday ? 'Today' : moment( draftRecord.createdAt ).format( 'dddd, D MMM' );
 
 		return (
-			<>
-				<DatePicker
-					startDate={ new Date( draftRecord.createdAt ) }
-					renderDate={ () => (
-						<ListItem
-							containerStyle={ styles.iconContainer }
-							title={ dateTitle }
-							bottomDivider={ true }
-							topDivider={ true }
-							leftIcon={ {
-								name: 'ios-calendar',
-								type: 'ionicon',
-								size: 25,
-								containerStyle: { paddingLeft: 15, paddingRight: 14 },
-							} }
-							rightElement={
-								<EButton
-									title={ isToday ? 'Yesterday?' : 'Today?' }
-									type="clear"
-									titleStyle={ { fontSize: 13 } }
-									onPress={ () => {
-										let d = new Date(); // Today!
-										if ( isToday ) {
-											d = d.setDate( d.getDate() - 1 ); // Yesterday
-										}
-										return _selectRecordDate( d );
-									} }
-								/>
-							}
-						/>
-					) }
-					onDateChanged={ ( { date } ) => _selectRecordDate( Date.parse( date ) ) }
-				/>
-			</>
+			<DatePicker
+				startDate={ new Date( draftRecord.createdAt ) }
+				renderDate={ () => (
+					<ListItem
+						containerStyle={ styles.iconContainer }
+						title={ dateTitle }
+						bottomDivider={ true }
+						topDivider={ true }
+						leftIcon={ {
+							name: 'ios-calendar',
+							type: 'ionicon',
+							size: 25,
+							containerStyle: { paddingLeft: 15, paddingRight: 14 },
+						} }
+						rightElement={
+							<EButton
+								title={ isToday ? 'Yesterday?' : 'Today?' }
+								type="clear"
+								titleStyle={ { fontSize: 13 } }
+								onPress={ () => {
+									let d = new Date(); // Today!
+									if ( isToday ) {
+										d = d.setDate( d.getDate() - 1 ); // Yesterday
+									}
+									return _selectRecordDate( d );
+								} }
+							/>
+						}
+					/>
+				) }
+				onDateChanged={ ( { date } ) => _selectRecordDate( Date.parse( date ) ) }
+			/>
 		);
 	}
 
@@ -235,6 +247,7 @@ const mapStateToProps = ( state ) => {
 const mapDispatchToProps = ( dispatch ) => {
 	return {
 		_createNewRecord: ( draftRecord ) => dispatch( createNewRecord( draftRecord ) ),
+		_updateRecord: ( draftRecord ) => dispatch( updateRecord( draftRecord ) ),
 		_selectRecordType: ( id ) => dispatch( selectRecordType( id ) ),
 		_selectRecordDate: ( date ) => dispatch( selectRecordDate( date ) ),
 	};

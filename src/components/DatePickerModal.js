@@ -119,14 +119,14 @@ class DatePicker extends Component {
 
 					const newDate = new Date( year, month, day );
 					if ( action !== DatePickerAndroid.dismissedAction ) {
-						this.setState( () => ( { date, startDate: date } ) );
+						this.setState( () => ( { newDate, startDate: date } ) );
 						this.props.onDateChanged( this.getDateObj() );
 					}
 				} catch ( error ) {
 					onError( error );
 				}
 			} else {
-				this.setState( () => ( { showIOSModal: true } ) );
+				this.setState( () => ( { showIOSModal: true, date: date || startDate } ) );
 			}
 		}
 
@@ -207,7 +207,7 @@ class DatePicker extends Component {
 const styles = StyleSheet.create( {
 	overlay: {
 		flex: 1,
-		// backgroundColor: 'rgba(0,0,0,.3)',
+		backgroundColor: 'rgba(0,0,0,.3)',
 		alignItems: 'center',
 		justifyContent: 'flex-end',
 	},

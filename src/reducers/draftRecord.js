@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { SELECT_RECORD_CATEGORY, SELECT_RECORD_CURRENCY, SELECT_RECORD_ACCOUNT, SELECT_RECORD_TYPE, START_NEW_DRAFT_RECORD, SELECT_RECORD_DATE } from '../actions';
+import { SELECT_RECORD_CATEGORY, SELECT_RECORD_CURRENCY, SELECT_RECORD_ACCOUNT, SELECT_RECORD_TYPE, START_NEW_DRAFT_RECORD, SELECT_RECORD_DATE, UPDATE_DRAFT_WITH_RECORD } from '../actions';
 
 const initialState = () => ( {
 	categoryId: 1,
@@ -25,6 +25,8 @@ export default function draftRecord( state = initialState(), action ) {
 			return { ...state, typeId: action.id };
 		case SELECT_RECORD_DATE:
 			return { ...state, createdAt: action.date };
+		case UPDATE_DRAFT_WITH_RECORD:
+			return action.record;
 		default:
 			return state;
 	}

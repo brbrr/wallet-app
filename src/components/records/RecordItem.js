@@ -10,7 +10,7 @@ function getTime( timestamp ) {
 	return moment( timestamp ).format( 'HH:mm' );
 }
 
-const RecordsItem = ( { category, account, amount, record } ) => {
+const RecordsItem = ( { category, account, amount, record, navigateEditRecordScreen } ) => {
 	return (
 		<ListItem
 			containerStyle={ { paddingTop: 3, paddingBottom: 3 } }
@@ -40,6 +40,7 @@ const RecordsItem = ( { category, account, amount, record } ) => {
 					<View style={ styles.accountIndicator( account.color ) } />
 				</View>
 			}
+			onPress={ () => navigateEditRecordScreen( record ) }
 		/>
 	);
 };

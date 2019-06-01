@@ -13,7 +13,7 @@ import RecordsItem from './RecordItem';
 import { getRecordAmountWithCurrency } from '../../utils';
 
 // TODO: separate in two components: RecordsList & FullList(?) components
-export const RecordsList = ( { records, accounts, categories, currencies } ) => {
+export const RecordsList = ( { records, accounts, categories, currencies, navigateEditRecordScreen } ) => {
 	if ( records.length === 0 ) {
 		return (
 			<Text style={ styles.getStartedText }>{ 'No records yet.' }</Text>
@@ -66,30 +66,10 @@ export const RecordsList = ( { records, accounts, categories, currencies } ) => 
 				category={ category }
 				account={ account }
 				amount={ amount }
+				navigateEditRecordScreen={ navigateEditRecordScreen }
 			/> );
 		} );
 	} );
-
-	// let prevDate = null;
-	// const result = [];
-	// records.forEach( ( record, idx ) => {
-	// 	const category = categories[ record.categoryId ];
-	// 	const currency = currencies[ record.currencyId ];
-	// 	const account = accounts[ record.accountId ];
-	// 	const amount = getAmount( currency.code, record.amount, record.typeId );
-	// 	const niceDate = new Date( record.createdAt ).toISOString().split( 'T' )[ 0 ];
-	// 	if ( ! prevDate || ! prevDate.isSame( moment( record.createdAt ), 'day' ) ) {
-	// 		prevDate = moment( record.createdAt );
-	// 		result.push( <Text key={ `${ idx }-${ niceDate }` } >{ niceDate }</Text> );
-	// 	}
-	// 	result.push( <RecordsItem
-	// 		key={ idx }
-	// 		record={ record }
-	// 		category={ category }
-	// 		account={ account }
-	// 		amount={ amount }
-	// 	/> );
-	// } );
 
 	return (
 		<ScrollView stickyHeaderIndices={ scrollIndexes } style={ styles.containerStyle }>
