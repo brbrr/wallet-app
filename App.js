@@ -4,16 +4,12 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
-import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 /**
  * Internal dependencies
  */
 import AppNavigator from './src/navigation/AppNavigator';
-
-import walletApp from './src/reducers';
-
-const store = createStore( walletApp );
+import store from './src/utils/createStore';
 
 export default class App extends React.Component {
 	state = {

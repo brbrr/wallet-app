@@ -18,7 +18,7 @@ const initialState = {
 			balance: 0,
 			name: 'Bank',
 			id: 2,
-			currencyId: 1,
+			currencyId: 2,
 			color: 'blue',
 			icon: 'google-wallet',
 		},

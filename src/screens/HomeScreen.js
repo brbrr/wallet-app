@@ -14,7 +14,7 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import { RecordsList } from '../components/records/RecordsList';
-import { getTotalSpent } from '../utils';
+import Overview from '../components/Overview';
 import { updateDraftWithRecord } from '../actions';
 
 // import Carousel from 'react-native-snap-carousel';
@@ -56,21 +56,25 @@ class HomeScreen extends React.Component {
 		navigation.navigate( 'NewRecord', { record, isEdit: true } );
 	}
 
-	render() {
-		const { records, accounts, categories, currencies } = this.props;
+	constructor( props ) {
+		super( props );
 
-		const totalSpent = getTotalSpent( records );
-		return (
-			<View style={ {
-				flex: 1,
-				flexDirection: 'column',
-				justifyContent: 'space-between',
-				backgroundColor: '#f9f9f9',
-			} }>
-				<View style={ { flex: 1, backgroundColor: '#8B9FBB' } }>
-					<Text> Total spent: { totalSpent } </Text>
-				</View>
-				<View style={ { flex: 3 } }>
+		this.state = {
+			view: 0,
+		};
+	}
+
+	updateView = ( viewId ) => {
+		this.setState( { view: viewId } );
+	}
+
+	renderView() {
+		const { records, accounts, categories, currencies } = this.props;
+		const { view } = this.state;
+
+		switch ( view ) {
+			case 0:
+				return (
 					<RecordsList
 						records={ records }
 						accounts={ accounts }
@@ -78,6 +82,32 @@ class HomeScreen extends React.Component {
 						currencies={ currencies }
 						navigateEditRecordScreen={ this.navigateEditRecordScreen }
 					/>
+				);
+			case 1:
+				return (
+					<Text>View 1</Text>
+				);
+			default:
+				break;
+		}
+	}
+
+	render() {
+		const { records } = this.props;
+
+		return (
+			<View
+				style={ {
+					flex: 1,
+					flexDirection: 'column',
+					justifyContent: 'space-between',
+					backgroundColor: '#f9f9f9',
+				} }
+				// contentContainer={ { justifyContent: 'space-between' } }
+			>
+				<Overview records={ records } onPress={ this.updateView } />
+				<View style={ { flex: 3 } }>
+					{ this.renderView() }
 				</View>
 			</View>
 		);

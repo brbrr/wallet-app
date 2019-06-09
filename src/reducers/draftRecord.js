@@ -5,7 +5,7 @@ import { SELECT_RECORD_CATEGORY, SELECT_RECORD_CURRENCY, SELECT_RECORD_ACCOUNT, 
 
 const initialState = () => ( {
 	categoryId: 1,
-	currencyId: 1,
+	// currencyId: 1,
 	accountId: 1,
 	typeId: 0,
 	createdAt: Date.now(),

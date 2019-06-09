@@ -3,14 +3,13 @@
  */
 import React from 'react';
 import { Text, ScrollView } from 'react-native';
-import { ListItem } from 'react-native-elements';
-import moment from 'moment';
 
 /**
  * Internal dependencies
  */
 import RecordsItem from './RecordItem';
 import { getRecordAmountWithCurrency } from '../../utils';
+import DayHeader from './DayHeader';
 
 // TODO: separate in two components: RecordsList & FullList(?) components
 export const RecordsList = ( { records, accounts, categories, currencies, navigateEditRecordScreen } ) => {
@@ -22,7 +21,7 @@ export const RecordsList = ( { records, accounts, categories, currencies, naviga
 
 	records.sort( ( a, b ) => a.createdAt < b.createdAt );
 
-	const list = records.reduce( ( acc, record, id ) => {
+	const list = records.reduce( ( acc, record ) => {
 		const date = new Date( record.createdAt );
 		const recordDate = date.toISOString().split( 'T' )[ 0 ];
 
@@ -34,25 +33,18 @@ export const RecordsList = ( { records, accounts, categories, currencies, naviga
 		return acc;
 	}, {} );
 
+	const listRecords = Object.values( list ).sort( ( a, b ) => a[ 0 ].createdAt < b[ 0 ].createdAt );
+
 	const result = [];
 	const scrollIndexes = [];
 
 	// Complex-ish way to generate a list of records with relevant dates and amounts
-	Object.entries( list ).forEach( ( [ _, itemsList ], idx ) => {
-		const niceDate = moment( itemsList[ 0 ].createdAt ).format( 'MMMM D' );
-		const totalPerDay = itemsList.reduce( ( acc, rec ) => acc += rec.amount, 0 );
-
+	listRecords.forEach( ( itemsList, idx ) => {
 		scrollIndexes.push( result.length );
 		result.push(
-			<ListItem
-				key={ `${ idx }-${ niceDate }` }
-				containerStyle={ { paddingTop: 3, paddingBottom: 3 } }
-				title={ niceDate }
-				rightContentContainerStyle={ { flex: 1 } }
-				rightTitle={ totalPerDay.toString() }
-
-				rightTitleStyle={ { fontWeight: 'bold', color: 'black' } }
-				bottomDivider={ true }
+			<DayHeader
+				key={ `${ idx }-header` }
+				records={ itemsList }
 			/>
 		);
 

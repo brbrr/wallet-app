@@ -13,6 +13,7 @@ import moment from 'moment';
 import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord } from '../actions/records';
 import { selectRecordType, selectRecordDate } from '../actions';
+import { getCurrencyById, getAccountById } from '../selectors';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -130,11 +131,11 @@ class NewRecordModal extends React.Component {
 
 	render() {
 		const { amount, description } = this.state;
-		const { draftRecord, categories, currencies, accounts, _selectRecordType } = this.props;
+		const { draftRecord, categories, _selectRecordType } = this.props;
 
 		const category = categories.byId[ draftRecord.categoryId ];
-		const currency = currencies.byId[ draftRecord.currencyId ];
-		const account = accounts.byId[ draftRecord.accountId ];
+		const account = getAccountById( this.props, draftRecord.accountId );
+		const currency = getCurrencyById( this.props, account.currencyId );
 
 		const buttons = [ 'expense', 'income', 'transfer' ];
 
