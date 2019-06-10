@@ -1,8 +1,5 @@
 export const ADD_NEW_CURRENCY = 'ADD_NEW_CURRENCY';
 export const ADD_NEW_ACCOUNT = 'ADD_NEW_ACCOUNT';
-
-export const START_NEW_DRAFT_RECORD = 'START_NEW_DRAFT_RECORD';
-
 // Categories
 export const SELECT_RECORD_CATEGORY = 'SELECT_RECORD_CATEGORY';
 
@@ -41,6 +38,10 @@ export const UPDATE_DRAFT_WITH_RECORD = 'UPDATE_DRAFT_WITH_RECORD';
 export function updateDraftWithRecord( record ) {
 	return { type: UPDATE_DRAFT_WITH_RECORD, record };
 }
+
+export const RESET_DRAFT_RECORD = 'RESET_DRAFT_RECORD';
+
+export const resetDraftRecord = () => ( { type: RESET_DRAFT_RECORD } );
 
 export function addNewAccount( account ) {
 	return { type: ADD_NEW_ACCOUNT, account };

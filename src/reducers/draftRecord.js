@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { SELECT_RECORD_CATEGORY, SELECT_RECORD_CURRENCY, SELECT_RECORD_ACCOUNT, SELECT_RECORD_TYPE, START_NEW_DRAFT_RECORD, SELECT_RECORD_DATE, UPDATE_DRAFT_WITH_RECORD } from '../actions';
+import { SELECT_RECORD_CATEGORY, SELECT_RECORD_CURRENCY, SELECT_RECORD_ACCOUNT, SELECT_RECORD_TYPE, RESET_DRAFT_RECORD, SELECT_RECORD_DATE, UPDATE_DRAFT_WITH_RECORD } from '../actions';
 
 const initialState = () => ( {
 	categoryId: 1,
@@ -13,7 +13,7 @@ const initialState = () => ( {
 
 export default function draftRecord( state = initialState(), action ) {
 	switch ( action.type ) {
-		case START_NEW_DRAFT_RECORD:
+		case RESET_DRAFT_RECORD:
 			return initialState();
 		case SELECT_RECORD_CATEGORY:
 			return { ...state, categoryId: action.id };

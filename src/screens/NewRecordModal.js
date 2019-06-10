@@ -12,7 +12,7 @@ import moment from 'moment';
  */
 import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord } from '../actions/records';
-import { selectRecordType, selectRecordDate } from '../actions';
+import { selectRecordType, selectRecordDate, resetDraftRecord } from '../actions';
 import { getCurrencyById, getAccountById } from '../selectors';
 
 class NewRecordModal extends React.Component {
@@ -41,18 +41,24 @@ class NewRecordModal extends React.Component {
 	constructor( props ) {
 		super( props );
 
-		const draftRecord = this.props.draftRecord;
+		const draftRecord = props.draftRecord;
+		const isEdit = props.navigation.getParam( 'isEdit', null );
+
 		this.state = {
 			amount: draftRecord.amount ? `${ draftRecord.amount }` : null,
 			selectedIndex: 2,
 			description: draftRecord.description ? draftRecord.description : '',
 		};
-		this.props.navigation.setParams(
+		props.navigation.setParams(
 			{
 				createNewRecordAndGoBack: this.createNewRecordAndGoBack.bind( this ),
-				isEdit: this.props.navigation.getParam( 'isEdit', null ),
+				isEdit,
 			}
 		);
+		// NOTE: We need to reset draftRecord to clean-up all the leftovers from previous drafts
+		if ( ! isEdit ) {
+			props._resetDraftRecord();
+		}
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -74,9 +80,13 @@ class NewRecordModal extends React.Component {
 	createNewRecordAndGoBack() {
 		const { amount, description } = this.state;
 		const { _createNewRecord, _updateRecord, navigation, draftRecord } = this.props;
+
+		const account = getAccountById( this.props, draftRecord.accountId );
+		const currency = getCurrencyById( this.props, account.currencyId );
 		const record = Object.assign( draftRecord, {
 			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
 			description,
+			currencyId: currency.id,
 			type: 'expense',
 		} );
 
@@ -88,6 +98,7 @@ class NewRecordModal extends React.Component {
 		navigation.navigate( 'Main' );
 	}
 
+	// TODO: here we might be using _old_ date for new records.
 	renderDatePicker() {
 		const { _selectRecordDate, draftRecord } = this.props;
 		const isToday = moment( draftRecord.createdAt ).isSame( Date.now(), 'day' );
@@ -130,6 +141,8 @@ class NewRecordModal extends React.Component {
 	}
 
 	render() {
+		console.log( '!!!!!!!! NewRecordModal screen render' );
+
 		const { amount, description } = this.state;
 		const { draftRecord, categories, _selectRecordType } = this.props;
 
@@ -251,6 +264,7 @@ const mapDispatchToProps = ( dispatch ) => {
 		_updateRecord: ( draftRecord ) => dispatch( updateRecord( draftRecord ) ),
 		_selectRecordType: ( id ) => dispatch( selectRecordType( id ) ),
 		_selectRecordDate: ( date ) => dispatch( selectRecordDate( date ) ),
+		_resetDraftRecord: () => dispatch( resetDraftRecord() ),
 	};
 };
 

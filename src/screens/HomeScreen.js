@@ -64,6 +64,21 @@ class HomeScreen extends React.Component {
 		};
 	}
 
+	componentDidUpdate( prevProps, prevState ) {
+		Object.entries( this.props ).forEach( ( [ key, val ] ) => {
+			if ( prevProps[ key ] !== val ) {
+				console.log( `Prop '${ key }' changed` );
+				// console.log( JSON.stringify( val ) );
+				// console.log( JSON.stringify( prevProps[ key ] ) );
+			}
+		}
+
+		);
+		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
+			prevState[ key ] !== val && console.log( `State '${ key }' changed` )
+		);
+	}
+
 	updateView = ( viewId ) => {
 		this.setState( { view: viewId } );
 	}
@@ -76,8 +91,9 @@ class HomeScreen extends React.Component {
 			case 0:
 				return (
 					<RecordsList
-						records={ records }
+						records={ Object.values( records ) }
 						accounts={ accounts }
+
 						categories={ categories }
 						currencies={ currencies }
 						navigateEditRecordScreen={ this.navigateEditRecordScreen }
@@ -93,6 +109,8 @@ class HomeScreen extends React.Component {
 	}
 
 	render() {
+		console.log( '!!!!!!!! Home screen render' );
+
 		const { records } = this.props;
 
 		return (
@@ -105,7 +123,7 @@ class HomeScreen extends React.Component {
 				} }
 				// contentContainer={ { justifyContent: 'space-between' } }
 			>
-				<Overview records={ records } onPress={ this.updateView } />
+				<Overview records={ Object.values( records ) } onPress={ this.updateView } />
 				<View style={ { flex: 3 } }>
 					{ this.renderView() }
 				</View>
@@ -117,9 +135,9 @@ class HomeScreen extends React.Component {
 const mapStateToProps = ( state ) => {
 	// console.log( state );
 
-	const records = Object.values( state.records.byId );
+	// const records = Object.values( state.records.byId );
 	return {
-		records,
+		records: state.records.byId,
 		accounts: state.accounts.byId,
 		categories: state.categories.byId,
 		currencies: state.currencies.byId,
