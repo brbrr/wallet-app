@@ -28,14 +28,35 @@ class AccountsScreen extends React.Component {
 		),
 	} );
 
+	constructor( props ) {
+		super( props );
+		const isEdit = props.navigation.getParam( 'isEdit', null );
+
+		this.state = { isEdit };
+	}
+
+	onPress = ( id ) => {
+		const { selectItem, navigation } = this.props;
+
+		if ( this.state.isEdit ) {
+			// TODO: Maybe navigate to Account edit screen
+			return;
+		}
+
+		selectItem( id );
+		navigation.goBack( null );
+	}
+
 	render() {
-		const { accounts, selectItem, navigation } = this.props;
+		const { accounts, navigation, selectItem } = this.props;
+		const isEdit = navigation.getParam( 'isEdit', null );
 
 		return (
 			<RecordOptionSelector
 				items={ Object.values( accounts.byId ) }
 				selectItem={ selectItem }
 				navigation={ navigation }
+				isEdit={ isEdit }
 			/>
 		);
 	}
