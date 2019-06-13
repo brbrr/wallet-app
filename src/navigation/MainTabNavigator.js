@@ -11,6 +11,7 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import { AccountsStack, CurrenciesStack } from './NewRecordNavigator';
 
 const HomeStack = createStackNavigator( {
 	Home: HomeScreen,
@@ -32,6 +33,8 @@ HomeStack.navigationOptions = {
 
 const SettingsStack = createStackNavigator( {
 	Settings: SettingsScreen,
+	SettingsAccounts: { screen: AccountsStack, navigationOptions: { header: null } },
+	SettingsCurrencies: { screen: CurrenciesStack, navigationOptions: { header: null } },
 } );
 
 SettingsStack.navigationOptions = {

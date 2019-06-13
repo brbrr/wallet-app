@@ -64,21 +64,6 @@ class HomeScreen extends React.Component {
 		};
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
-		Object.entries( this.props ).forEach( ( [ key, val ] ) => {
-			if ( prevProps[ key ] !== val ) {
-				console.log( `Prop '${ key }' changed` );
-				// console.log( JSON.stringify( val ) );
-				// console.log( JSON.stringify( prevProps[ key ] ) );
-			}
-		}
-
-		);
-		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
-			prevState[ key ] !== val && console.log( `State '${ key }' changed` )
-		);
-	}
-
 	updateView = ( viewId ) => {
 		this.setState( { view: viewId } );
 	}
@@ -93,7 +78,6 @@ class HomeScreen extends React.Component {
 					<RecordsList
 						records={ Object.values( records ) }
 						accounts={ accounts }
-
 						categories={ categories }
 						currencies={ currencies }
 						navigateEditRecordScreen={ this.navigateEditRecordScreen }

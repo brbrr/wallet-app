@@ -48,6 +48,7 @@ class NewRecordModal extends React.Component {
 			amount: draftRecord.amount ? `${ draftRecord.amount }` : null,
 			selectedIndex: 2,
 			description: draftRecord.description ? draftRecord.description : '',
+			isEdit,
 		};
 		props.navigation.setParams(
 			{
@@ -98,7 +99,6 @@ class NewRecordModal extends React.Component {
 		navigation.navigate( 'Main' );
 	}
 
-	// TODO: here we might be using _old_ date for new records.
 	renderDatePicker() {
 		const { _selectRecordDate, draftRecord } = this.props;
 		const isToday = moment( draftRecord.createdAt ).isSame( Date.now(), 'day' );
