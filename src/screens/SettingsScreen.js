@@ -2,8 +2,8 @@
  * External dependencies
  */
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, ScrollView } from 'react-native';
-import { ListItem, Input } from 'react-native-elements';
+import { StyleSheet, ScrollView, Platform } from 'react-native';
+import { ListItem } from 'react-native-elements';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 
 export default class SettingsScreen extends React.Component {
@@ -113,7 +113,15 @@ export class SettingsScreen12 extends React.Component {
 }
 
 const styles = StyleSheet.create( {
-	container: { backgroundColor: '#f9f9f9', flex: 1 },
+	container: {
+		backgroundColor: '#f9f9f9',
+		flex: 1,
+
+		...Platform.select( {
+			ios: {
+				paddingTop: 20,
+			},
+		} ) },
 	iconContainer: {
 		marginTop: 20,
 		marginBottom: 20,
