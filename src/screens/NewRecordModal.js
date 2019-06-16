@@ -12,8 +12,7 @@ import moment from 'moment';
  */
 import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord } from '../actions/records';
-import { selectRecordType, selectRecordDate, resetDraftRecord } from '../actions';
-import { getCurrencyById, getAccountById } from '../selectors';
+import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory } from '../selectors';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -40,26 +39,32 @@ class NewRecordModal extends React.Component {
 
 	constructor( props ) {
 		super( props );
-
-		const draftRecord = props.draftRecord;
 		const isEdit = props.navigation.getParam( 'isEdit', null );
 
+		const account = getDefaultAccount( props );
+		const category = getDefaultCategory( props );
 		this.state = {
-			amount: draftRecord.amount ? `${ draftRecord.amount }` : null,
-			selectedIndex: 2,
-			description: draftRecord.description ? draftRecord.description : '',
+			amount: null,
+			description: '',
+			accountId: account.id,
+			currencyId: account.currencyId,
+			categoryId: category.id,
+			createdAt: Date.now(),
+			typeId: 2,
 			isEdit,
 		};
+
+		if ( isEdit ) {
+			const draftRecord = props.draftRecord;
+			this.state = Object.assign( {}, this.setState, draftRecord );
+		}
+
 		props.navigation.setParams(
 			{
 				createNewRecordAndGoBack: this.createNewRecordAndGoBack.bind( this ),
 				isEdit,
 			}
 		);
-		// NOTE: We need to reset draftRecord to clean-up all the leftovers from previous drafts
-		if ( ! isEdit ) {
-			props._resetDraftRecord();
-		}
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -79,18 +84,20 @@ class NewRecordModal extends React.Component {
 	}
 
 	createNewRecordAndGoBack() {
-		const { amount, description } = this.state;
-		const { _createNewRecord, _updateRecord, navigation, draftRecord } = this.props;
+		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId } = this.state;
+		const { _createNewRecord, _updateRecord, navigation } = this.props;
 
-		const account = getAccountById( this.props, draftRecord.accountId );
-		const currency = getCurrencyById( this.props, account.currencyId );
-		const record = Object.assign( draftRecord, {
+		const record = {
 			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
 			description,
-			currencyId: currency.id,
+			currencyId,
+			accountId,
+			categoryId,
+			createdAt,
+			typeId,
 			type: 'expense',
-		} );
-
+		};
+		// Sanitize record object!
 		if ( ! record.id ) {
 			_createNewRecord( record );
 		} else {
@@ -99,14 +106,16 @@ class NewRecordModal extends React.Component {
 		navigation.navigate( 'Main' );
 	}
 
+	onStateChange = ( value, name ) => this.setState( { [ name ]: value } )
+
 	renderDatePicker() {
-		const { _selectRecordDate, draftRecord } = this.props;
-		const isToday = moment( draftRecord.createdAt ).isSame( Date.now(), 'day' );
-		const dateTitle = isToday ? 'Today' : moment( draftRecord.createdAt ).format( 'dddd, D MMM' );
+		const { createdAt } = this.state;
+		const isToday = moment( createdAt ).isSame( Date.now(), 'day' );
+		const dateTitle = isToday ? 'Today' : moment( createdAt ).format( 'dddd, D MMM' );
 
 		return (
 			<DatePicker
-				startDate={ new Date( draftRecord.createdAt ) }
+				startDate={ new Date( createdAt ) }
 				renderDate={ () => (
 					<ListItem
 						containerStyle={ styles.iconContainer }
@@ -129,13 +138,13 @@ class NewRecordModal extends React.Component {
 									if ( isToday ) {
 										d = d.setDate( d.getDate() - 1 ); // Yesterday
 									}
-									return _selectRecordDate( d );
+									return this.onStateChange( d, 'createdAt' );
 								} }
 							/>
 						}
 					/>
 				) }
-				onDateChanged={ ( { date } ) => _selectRecordDate( Date.parse( date ) ) }
+				onDateChanged={ ( { date } ) => this.onStateChange( Date.parse( date ), 'createdAt' ) }
 			/>
 		);
 	}
@@ -143,20 +152,20 @@ class NewRecordModal extends React.Component {
 	render() {
 		console.log( '!!!!!!!! NewRecordModal screen render' );
 
-		const { amount, description } = this.state;
-		const { draftRecord, categories, _selectRecordType } = this.props;
+		const { amount, description, accountId, currencyId, categoryId, typeId } = this.state;
+		const { navigation } = this.props;
 
-		const category = categories.byId[ draftRecord.categoryId ];
-		const account = getAccountById( this.props, draftRecord.accountId );
-		const currency = getCurrencyById( this.props, account.currencyId );
+		const category = getCategoryById( this.props, categoryId );
+		const account = getAccountById( this.props, accountId );
+		const currency = getCurrencyById( this.props, currencyId );
 
 		const buttons = [ 'expense', 'income', 'transfer' ];
 
 		return (
 			<View style={ { backgroundColor: '#f9f9f9' } }>
 				<ButtonGroup
-					onPress={ ( id ) => _selectRecordType( id ) }
-					selectedIndex={ draftRecord.typeId }
+					onPress={ ( id ) => this.setState( { typeId: id } ) }
+					selectedIndex={ typeId }
 					buttons={ buttons }
 					containerStyle={ { borderRadius: 5, height: 25 } }
 				/>
@@ -170,9 +179,10 @@ class NewRecordModal extends React.Component {
 							containerStyle={ { paddingHorizontal: 0 } }
 							inputContainerStyle={ { borderBottomWidth: 0 } }
 							inputStyle={ styles.amountInput }
+							keyboardType="numeric"
 							value={ amount }
 							placeholder="0.0"
-							onChangeText={ ( amnt ) => this.setState( { amount: amnt } ) }
+							onChangeText={ ( amnt ) => this.onStateChange( amnt, 'amount' ) }
 							autoFocus
 						/>
 					}
@@ -180,7 +190,7 @@ class NewRecordModal extends React.Component {
 					topDivider={ true }
 					leftElement={
 						<Text
-							onPress={ () => this.props.navigation.navigate( 'Currencies' ) }
+							onPress={ () => navigation.navigate( 'Currencies', { onStateChange: this.onStateChange } ) }
 							style={ styles.currencyButton }
 						>
 							{ currency.code }
@@ -202,7 +212,7 @@ class NewRecordModal extends React.Component {
 						size: 20,
 						containerStyle: { margin: -4 },
 					} }
-					onPress={ () => this.props.navigation.navigate( 'Categories' ) }
+					onPress={ () => navigation.navigate( 'Categories', { onStateChange: this.onStateChange } ) }
 				/>
 
 				<ListItem
@@ -216,7 +226,7 @@ class NewRecordModal extends React.Component {
 						size: 25,
 						containerStyle: { paddingLeft: 15, paddingRight: 14 },
 					} }
-					onPress={ () => this.props.navigation.navigate( 'Accounts' ) }
+					onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange } ) }
 				/>
 
 				{ this.renderDatePicker() }
@@ -247,7 +257,7 @@ class NewRecordModal extends React.Component {
 }
 
 const mapStateToProps = ( state ) => {
-	console.log( state );
+	// console.log( state );
 
 	const { draftRecord, categories, currencies, accounts } = state;
 	return {
@@ -262,9 +272,6 @@ const mapDispatchToProps = ( dispatch ) => {
 	return {
 		_createNewRecord: ( draftRecord ) => dispatch( createNewRecord( draftRecord ) ),
 		_updateRecord: ( draftRecord ) => dispatch( updateRecord( draftRecord ) ),
-		_selectRecordType: ( id ) => dispatch( selectRecordType( id ) ),
-		_selectRecordDate: ( date ) => dispatch( selectRecordDate( date ) ),
-		_resetDraftRecord: () => dispatch( resetDraftRecord() ),
 	};
 };
 

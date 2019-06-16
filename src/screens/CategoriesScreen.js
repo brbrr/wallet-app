@@ -8,7 +8,6 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { selectRecordCategory } from '../actions';
 import RecordOptionSelector from '../components/records/RecordOptionSelector';
 
 class CategoriesScreen extends React.Component {
@@ -29,12 +28,13 @@ class CategoriesScreen extends React.Component {
 	} );
 
 	render() {
-		const { categories, selectItem, navigation } = this.props;
+		const { categories, navigation } = this.props;
+		const onStateChange = navigation.getParam( 'onStateChange' );
 
 		return (
 			<RecordOptionSelector
 				items={ Object.values( categories.byId ) }
-				selectItem={ selectItem }
+				selectItem={ ( id ) => onStateChange( id, 'categoryId' ) }
 				navigation={ navigation }
 			/>
 		);
@@ -49,11 +49,7 @@ const mapStateToProps = ( state ) => {
 	};
 };
 
-const mapDispatchToProps = ( dispatch ) => {
-	return {
-		selectItem: ( id ) => dispatch( selectRecordCategory( id ) ),
-	};
-};
+const mapDispatchToProps = () => ( {} );
 
 export default connect(
 	mapStateToProps,

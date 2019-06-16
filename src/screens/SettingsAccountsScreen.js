@@ -103,8 +103,16 @@ export class Basic extends Component {
 		);
 	}
 
+	onPress = ( id ) => {
+		const { navigation } = this.props;
+		const onStateChange = navigation.getParam( 'onStateChange' );
+
+		onStateChange( id, 'accountId' );
+		navigation.goBack( null );
+	}
+
 	_renderRow = ( { key, index, data, disabled, active } ) => {
-		return <ListRow item={ data } active={ active } disabled={ disabled } />;
+		return <ListRow item={ data } active={ active } disabled={ disabled } onStateChange={ this.onPress } />;
 	}
 }
 
@@ -175,7 +183,7 @@ class ListRow extends Component {
 	render() {
 		console.log( this.props );
 
-		const { item, disabled } = this.props;
+		const { item, disabled, onStateChange } = this.props;
 
 		return (
 			<ListItem
@@ -188,9 +196,7 @@ class ListRow extends Component {
 
 				chevron={ disabled ? true : { name: 'bars', type: 'font-awesome' } }
 				rightTitle={ disabled ? 'Select' : null }
-				onPress={ disabled ? () => console.log( ' clicked!' ) : null }
-				// rightIcon={ this.getIconConfiguration( item, disabled ) }
-				// rightElement={ this.rightComponent }
+				onPress={ disabled ? () => onStateChange( item.id ) : null }
 			/>
 		);
 	}

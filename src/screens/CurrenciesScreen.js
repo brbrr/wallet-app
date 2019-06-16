@@ -8,7 +8,6 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { selectRecordCurrency } from '../actions';
 import RecordOptionSelector from '../components/records/RecordOptionSelector';
 
 class CurrenciesScreen extends React.Component {
@@ -29,12 +28,13 @@ class CurrenciesScreen extends React.Component {
 	} );
 
 	render() {
-		const { currencies, selectItem, navigation } = this.props;
+		const { currencies, navigation } = this.props;
+		const onStateChange = navigation.getParam( 'onStateChange' );
 
 		return (
 			<RecordOptionSelector
 				items={ Object.values( currencies.byId ) }
-				selectItem={ selectItem }
+				selectItem={ ( id ) => onStateChange( id, 'currencyId' ) }
 				navigation={ navigation }
 				nameValue="code"
 			/>
@@ -50,11 +50,7 @@ const mapStateToProps = ( state ) => {
 	};
 };
 
-const mapDispatchToProps = ( dispatch ) => {
-	return {
-		selectItem: ( id ) => dispatch( selectRecordCurrency( id ) ),
-	};
-};
+const mapDispatchToProps = () => ( {} );
 
 export default connect(
 	mapStateToProps,
