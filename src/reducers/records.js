@@ -7,7 +7,7 @@ import { addNewItem } from '../utils/reducerHelper';
 const initialState = {
 	byId: {
 		1: {
-			amount: 22,
+			amount: '22',
 			createdAt: 1555534119211,
 			description: 'Ice cream',
 			id: 1,
@@ -17,7 +17,7 @@ const initialState = {
 			typeId: 0,
 		},
 		2: {
-			amount: 2343.2,
+			amount: '2343.2',
 			createdAt: 1555534417211,
 			description: 'Pizza',
 			id: 2,
@@ -27,7 +27,7 @@ const initialState = {
 			typeId: 0,
 		},
 		3: {
-			amount: 321.32,
+			amount: '321.32',
 			createdAt: 1555554819211,
 			description: 'Random transaction',
 			id: 3,
@@ -37,7 +37,7 @@ const initialState = {
 			typeId: 0,
 		},
 		4: {
-			amount: 243.6,
+			amount: '243.6',
 			createdAt: 1555597817211,
 			description: 'Whatever',
 			id: 4,
@@ -47,7 +47,7 @@ const initialState = {
 			typeId: 0,
 		},
 		5: {
-			amount: 32.6,
+			amount: '32.6',
 			createdAt: 1555697817211,
 			description: 'Whatever',
 			id: 5,
@@ -57,7 +57,7 @@ const initialState = {
 			typeId: 0,
 		},
 		6: {
-			amount: 765.1,
+			amount: '765.1',
 			createdAt: 1552597817211,
 			description: 'Whatever',
 			id: 6,
@@ -67,7 +67,7 @@ const initialState = {
 			typeId: 0,
 		},
 		7: {
-			amount: 1600,
+			amount: '1600',
 			createdAt: 1555397817211,
 			description: 'Whatever',
 			id: 7,
@@ -77,7 +77,7 @@ const initialState = {
 			typeId: 0,
 		},
 		8: {
-			amount: 123,
+			amount: '123',
 			createdAt: 1555567817211,
 			description: 'Whatever',
 			id: 8,
@@ -87,7 +87,7 @@ const initialState = {
 			typeId: 0,
 		},
 		9: {
-			amount: 532,
+			amount: '532',
 			createdAt: 1555591817211,
 			description: 'Whatever',
 			id: 9,
