@@ -16,6 +16,7 @@ import IconSelector from '../components/IconSelector';
 import ColorSelector from '../components/ColorSelector';
 import NewAccountScreen from '../screens/NewAccountScreen';
 import NewCurrencyScreen from '../screens/NewCurrencyScreen';
+import SettingsAccountsScreen from '../screens/SettingsAccountsScreen';
 
 export const CategoriesStack = createStackNavigator( {
 	CategoriesList: { screen: CategoriesScreen },
@@ -25,7 +26,7 @@ export const CategoriesStack = createStackNavigator( {
 } );
 
 export const AccountsStack = createStackNavigator( {
-	AccountsList: { screen: AccountsScreen },
+	AccountsList: { screen: SettingsAccountsScreen },
 	NewAccount: { screen: NewAccountScreen },
 	IconSelector: { screen: IconSelector },
 	ColorSelector: { screen: ColorSelector },

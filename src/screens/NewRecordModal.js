@@ -100,7 +100,9 @@ class NewRecordModal extends React.Component {
 			typeId,
 			type: 'expense',
 		};
+
 		// Sanitize record object!
+		// e.g. amount value
 		if ( ! record.id ) {
 			_createNewRecord( record );
 		} else {

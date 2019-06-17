@@ -40,7 +40,7 @@ const RecordsItem = ( { category, account, amount, record, navigateEditRecordScr
 					<View style={ styles.accountIndicator( account.color ) } />
 				</View>
 			}
-			onPress={ () => navigateEditRecordScreen( record ) }
+			onPress={ () => navigateEditRecordScreen( record.id ) }
 		/>
 	);
 };
