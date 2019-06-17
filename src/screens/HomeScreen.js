@@ -15,45 +15,15 @@ import { connect } from 'react-redux';
  */
 import { RecordsList } from '../components/records/RecordsList';
 import Overview from '../components/Overview';
-import { updateDraftWithRecord } from '../actions';
-
-// import Carousel from 'react-native-snap-carousel';
-
-// export default class MyCarousel extends React.Component {
-// 	constructor() {
-// 		super();
-// 		this.state = { entries: [ 'first', 'second', 'third' ] };
-// 	}
-
-// 	_renderItem( { type } ) {
-// 		return ( <Zzz type={ type } /> );
-// 	}
-
-// 	render() {
-// 		const { height, width } = Dimensions.get( 'window' );
-// 		return (
-// 			<Carousel
-// 				ref={ ( c ) => {
-// 					this._carousel = c;
-// 				} }
-// 				data={ this.state.entries }
-// 				renderItem={ this._renderItem }
-// 				sliderWidth={ width }
-// 				itemWidth={ width - 10 }
-// 			/>
-// 		);
-// 	}
-// }
 
 class HomeScreen extends React.Component {
 	static navigationOptions = {
 		title: 'Home',
 	};
 
-	navigateEditRecordScreen = ( record ) => {
-		const { navigation, _updateDraftWithRecord } = this.props;
-		_updateDraftWithRecord( record );
-		navigation.navigate( 'NewRecord', { record, isEdit: true } );
+	navigateEditRecordScreen = ( recordId ) => {
+		const { navigation } = this.props;
+		navigation.navigate( 'NewRecord', { recordId, isEdit: true } );
 	}
 
 	constructor( props ) {
@@ -66,6 +36,15 @@ class HomeScreen extends React.Component {
 
 	updateView = ( viewId ) => {
 		this.setState( { view: viewId } );
+	}
+
+	componentDidUpdate( prevProps, prevState ) {
+		Object.entries( this.props ).forEach( ( [ key, val ] ) =>
+			prevProps[ key ] !== val && console.log( `Prop '${ key }' changed` )
+		);
+		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
+			prevState[ key ] !== val && console.log( `State '${ key }' changed` )
+		);
 	}
 
 	renderView() {
@@ -117,9 +96,6 @@ class HomeScreen extends React.Component {
 }
 
 const mapStateToProps = ( state ) => {
-	// console.log( state );
-
-	// const records = Object.values( state.records.byId );
 	return {
 		records: state.records.byId,
 		accounts: state.accounts.byId,
@@ -128,11 +104,7 @@ const mapStateToProps = ( state ) => {
 	};
 };
 
-const mapDispatchToProps = ( dispatch ) => {
-	return {
-		_updateDraftWithRecord: ( record ) => dispatch( updateDraftWithRecord( record ) ),
-	};
-};
+const mapDispatchToProps = () => ( {} );
 
 export default connect(
 	mapStateToProps,

@@ -12,7 +12,7 @@ import moment from 'moment';
  */
 import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord } from '../actions/records';
-import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory } from '../selectors';
+import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -55,8 +55,10 @@ class NewRecordModal extends React.Component {
 		};
 
 		if ( isEdit ) {
-			const draftRecord = props.draftRecord;
-			this.state = Object.assign( {}, this.setState, draftRecord );
+			const recordId = props.navigation.getParam( 'recordId', null );
+			const record = getRecordById( props, recordId );
+
+			this.state = Object.assign( {}, this.setState, record );
 		}
 
 		props.navigation.setParams(
@@ -84,10 +86,11 @@ class NewRecordModal extends React.Component {
 	}
 
 	createNewRecordAndGoBack() {
-		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId } = this.state;
+		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, id } = this.state;
 		const { _createNewRecord, _updateRecord, navigation } = this.props;
 
 		const record = {
+			id,
 			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
 			description,
 			currencyId,
@@ -107,6 +110,14 @@ class NewRecordModal extends React.Component {
 	}
 
 	onStateChange = ( value, name ) => this.setState( { [ name ]: value } )
+
+	// Don't allow multiple periods in amount
+	onAmountChange( amount ) {
+		const periodCount = ( amount.match( /\./g ) || [] ).length;
+		if ( periodCount < 2 ) {
+			this.onStateChange( amount, 'amount' );
+		}
+	}
 
 	renderDatePicker() {
 		const { createdAt } = this.state;
@@ -182,7 +193,7 @@ class NewRecordModal extends React.Component {
 							keyboardType="numeric"
 							value={ amount }
 							placeholder="0.0"
-							onChangeText={ ( amnt ) => this.onStateChange( amnt, 'amount' ) }
+							onChangeText={ ( amnt ) => this.onAmountChange( amnt ) }
 							autoFocus
 						/>
 					}
@@ -259,9 +270,9 @@ class NewRecordModal extends React.Component {
 const mapStateToProps = ( state ) => {
 	// console.log( state );
 
-	const { draftRecord, categories, currencies, accounts } = state;
+	const { categories, currencies, accounts, records } = state;
 	return {
-		draftRecord,
+		records,
 		categories,
 		currencies,
 		accounts,
@@ -270,8 +281,8 @@ const mapStateToProps = ( state ) => {
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {
-		_createNewRecord: ( draftRecord ) => dispatch( createNewRecord( draftRecord ) ),
-		_updateRecord: ( draftRecord ) => dispatch( updateRecord( draftRecord ) ),
+		_createNewRecord: ( record ) => dispatch( createNewRecord( record ) ),
+		_updateRecord: ( record ) => dispatch( updateRecord( record ) ),
 	};
 };
 
