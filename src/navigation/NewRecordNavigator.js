@@ -10,13 +10,12 @@ import NewRecordModal from '../screens/NewRecordModal';
 // import NewRecordModal from '../components/record-modal/RecordModal';
 import CategoriesScreen from '../screens/CategoriesScreen';
 import CurrenciesScreen from '../screens/CurrenciesScreen';
-import AccountsScreen from '../screens/AccountsScreen';
 import NewCategoryScreen from '../screens/NewCategoryScreen';
 import IconSelector from '../components/IconSelector';
 import ColorSelector from '../components/ColorSelector';
 import NewAccountScreen from '../screens/NewAccountScreen';
 import NewCurrencyScreen from '../screens/NewCurrencyScreen';
-import SettingsAccountsScreen from '../screens/SettingsAccountsScreen';
+import AccountsScreen from '../screens/AccountsScreen';
 
 export const CategoriesStack = createStackNavigator( {
 	CategoriesList: { screen: CategoriesScreen },
@@ -26,7 +25,7 @@ export const CategoriesStack = createStackNavigator( {
 } );
 
 export const AccountsStack = createStackNavigator( {
-	AccountsList: { screen: SettingsAccountsScreen },
+	AccountsList: { screen: AccountsScreen },
 	NewAccount: { screen: NewAccountScreen },
 	IconSelector: { screen: IconSelector },
 	ColorSelector: { screen: ColorSelector },

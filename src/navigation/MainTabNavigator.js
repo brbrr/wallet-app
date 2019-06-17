@@ -15,7 +15,7 @@ import { CurrenciesStack } from './NewRecordNavigator';
 import IconSelector from '../components/IconSelector';
 import ColorSelector from '../components/ColorSelector';
 import NewAccountScreen from '../screens/NewAccountScreen';
-import SettingsAccountsScreen from '../screens/SettingsAccountsScreen';
+import AccountsScreen from '../screens/AccountsScreen';
 
 const HomeStack = createStackNavigator( {
 	Home: HomeScreen,
@@ -36,7 +36,7 @@ HomeStack.navigationOptions = {
 };
 
 export const SettingsAccountsStack = createStackNavigator( {
-	AccountsList: { screen: SettingsAccountsScreen },
+	AccountsList: { screen: AccountsScreen },
 	NewAccount: { screen: NewAccountScreen },
 	IconSelector: { screen: IconSelector },
 	ColorSelector: { screen: ColorSelector },
