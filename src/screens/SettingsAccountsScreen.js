@@ -2,10 +2,10 @@
  * External dependencies
  */
 import React, { Component } from 'react';
-import { Animated, Easing, StyleSheet, Text, Image, View, Dimensions, Platform, Button } from 'react-native';
+import { Animated, Easing, StyleSheet, Text, View, Dimensions, Platform, Button } from 'react-native';
 import SortableList from 'react-native-sortable-list';
 import { connect } from 'react-redux';
-import { ListItem, Button as EButton, Icon } from 'react-native-elements';
+import { ListItem } from 'react-native-elements';
 /**
  * Internal dependencies
  */
@@ -14,7 +14,7 @@ import { getAccountsById, getAccountOrder } from '../selectors';
 
 const window = Dimensions.get( 'window' );
 
-export class Basic extends Component {
+export class SettingsAccountsScreen extends Component {
 	static navigationOptions = ( { navigation } ) => {
 		const isReorderEnabled = navigation.getParam( 'isReorderEnabled', false );
 		const _updateAccountsOrder = navigation.getParam( 'updateAccountsOrder', false );
@@ -96,6 +96,7 @@ export class Basic extends Component {
 						buttonStyle={ { backgroundColor: 'white', borderTopWidth: 1 } }
 						type="clear"
 						title="Change order"
+						disabled={ !! isReorderEnabled }
 						onPress={ this.onReorderClick }
 					/>
 				</View>
@@ -295,5 +296,5 @@ const mapDispatchToProps = ( dispatch ) => {
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)( Basic );
+)( SettingsAccountsScreen );
 
