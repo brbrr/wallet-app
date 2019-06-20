@@ -1,40 +1,49 @@
 {
-	"main": "node_modules/expo/AppEntry.js",
-	"scripts": {
-		"start": "expo start",
-		"android": "expo start --android",
-		"ios": "expo start --ios",
-		"eject": "expo eject",
-		"test": "node ./node_modules/jest/bin/jest.js --watchAll"
-	},
-	"dependencies": {
-		"@expo/samples": "2.1.1",
-		"@expo/vector-icons": "^9.0.0",
-		"expo": "^33.0.0",
-		"expo-asset": "^5.0.1",
-		"expo-font": "~5.0.1",
-		"moment": "^2.24.0",
-		"money": "^0.2.0",
-		"react": "16.8.3",
-		"react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
-		"react-native-elements": "^1.1.0",
-		"react-native-sortable-list": "^0.0.23",
-		"react-navigation": "^3.11.0",
-		"react-redux": "^6.0.1",
-		"redux": "^4.0.1",
-		"reselect": "^4.0.0"
-	},
-	"devDependencies": {
-		"@wordpress/eslint-plugin": "^2.1.0",
-		"babel-preset-expo": "^5.0.0",
-		"create-jest-runner": "^0.5.0",
-		"eslint": "^5.16.0",
-		"eslint-config-wpcalypso": "^4.0.1",
-		"eslint-plugin-jest": "^22.4.1",
-		"eslint-plugin-react": "^7.12.4",
-		"eslint-plugin-wpcalypso": "^4.0.2",
-		"jest": "^24.8.0",
-		"jest-expo": "^33.0.0"
-	},
-	"private": true
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "eject": "expo eject",
+    "test": "node ./node_modules/jest/bin/jest.js --watchAll",
+    "storybook": "start-storybook -p 7007"
+  },
+  "dependencies": {
+    "@expo/samples": "2.1.1",
+    "@expo/vector-icons": "^9.0.0",
+    "expo": "^33.0.6",
+    "expo-asset": "^5.0.1",
+    "expo-font": "~5.0.1",
+    "moment": "^2.24.0",
+    "money": "^0.2.0",
+    "react": "16.8.3",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
+    "react-native-elements": "^1.1.0",
+    "react-native-sortable-list": "^0.0.23",
+    "react-navigation": "^3.11.0",
+    "react-redux": "^6.0.1",
+    "redux": "^4.0.1",
+    "reselect": "^4.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@storybook/addon-actions": "^5.1.9",
+    "@storybook/addon-links": "^5.1.9",
+    "@storybook/addons": "^5.1.9",
+    "@storybook/react-native": "^5.1.9",
+    "@storybook/react-native-server": "^5.1.9",
+    "@wordpress/eslint-plugin": "^2.1.0",
+    "babel-loader": "^8.0.6",
+    "babel-preset-expo": "^5.0.0",
+    "create-jest-runner": "^0.5.0",
+    "eslint": "^5.16.0",
+    "eslint-config-wpcalypso": "^4.0.1",
+    "eslint-plugin-jest": "^22.4.1",
+    "eslint-plugin-react": "^7.12.4",
+    "eslint-plugin-wpcalypso": "^4.0.2",
+    "jest": "^24.8.0",
+    "jest-expo": "^33.0.0",
+    "react-dom": "16.8.3"
+  },
+  "private": true
 }
