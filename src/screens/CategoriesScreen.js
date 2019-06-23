@@ -32,7 +32,7 @@ class CategoriesScreen extends React.Component {
 		const onStateChange = navigation.getParam( 'onStateChange' );
 
 		onStateChange( { categoryId } );
-		navigation.goBack();
+		navigation.goBack( null );
 	}
 
 	render() {
