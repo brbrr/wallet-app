@@ -32,8 +32,8 @@ class NewAccountScreen extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.state = {
-			name: null,
-			balance: null,
+			name: '',
+			balance: '',
 			colorCode: 'blue',
 			iconName: 'car',
 			currencyId: 1,
