@@ -8,54 +8,83 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { addNewAccount } from '../actions';
+import { addNewAccount, updateAccount } from '../actions';
 import AccountInfo from '../components/AccountInfo';
-import { getCurrencyById } from '../selectors';
+import { getCurrencyById, getAccountById } from '../selectors';
 
 class NewAccountScreen extends React.Component {
-	static navigationOptions = ( { navigation } ) => ( {
-		title: 'New Account',
-		headerRight: (
-			<Button
-				onPress={ () => navigation.state.params.createNewAccountAndGoBack() }
-				title="Add"
-			/>
-		),
-		headerLeft: (
-			<Button
-				onPress={ () => navigation.goBack() }
-				title="Back"
-			/>
-		),
-	} );
+	static navigationOptions = ( { navigation } ) => {
+		const rightButtonTitle = navigation.state.params && navigation.state.params.isEdit ? 'Save' : 'Add';
+
+		return {
+			title: 'New Account',
+			headerRight: (
+				<Button
+					onPress={ () => navigation.state.params.persistAccountAndGoBack() }
+					title={ rightButtonTitle }
+				/>
+			),
+			headerLeft: (
+				<Button
+					onPress={ () => navigation.goBack() }
+					title="Back"
+				/>
+			),
+		};
+	};
 
 	constructor( props ) {
 		super( props );
+		const isEdit = props.navigation.getParam( 'isEdit', false );
 		this.state = {
 			name: '',
 			balance: '',
 			colorCode: 'blue',
 			iconName: 'car',
 			currencyId: 1,
+			isEdit,
 		};
 
+		if ( isEdit ) {
+			const accountId = props.navigation.getParam( 'accountId', null );
+			const account = getAccountById( props, accountId );
+			this.state = Object.assign( {}, this.state, account );
+		}
+
 		this.props.navigation.setParams(
-			{ createNewAccountAndGoBack: this.createNewAccountAndGoBack }
+			{ persistAccountAndGoBack: this.persistAccountAndGoBack }
 		);
 	}
 
 	onStateChange = ( state ) => this.setState( state )
 
-	createNewAccountAndGoBack = () => {
-		const { name, balance, colorCode, iconName, currencyId } = this.state;
-		const { navigation, _addNewAccount } = this.props;
+	persistAccountAndGoBack = () => {
+		const { name, balance, colorCode, iconName, currencyId, isEdit, id } = this.state;
+		const { navigation, _addNewAccount, _updateAccount } = this.props;
 
-		_addNewAccount( { name, colorCode, iconName, currencyId, balance } );
+		const account = {
+			name,
+			balance,
+			colorCode,
+			iconName,
+			currencyId,
+		};
+
+		if ( ! isEdit ) {
+			_addNewAccount( account );
+		} else {
+			account.id = id;
+			_updateAccount( account );
+		}
+
 		navigation.goBack();
 	}
 
 	render() {
-		const { name, balance, colorCode, iconName, currencyId } = this.state;
+		console.log( '!!!!WWWWWW' );
+		console.log( this.state, this.props );
+
+		const { name, balance, colorCode, iconName, currencyId, isEdit } = this.state;
 		const { navigation } = this.props;
 
 		const currency = getCurrencyById( this.props, currencyId );
@@ -68,21 +97,25 @@ class NewAccountScreen extends React.Component {
 				iconName={ iconName }
 				currencyCode={ currency.code }
 				navigate={ navigation.navigate }
-				onStateChange={ this.onStateChange } />
+				onStateChange={ this.onStateChange }
+				isEditMode={ isEdit }
+			/>
 		);
 	}
 }
 
 const mapStateToProps = ( state ) => {
-	const { currencies } = state;
+	const { currencies, accounts } = state;
 	return {
 		currencies,
+		accounts,
 	};
 };
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {
 		_addNewAccount: ( account ) => dispatch( addNewAccount( account ) ),
+		_updateAccount: ( account ) => dispatch( updateAccount( account ) ),
 	};
 };
 

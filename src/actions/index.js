@@ -3,6 +3,7 @@ export const SELECT_RECORD_CURRENCY = 'SELECT_RECORD_CURRENCY';
 export const ADD_NEW_CURRENCY = 'ADD_NEW_CURRENCY';
 export const SELECT_RECORD_ACCOUNT = 'SELECT_RECORD_ACCOUNT';
 export const ADD_NEW_ACCOUNT = 'ADD_NEW_ACCOUNT';
+export const UPDATE_ACCOUNT = 'UPDATE_ACCOUNT';
 export const UPDATE_ACCOUNTS_ORDER = 'UPDATE_ACCOUNTS_ORDER';
 export const SELECT_RECORD_TYPE = 'SELECT_RECORD_TYPE';
 export const SELECT_RECORD_DATE = 'SELECT_RECORD_DATE';
@@ -30,6 +31,10 @@ export function selectRecordAccount( id ) {
 
 export function addNewAccount( account ) {
 	return { type: ADD_NEW_ACCOUNT, account };
+}
+
+export function updateAccount( account ) {
+	return { type: UPDATE_ACCOUNT, account };
 }
 
 export function updateAccountsOrder( newOrder ) {

@@ -57,8 +57,7 @@ class NewRecordModal extends React.Component {
 		if ( isEdit ) {
 			const recordId = props.navigation.getParam( 'recordId', null );
 			const record = getRecordById( props, recordId );
-
-			this.state = Object.assign( {}, this.setState, record );
+			this.state = Object.assign( {}, this.state, record );
 		}
 
 		props.navigation.setParams(

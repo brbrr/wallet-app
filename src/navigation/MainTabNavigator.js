@@ -15,7 +15,7 @@ import { CurrenciesStack, AccountsStack } from './NewRecordNavigator';
 import IconSelector from '../components/IconSelector';
 import ColorSelector from '../components/ColorSelector';
 import NewAccountScreen from '../screens/NewAccountScreen';
-import AccountsScreen from '../screens/AccountsScreen';
+import AccountsScreen, { SettingsAccountsScreen } from '../screens/AccountsScreen';
 
 const HomeStack = createStackNavigator( {
 	Home: HomeScreen,
@@ -35,17 +35,17 @@ HomeStack.navigationOptions = {
 	),
 };
 
-// export const SettingsAccountsStack = createStackNavigator( {
-// 	AccountsList: { screen: AccountsScreen },
-// 	NewAccount: { screen: NewAccountScreen },
-// 	IconSelector: { screen: IconSelector },
-// 	ColorSelector: { screen: ColorSelector },
-// } );
+export const SettingsAccountsStack = createStackNavigator( {
+	SettingsAccountsList: { screen: SettingsAccountsScreen, params: { isSettings: true } },
+	NewAccount: { screen: NewAccountScreen },
+	IconSelector: { screen: IconSelector },
+	ColorSelector: { screen: ColorSelector },
+} );
 
 const SettingsStack = createStackNavigator( {
 	Settings: SettingsScreen,
-	SettingsAccounts: { screen: AccountsStack, navigationOptions: { header: null } },
-	// SettingsAccounts: { screen: SettingsAccountsStack, navigationOptions: { header: null } },
+	// SettingsAccounts: { screen: AccountsStack, navigationOptions: { header: null } },
+	SettingsAccounts: { screen: SettingsAccountsStack, navigationOptions: { header: null } },
 	SettingsCurrencies: { screen: CurrenciesStack, navigationOptions: { header: null } },
 } );
 
