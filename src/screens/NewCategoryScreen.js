@@ -33,25 +33,27 @@ export class NewCategoryScreen extends React.Component {
 		super( props );
 		this.state = {
 			name: null,
+			colorCode: 'grey',
+			iconName: 'shopping-cart',
 		};
 		this.props.navigation.setParams(
 			{ createNewCategoryAndGoBack: this.createNewCategoryAndGoBack.bind( this ) }
 		);
 	}
 
+	onStateChange = ( state ) => this.setState( state )
+
 	createNewCategoryAndGoBack() {
-		const { name } = this.state;
+		const { name, colorCode, iconName } = this.state;
 		const { navigation, _addNewCategory } = this.props;
-		const colorCode = navigation.getParam( 'colorCode', 'blue' );
-		const iconName = navigation.getParam( 'iconName', 'car' );
 		_addNewCategory( { name, colorCode, iconName } );
 		navigation.goBack();
 	}
 
 	render() {
-		const { name } = this.state;
-		const colorCode = this.props.navigation.getParam( 'colorCode', 'blue' );
-		const iconName = this.props.navigation.getParam( 'iconName', 'car' );
+		const { name, colorCode, iconName } = this.state;
+		const { navigation } = this.props;
+
 		return (
 			<ScrollView style={ styles.container }>
 				<ListItem
@@ -87,7 +89,7 @@ export class NewCategoryScreen extends React.Component {
 					} }
 					chevron
 					rightTitle={ 'Select' }
-					onPress={ () => this.props.navigation.navigate( 'ColorSelector', { parent: 'NewCategory' } ) }
+					onPress={ () => navigation.navigate( 'ColorSelector', { onStateChange: this.onStateChange } ) }
 				/>
 
 				<ListItem
@@ -107,7 +109,7 @@ export class NewCategoryScreen extends React.Component {
 					} }
 					chevron
 					rightTitle={ 'Select' }
-					onPress={ () => this.props.navigation.navigate( 'IconSelector', { parent: 'NewCategory' } ) }
+					onPress={ () => navigation.navigate( 'IconSelector', { onStateChange: this.onStateChange } ) }
 				/>
 			</ScrollView>
 		);
