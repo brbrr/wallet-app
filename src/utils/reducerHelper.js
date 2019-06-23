@@ -1,7 +1,7 @@
 export function addNewItem( item, state ) {
 	const lastId = getMaxId( state.allIds );
 	const newId = lastId + 1;
-	const itemObject = Object.assign( {}, { id: newId }, item );
+	const itemObject = Object.assign( {}, item, { id: newId } );
 	return {
 		byId: { ...state.byId, [ newId ]: itemObject },
 		allIds: [ ...state.allIds, newId ],
