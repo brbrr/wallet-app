@@ -10,22 +10,16 @@ export default class RecordOptionSelector extends React.Component {
 		nameValue: 'name',
 	}
 
-	selectItemAndGoBack( id ) {
-		const { selectItem, navigation } = this.props;
-
-		selectItem( id );
-		navigation.goBack( null );
-	}
-
+	// TODO: extract into shared function
 	getIconConfiguration( item ) {
 		let iconConfiguration = null;
-		if ( item.icon ) {
+		if ( item.iconName ) {
 			iconConfiguration = {
-				name: item.icon,
+				name: item.iconName,
 				type: 'font-awesome',
 				reverse: true,
 				reverseColor: 'white',
-				color: item.color,
+				color: item.colorCode,
 				size: 20,
 				containerStyle: { margin: -2 },
 			};
@@ -35,7 +29,7 @@ export default class RecordOptionSelector extends React.Component {
 	}
 
 	render() {
-		const { items, nameValue } = this.props;
+		const { items, nameValue, selectItem } = this.props;
 
 		if ( items.length === 0 ) {
 			return (
@@ -55,7 +49,7 @@ export default class RecordOptionSelector extends React.Component {
 								bottomDivider={ true }
 								topDivider={ true }
 								leftIcon={ this.getIconConfiguration( item ) }
-								onPress={ () => this.selectItemAndGoBack( item.id ) }
+								onPress={ () => selectItem( item.id ) }
 							/>
 						);
 					} )

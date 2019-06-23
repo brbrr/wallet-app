@@ -27,14 +27,21 @@ class CategoriesScreen extends React.Component {
 		),
 	} );
 
+	selectItemAndGoBack = ( categoryId ) => {
+		const { navigation } = this.props;
+		const onStateChange = navigation.getParam( 'onStateChange' );
+
+		onStateChange( { categoryId } );
+		navigation.goBack();
+	}
+
 	render() {
 		const { categories, navigation } = this.props;
-		const onStateChange = navigation.getParam( 'onStateChange' );
 
 		return (
 			<RecordOptionSelector
 				items={ Object.values( categories.byId ) }
-				selectItem={ ( id ) => onStateChange( id, 'categoryId' ) }
+				selectItem={ ( categoryId ) => this.selectItemAndGoBack( categoryId ) }
 				navigation={ navigation }
 			/>
 		);

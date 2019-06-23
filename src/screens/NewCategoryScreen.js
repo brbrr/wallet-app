@@ -42,9 +42,9 @@ export class NewCategoryScreen extends React.Component {
 	createNewCategoryAndGoBack() {
 		const { name } = this.state;
 		const { navigation, _addNewCategory } = this.props;
-		const color = navigation.getParam( 'colorCode', 'blue' );
-		const icon = navigation.getParam( 'iconName', 'car' );
-		_addNewCategory( { name, color, icon } );
+		const colorCode = navigation.getParam( 'colorCode', 'blue' );
+		const iconName = navigation.getParam( 'iconName', 'car' );
+		_addNewCategory( { name, colorCode, iconName } );
 		navigation.goBack();
 	}
 

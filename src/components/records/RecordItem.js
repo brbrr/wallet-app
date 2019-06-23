@@ -30,14 +30,14 @@ const RecordsItem = ( { category, account, amount, record, navigateEditRecordScr
 			leftIcon={
 				<View >
 					<Icon
-						name={ category.icon }
+						name={ category.iconName }
 						type="font-awesome"
 						reverse
 						reverseColor="white"
-						color={ category.color }
+						color={ category.colorCode }
 						size={ 20 }
 					/>
-					<View style={ styles.accountIndicator( account.color ) } />
+					<View style={ styles.accountIndicator( account.colorCode ) } />
 				</View>
 			}
 			onPress={ () => navigateEditRecordScreen( record.id ) }

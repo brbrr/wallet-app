@@ -86,11 +86,10 @@ class NewRecordModal extends React.Component {
 	}
 
 	createNewRecordAndGoBack() {
-		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, id } = this.state;
+		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, id, isEdit } = this.state;
 		const { _createNewRecord, _updateRecord, navigation } = this.props;
 
 		const record = {
-			id,
 			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
 			description,
 			currencyId,
@@ -103,21 +102,23 @@ class NewRecordModal extends React.Component {
 
 		// Sanitize record object!
 		// e.g. amount value
-		if ( ! record.id ) {
+		if ( ! isEdit ) {
 			_createNewRecord( record );
 		} else {
+			record.id = id;
 			_updateRecord( record );
 		}
 		navigation.navigate( 'Main' );
 	}
 
-	onStateChange = ( value, name ) => this.setState( { [ name ]: value } )
+	onStateChange = ( state ) => this.setState( state )
+	// onStateChange = ( value, name ) => this.setState( { [ name ]: value } )
 
 	// Don't allow multiple periods in amount
 	onAmountChange( amount ) {
 		const periodCount = ( amount.match( /\./g ) || [] ).length;
 		if ( periodCount < 2 ) {
-			this.onStateChange( amount, 'amount' );
+			this.onStateChange( { amount } );
 		}
 	}
 
@@ -147,17 +148,17 @@ class NewRecordModal extends React.Component {
 								type="clear"
 								titleStyle={ { fontSize: 13 } }
 								onPress={ () => {
-									let d = new Date(); // Today!
+									let date = new Date(); // Today!
 									if ( isToday ) {
-										d = d.setDate( d.getDate() - 1 ); // Yesterday
+										date = date.setDate( date.getDate() - 1 ); // Yesterday
 									}
-									return this.onStateChange( d, 'createdAt' );
+									return this.onStateChange( { createdAt: date } );
 								} }
 							/>
 						}
 					/>
 				) }
-				onDateChanged={ ( { date } ) => this.onStateChange( Date.parse( date ), 'createdAt' ) }
+				onDateChanged={ ( { date } ) => this.onStateChange( { createdAt: Date.parse( date ) } ) }
 			/>
 		);
 	}
@@ -217,11 +218,11 @@ class NewRecordModal extends React.Component {
 					bottomDivider={ true }
 					topDivider={ true }
 					leftIcon={ {
-						name: category.icon,
+						name: category.iconName,
 						type: 'font-awesome',
 						reverse: true,
 						reverseColor: 'white',
-						color: category.color,
+						color: category.colorCode,
 						size: 20,
 						containerStyle: { margin: -4 },
 					} }

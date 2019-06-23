@@ -33,7 +33,7 @@ class NewAccountScreen extends React.Component {
 		super( props );
 		this.state = {
 			name: null,
-			balance: 0.0,
+			balance: null,
 			colorCode: 'blue',
 			iconName: 'car',
 			currencyId: 1,

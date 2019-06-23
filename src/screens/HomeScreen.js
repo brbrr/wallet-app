@@ -15,6 +15,7 @@ import { connect } from 'react-redux';
  */
 import { RecordsList } from '../components/records/RecordsList';
 import Overview from '../components/Overview';
+import { getRecordsById, getAccountsById, getCategoriesById, getCurrenciesById } from '../selectors';
 
 class HomeScreen extends React.Component {
 	static navigationOptions = {
@@ -97,10 +98,10 @@ class HomeScreen extends React.Component {
 
 const mapStateToProps = ( state ) => {
 	return {
-		records: state.records.byId,
-		accounts: state.accounts.byId,
-		categories: state.categories.byId,
-		currencies: state.currencies.byId,
+		records: getRecordsById( state ),
+		accounts: getAccountsById( state ),
+		categories: getCategoriesById( state ),
+		currencies: getCurrenciesById( state ),
 	};
 };
 

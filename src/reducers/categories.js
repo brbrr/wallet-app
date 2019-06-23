@@ -8,20 +8,20 @@ const initialState = {
 	byId: {
 		1: {
 			name: 'General',
-			icon: 'shopping-basket',
-			color: 'red',
+			iconName: 'shopping-basket',
+			colorCode: 'red',
 			id: 1,
 		},
 		2: {
 			name: 'Home',
-			icon: 'home',
-			color: 'green',
+			iconName: 'home',
+			colorCode: 'green',
 			id: 2,
 		},
 		3: {
 			name: 'Cafe',
-			icon: 'coffee',
-			color: 'blue',
+			iconName: 'coffee',
+			colorCode: 'blue',
 			id: 3,
 		},
 	},

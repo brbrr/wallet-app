@@ -27,14 +27,21 @@ class CurrenciesScreen extends React.Component {
 		),
 	} );
 
+	selectItemAndGoBack = ( currencyId ) => {
+		const { navigation } = this.props;
+		const onStateChange = navigation.getParam( 'onStateChange' );
+
+		onStateChange( { currencyId } );
+		navigation.goBack( null );
+	}
+
 	render() {
 		const { currencies, navigation } = this.props;
-		const onStateChange = navigation.getParam( 'onStateChange' );
 
 		return (
 			<RecordOptionSelector
 				items={ Object.values( currencies.byId ) }
-				selectItem={ ( id ) => onStateChange( id, 'currencyId' ) }
+				selectItem={ ( currencyId ) => this.selectItemAndGoBack( currencyId ) }
 				navigation={ navigation }
 				nameValue="code"
 			/>
