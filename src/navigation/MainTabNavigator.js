@@ -14,7 +14,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import { CurrenciesStack, AccountsStack } from './NewRecordNavigator';
 import IconSelector from '../components/IconSelector';
 import ColorSelector from '../components/ColorSelector';
-import NewAccountScreen from '../screens/NewAccountScreen';
+import NewAccountScreen, { SettingsNewAccountsScreen } from '../screens/NewAccountScreen';
 import AccountsScreen, { SettingsAccountsScreen } from '../screens/AccountsScreen';
 
 const HomeStack = createStackNavigator( {
@@ -37,7 +37,7 @@ HomeStack.navigationOptions = {
 
 export const SettingsAccountsStack = createStackNavigator( {
 	SettingsAccountsList: { screen: SettingsAccountsScreen, params: { isSettings: true } },
-	NewAccount: { screen: NewAccountScreen },
+	NewAccount: { screen: SettingsNewAccountsScreen },
 	IconSelector: { screen: IconSelector },
 	ColorSelector: { screen: ColorSelector },
 } );

@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 
 export default class AccountInfo extends React.Component {
 	render() {
-		const { navigate, onStateChange, name, balance, colorCode, iconName, currencyCode, isEditMode } = this.props;
+		const { navigate, onStateChange, name, balance, colorCode, iconName, currencyCode, onPressCurrency } = this.props;
 		return (
 			<ScrollView style={ styles.container } keyboardShouldPersistTaps="always" >
 				<ListItem
@@ -53,7 +53,7 @@ export default class AccountInfo extends React.Component {
 					rightTitle={ currencyCode }
 					bottomDivider={ true }
 					topDivider={ true }
-					onPress={ isEditMode ? () => navigate( 'SettingsCurrencies', { onStateChange } ) : null }
+					onPress={ onPressCurrency }
 
 					containerStyle={ StyleSheet.flatten( [ styles.itemContainer ] ) }
 					contentContainerStyle={ { flex: 2 } }

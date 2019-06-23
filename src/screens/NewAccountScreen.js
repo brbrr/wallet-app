@@ -80,6 +80,12 @@ class NewAccountScreen extends React.Component {
 		navigation.goBack();
 	}
 
+	onPressCurrency = () => {
+		if ( ! this.state.isEdit ) {
+			this.props.navigation.navigate( 'Currencies', { onStateChange: this.onStateChange } );
+		}
+	}
+
 	render() {
 		console.log( '!!!!WWWWWW' );
 		console.log( this.state, this.props );
@@ -98,7 +104,7 @@ class NewAccountScreen extends React.Component {
 				currencyCode={ currency.code }
 				navigate={ navigation.navigate }
 				onStateChange={ this.onStateChange }
-				isEditMode={ isEdit }
+				onPressCurrency={ this.onPressCurrency }
 			/>
 		);
 	}
@@ -123,3 +129,17 @@ export default connect(
 	mapStateToProps,
 	mapDispatchToProps
 )( NewAccountScreen );
+
+class SNewAccountScreen extends NewAccountScreen {
+	onPressCurrency = () => {
+		if ( ! this.state.isEdit ) {
+			this.props.navigation.navigate( 'SettingsCurrencies', { onStateChange: this.onStateChange } );
+		}
+	}
+}
+
+export const SettingsNewAccountsScreen = connect(
+	mapStateToProps,
+	mapDispatchToProps
+)( SNewAccountScreen );
+
