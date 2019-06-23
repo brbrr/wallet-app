@@ -11,7 +11,7 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import { CurrenciesStack } from './NewRecordNavigator';
+import { CurrenciesStack, AccountsStack } from './NewRecordNavigator';
 import IconSelector from '../components/IconSelector';
 import ColorSelector from '../components/ColorSelector';
 import NewAccountScreen from '../screens/NewAccountScreen';
@@ -35,16 +35,17 @@ HomeStack.navigationOptions = {
 	),
 };
 
-export const SettingsAccountsStack = createStackNavigator( {
-	AccountsList: { screen: AccountsScreen },
-	NewAccount: { screen: NewAccountScreen },
-	IconSelector: { screen: IconSelector },
-	ColorSelector: { screen: ColorSelector },
-} );
+// export const SettingsAccountsStack = createStackNavigator( {
+// 	AccountsList: { screen: AccountsScreen },
+// 	NewAccount: { screen: NewAccountScreen },
+// 	IconSelector: { screen: IconSelector },
+// 	ColorSelector: { screen: ColorSelector },
+// } );
 
 const SettingsStack = createStackNavigator( {
 	Settings: SettingsScreen,
-	SettingsAccounts: { screen: SettingsAccountsStack, navigationOptions: { header: null } },
+	SettingsAccounts: { screen: AccountsStack, navigationOptions: { header: null } },
+	// SettingsAccounts: { screen: SettingsAccountsStack, navigationOptions: { header: null } },
 	SettingsCurrencies: { screen: CurrenciesStack, navigationOptions: { header: null } },
 } );
 

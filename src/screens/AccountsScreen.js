@@ -6,6 +6,8 @@ import { Animated, Easing, StyleSheet, Text, View, Dimensions, Platform, Button 
 import SortableList from 'react-native-sortable-list';
 import { connect } from 'react-redux';
 import { ListItem } from 'react-native-elements';
+
+import { isEqual } from 'lodash';
 /**
  * Internal dependencies
  */
@@ -29,8 +31,8 @@ export class AccountsScreen extends Component {
 
 		if ( isReorderEnabled ) {
 			headersConfig.rightTitle = 'Done';
-			headersConfig.leftTitle = 'Cancel';
 			headersConfig.rightOnPress = () => _updateAccountsOrder( nextOrder ) && navigation.setParams( { isReorderEnabled: false } );
+			headersConfig.leftTitle = 'Cancel';
 			headersConfig.leftOnPress = () => navigation.setParams( { isReorderEnabled: false } );
 		}
 		return {
@@ -61,14 +63,30 @@ export class AccountsScreen extends Component {
 		} );
 	}
 
+	componentDidUpdate( prevProps, prevState ) {
+		Object.entries( this.props ).forEach( ( [ key, val ] ) =>
+			prevProps[ key ] !== val && console.log( `Prop '${ key }' changed` )
+		);
+		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
+			prevState[ key ] !== val && console.log( `State '${ key }' changed` )
+		);
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		if ( ! isEqual( this.state.accountOrder, nextProps.accountOrder ) ) {
+			this.setState( { accountOrder: nextProps.accountOrder } );
+		}
+	}
+
 	onReorderClick = () => this.props.navigation.setParams( { isReorderEnabled: true } )
 
-	onChangeOrder = ( nextOrder ) => {
-		this.props.navigation.setParams( { nextOrder } );
+	onChangeOrder = ( key, nextOrder ) => {
 		this.setState( { accountOrder: nextOrder } );
+		this.props.navigation.setParams( { nextOrder } ); // We need this to update order in redux state within screen header
 	}
 
 	render() {
+		console.log( '!!!! Accounts screen' );
 		const { accountsById, navigation } = this.props;
 		const { accountOrder } = this.state;
 
@@ -88,7 +106,8 @@ export class AccountsScreen extends Component {
 					data={ accountsById }
 					order={ accountOrder }
 					renderRow={ this._renderRow }
-					onChangeOrder={ this.onChangeOrder }
+					renderHeader={ () => <View style={ { marginTop: 20 } } /> }
+					onReleaseRow={ this.onChangeOrder }
 				/>
 				{ /* Be fancy about what the state of this button. Maybe hide/update it's title */ }
 				<View style={ { flex: 0.1, justifyContent: 'flex-end' } }>
@@ -104,16 +123,16 @@ export class AccountsScreen extends Component {
 		);
 	}
 
-	onPress = ( id ) => {
+	onListRowPress = ( accountId ) => {
 		const { navigation } = this.props;
 		const onStateChange = navigation.getParam( 'onStateChange' );
 
-		onStateChange( id, 'accountId' );
+		onStateChange( { accountId } );
 		navigation.goBack( null );
 	}
 
 	_renderRow = ( { key, index, data, disabled, active } ) => {
-		return <ListRow item={ data } active={ active } disabled={ disabled } onStateChange={ this.onPress } />;
+		return <ListRow item={ data } active={ active } disabled={ disabled } onStateChange={ this.onListRowPress } />;
 	}
 }
 
@@ -164,15 +183,16 @@ class ListRow extends Component {
 		}
 	}
 
+	// TODO: extract into helper function
 	getIconConfiguration( item ) {
 		let iconConfiguration = null;
-		if ( item.icon ) {
+		if ( item.iconName ) {
 			iconConfiguration = {
-				name: item.icon,
+				name: item.iconName,
 				type: 'font-awesome',
 				reverse: true,
 				reverseColor: 'white',
-				color: item.color,
+				color: item.colorCode,
 				size: 16,
 				containerStyle: { margin: -2 },
 			};
@@ -182,8 +202,6 @@ class ListRow extends Component {
 	}
 
 	render() {
-		console.log( this.props );
-
 		const { item, disabled, onStateChange } = this.props;
 
 		return (
@@ -209,12 +227,6 @@ const styles = StyleSheet.create( {
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: '#eee',
-
-		...Platform.select( {
-			ios: {
-				paddingTop: 20,
-			},
-		} ),
 	},
 
 	title: {
@@ -246,7 +258,7 @@ const styles = StyleSheet.create( {
 		alignItems: 'center',
 		backgroundColor: '#fff',
 		// padding: 16,
-		// height: 80,
+		height: 80,
 		flex: 1,
 		// marginTop: 7,
 		// marginBottom: 12,
