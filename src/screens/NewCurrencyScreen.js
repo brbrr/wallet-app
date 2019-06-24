@@ -15,12 +15,12 @@ import currenciesList from '../utils/currenciesList';
 class NewCurrencyScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
 		title: 'New Currency',
-		headerRight: (
-			<Button
-				onPress={ () => navigation.state.params.addNewCurrencyAndGoBack() }
-				title="Add"
-			/>
-		),
+		// headerRight: (
+		// 	<Button
+		// 		onPress={ () => navigation.state.params.addNewCurrencyAndGoBack() }
+		// 		title="Add"
+		// 	/>
+		// ),
 		headerLeft: (
 			<Button
 				onPress={ () => navigation.goBack() }
@@ -36,19 +36,19 @@ class NewCurrencyScreen extends React.Component {
 			balance: null,
 			search: '',
 		};
-		this.props.navigation.setParams(
-			{ addNewCurrencyAndGoBack: this.addNewCurrencyAndGoBack.bind( this ) }
-		);
+		// this.props.navigation.setParams(
+		// 	{ addNewCurrencyAndGoBack: this.addNewCurrencyAndGoBack }
+		// );
 	}
 
 	updateSearch = ( search ) => {
 		this.setState( { search } );
 	};
 
-	addNewCurrencyAndGoBack( code, name ) {
+	addNewCurrencyAndGoBack = ( code, name ) => {
 		const { navigation, _addNewCurrency } = this.props;
 		_addNewCurrency( { code, name } );
-		navigation.goBack();
+		navigation.goBack( null );
 	}
 
 	render() {
