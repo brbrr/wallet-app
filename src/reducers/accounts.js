@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { ADD_NEW_ACCOUNT, UPDATE_ACCOUNTS_ORDER, UPDATE_ACCOUNT } from '../actions';
+import { ADD_NEW_ACCOUNT, UPDATE_ACCOUNTS_ORDER, UPDATE_ACCOUNT, UPDATE_ACCOUNT_BALANCE } from '../actions';
 import { addNewItem } from '../utils/reducerHelper';
 
 const initialState = {
@@ -27,15 +27,21 @@ const initialState = {
 };
 
 export default function accounts( state = initialState, action ) {
-	switch ( action.type ) {
+	const { account, type } = action;
+	switch ( type ) {
 		case ADD_NEW_ACCOUNT:
-			return addNewItem( action.account, state );
+			return addNewItem( account, state );
 		case UPDATE_ACCOUNT:
 			return {
-				byId: { ...state.byId, [ action.account.id ]: action.account },
+				byId: { ...state.byId, [ account.id ]: account },
 				allIds: [ ...state.allIds ],
 			};
-		case UPDATE_ACCOUNTS_ORDER:
+		case UPDATE_ACCOUNT_BALANCE:
+			account.balance = action.newBalance;
+			return {
+				byId: { ...state.byId, [ account.id ]: account },
+				allIds: [ ...state.allIds ],
+			};		case UPDATE_ACCOUNTS_ORDER:
 			return {
 				...state,
 				allIds: action.newOrder,

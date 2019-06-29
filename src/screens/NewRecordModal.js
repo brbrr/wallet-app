@@ -13,6 +13,7 @@ import moment from 'moment';
 import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord } from '../actions/records';
 import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
+import { updateAccountBalance } from '../actions';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -44,7 +45,7 @@ class NewRecordModal extends React.Component {
 		const account = getDefaultAccount( props );
 		const category = getDefaultCategory( props );
 		this.state = {
-			amount: null,
+			amount: 0,
 			description: '',
 			accountId: account.id,
 			currencyId: account.currencyId,
@@ -86,7 +87,7 @@ class NewRecordModal extends React.Component {
 
 	createNewRecordAndGoBack() {
 		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, id, isEdit } = this.state;
-		const { _createNewRecord, _updateRecord, navigation } = this.props;
+		const { _createNewRecord, _updateRecord, _updateAccountBalance, navigation } = this.props;
 
 		const record = {
 			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
@@ -103,10 +104,15 @@ class NewRecordModal extends React.Component {
 		// e.g. amount value
 		if ( ! isEdit ) {
 			_createNewRecord( record );
+			const account = getAccountById( this.props, accountId );
+			const newBalance = account.balance - amount;
+			_updateAccountBalance( account, newBalance );
+			// TODO: make it work for the updated tx
 		} else {
 			record.id = id;
 			_updateRecord( record );
 		}
+
 		navigation.navigate( 'Main' );
 	}
 
@@ -285,6 +291,7 @@ const mapDispatchToProps = ( dispatch ) => {
 	return {
 		_createNewRecord: ( record ) => dispatch( createNewRecord( record ) ),
 		_updateRecord: ( record ) => dispatch( updateRecord( record ) ),
+		_updateAccountBalance: ( account, newBalance ) => dispatch( updateAccountBalance( account, newBalance ) ),
 	};
 };
 

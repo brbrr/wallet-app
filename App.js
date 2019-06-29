@@ -12,7 +12,7 @@ import { Provider } from 'react-redux';
  * Internal dependencies
  */
 import AppNavigator from './src/navigation/AppNavigator';
-import store from './src/utils/createStore';
+import store from './src/utils/create-store';
 
 export default class App extends React.Component {
 	state = {

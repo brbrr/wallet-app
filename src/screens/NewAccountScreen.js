@@ -87,9 +87,6 @@ class NewAccountScreen extends React.Component {
 	}
 
 	render() {
-		console.log( '!!!!WWWWWW' );
-		console.log( this.state, this.props );
-
 		const { name, balance, colorCode, iconName, currencyId, isEdit } = this.state;
 		const { navigation } = this.props;
 
