@@ -117,7 +117,6 @@ class NewRecordModal extends React.Component {
 	}
 
 	onStateChange = ( state ) => this.setState( state )
-	// onStateChange = ( value, name ) => this.setState( { [ name ]: value } )
 
 	// Don't allow multiple periods in amount
 	onAmountChange( amount ) {
