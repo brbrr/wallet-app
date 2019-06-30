@@ -14,6 +14,7 @@ import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord } from '../actions/records';
 import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
 import { updateAccountBalance } from '../actions';
+import { getUpdatedAccountBalance } from '../utils';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -51,7 +52,7 @@ class NewRecordModal extends React.Component {
 			currencyId: account.currencyId,
 			categoryId: category.id,
 			createdAt: Date.now(),
-			typeId: 2,
+			typeId: 0,
 			isEdit,
 		};
 
@@ -100,16 +101,21 @@ class NewRecordModal extends React.Component {
 			type: 'expense',
 		};
 
+		// TODO: make it work for the updated tx
+		const account = getAccountById( this.props, accountId );
+		console.log( record, account );
+
 		// Sanitize record object!
 		// e.g. amount value
 		if ( ! isEdit ) {
-			_createNewRecord( record );
-			const account = getAccountById( this.props, accountId );
-			const newBalance = account.balance - amount;
+			const newBalance = getUpdatedAccountBalance( this.props, record );
 			_updateAccountBalance( account, newBalance );
-			// TODO: make it work for the updated tx
+			_createNewRecord( record );
 		} else {
 			record.id = id;
+			// this should be called _before_ updating the account and after record got assigned an id
+			const newBalance = getUpdatedAccountBalance( this.props, record );
+			_updateAccountBalance( account, newBalance );
 			_updateRecord( record );
 		}
 
@@ -198,7 +204,7 @@ class NewRecordModal extends React.Component {
 							inputContainerStyle={ { borderBottomWidth: 0 } }
 							inputStyle={ styles.amountInput }
 							keyboardType="numeric"
-							value={ amount }
+							value={ amount.toString() }
 							placeholder="0.0"
 							onChangeText={ ( amnt ) => this.onAmountChange( amnt ) }
 							autoFocus

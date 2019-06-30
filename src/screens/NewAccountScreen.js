@@ -95,7 +95,7 @@ class NewAccountScreen extends React.Component {
 		return (
 			<AccountInfo
 				name={ name }
-				balance={ balance }
+				balance={ balance.toString() }
 				colorCode={ colorCode }
 				iconName={ iconName }
 				currencyCode={ currency.code }

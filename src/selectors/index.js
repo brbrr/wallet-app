@@ -1,13 +1,9 @@
-/**
- * Internal dependencies
- */
-import { getMaxId } from '../utils/reducerHelper';
 
 export const getAccounts = ( state ) => state.accounts;
 export const getAccountsById = ( state ) => getAccounts( state ).byId;
 export const getAccountOrder = ( state ) => getAccounts( state ).allIds;
 export const getAccountById = ( state, accountId ) => getAccountsById( state )[ accountId ];
-export const getDefaultAccount = ( state ) => getAccountById( state, getMaxId( getAccountOrder( state ) ) );
+export const getDefaultAccount = ( state ) => getAccountById( state, getAccountOrder( state )[ 0 ] );
 
 export const getCurrencies = ( state ) => state.currencies;
 export const getCurrenciesById = ( state ) => getCurrencies( state ).byId;
