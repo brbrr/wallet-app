@@ -7,33 +7,26 @@ import { createStackNavigator } from 'react-navigation';
  * Internal dependencies
  */
 import NewRecordModal from '../screens/NewRecordModal';
-// import NewRecordModal from '../components/record-modal/RecordModal';
 import CategoriesScreen from '../screens/CategoriesScreen';
 import CurrenciesScreen from '../screens/CurrenciesScreen';
-import NewCategoryScreen from '../screens/NewCategoryScreen';
-import IconSelector from '../components/IconSelector';
-import ColorSelector from '../components/ColorSelector';
-import NewAccountScreen from '../screens/NewAccountScreen';
-import NewCurrencyScreen from '../screens/NewCurrencyScreen';
 import AccountsScreen from '../screens/AccountsScreen';
+import { NewAccountStack } from './AccountsNavigator';
+import { NewCurrencyStack } from './CurrenciesNavigator';
+import { NewCategoryStack } from './CategoriesStack';
 
 export const CategoriesStack = createStackNavigator( {
 	CategoriesList: { screen: CategoriesScreen },
-	NewCategory: { screen: NewCategoryScreen },
-	IconSelector: { screen: IconSelector },
-	ColorSelector: { screen: ColorSelector },
+	NewCategory: NewCategoryStack,
 } );
 
 export const AccountsStack = createStackNavigator( {
 	AccountsList: { screen: AccountsScreen },
-	NewAccount: { screen: NewAccountScreen },
-	IconSelector: { screen: IconSelector },
-	ColorSelector: { screen: ColorSelector },
+	NewAccount: NewAccountStack,
 } );
 
 export const CurrenciesStack = createStackNavigator( {
 	CurrenciesList: { screen: CurrenciesScreen },
-	NewCurrency: { screen: NewCurrencyScreen },
+	NewCurrencyStack,
 } );
 
 export default createStackNavigator( {

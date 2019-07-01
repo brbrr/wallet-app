@@ -26,7 +26,7 @@ class NewAccountScreen extends React.Component {
 			),
 			headerLeft: (
 				<Button
-					onPress={ () => navigation.goBack() }
+					onPress={ () => navigation.goBack( null ) }
 					title="Back"
 				/>
 			),
