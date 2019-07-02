@@ -8,11 +8,15 @@ import { Asset } from 'expo-asset';
 import * as Font from 'expo-font';
 import * as Icon from '@expo/vector-icons';
 import { Provider } from 'react-redux';
+// Before rendering any navigation stack
+import { useScreens } from 'react-native-screens';
 /**
  * Internal dependencies
  */
 import AppNavigator from './src/navigation/AppNavigator';
 import store from './src/utils/create-store';
+
+useScreens();
 
 export default class App extends React.Component {
 	state = {

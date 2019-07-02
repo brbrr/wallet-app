@@ -32,7 +32,6 @@ export function getRecordAmount( { amount, typeId } ) {
 
 // TODO: Set a expected currency, e.g. in which to convert
 export function getTotalSpent( records ) {
-	console.log( '######' );
 	const state = store.getState();
 
 	return records.reduce( ( acc, record ) => {
