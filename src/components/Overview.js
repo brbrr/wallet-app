@@ -14,7 +14,6 @@ import { getTotalSpent } from '../utils';
 
 const Overview = ( { records, account } ) => {
 	const totalSpent = getTotalSpent( records );
-	console.log( account );
 
 	const backgroundColor = account ? account.colorCode : '#8B9FBB';
 	return (

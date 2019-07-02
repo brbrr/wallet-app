@@ -34,10 +34,6 @@ class HomeScreen extends React.Component {
 		};
 	}
 
-	updateView = ( viewId ) => {
-		this.setState( { view: viewId } );
-	}
-
 	componentDidUpdate( prevProps, prevState ) {
 		Object.entries( this.props ).forEach( ( [ key, val ] ) =>
 			prevProps[ key ] !== val && console.log( `Prop '${ key }' changed` )
@@ -109,6 +105,7 @@ class HomeScreen extends React.Component {
 				loop={ false }
 				paginationStyle={ { position: 'absolute', top: this.state.viewCenter } }
 				bounces={ true }
+				showsButtons={ false }
 			>
 				{ this.renderRecordsLists() }
 			</Swiper>

@@ -9,10 +9,10 @@
     "storybook": "start-storybook -p 7007"
   },
   "dependencies": {
-    "@expo/samples": "2.1.1",
+    "@expo/samples": "3.0.3",
     "@expo/vector-icons": "^9.0.0",
     "currency.js": "^1.2.2",
-    "expo": "^33.0.6",
+    "expo": "^33.0.7",
     "expo-asset": "^5.0.1",
     "expo-font": "~5.0.1",
     "lodash": "^4.17.11",
@@ -22,7 +22,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
     "react-native-elements": "^1.1.0",
     "react-native-sortable-list": "^0.0.23",
-    "react-native-swiper": "^1.5.14",
+    "react-native-swiper": "1.6.0-dev",
     "react-navigation": "^3.11.0",
     "react-redux": "^6.0.1",
     "redux": "^4.0.1",
