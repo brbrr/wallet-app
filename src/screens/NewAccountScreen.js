@@ -77,7 +77,7 @@ class NewAccountScreen extends React.Component {
 			_updateAccount( account );
 		}
 
-		navigation.goBack();
+		navigation.goBack( null );
 	}
 
 	onPressCurrency = () => {

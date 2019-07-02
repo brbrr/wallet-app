@@ -56,7 +56,7 @@ export const RecordsList = ( { records, accounts, categories, currencies, naviga
 				key={ `${ idx }-${ index }` }
 				record={ record }
 				category={ category }
-				account={ account }
+				accountColor={ account.colorCode }
 				amount={ amount }
 				navigateEditRecordScreen={ navigateEditRecordScreen }
 			/> );
