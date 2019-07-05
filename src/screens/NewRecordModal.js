@@ -13,7 +13,7 @@ import moment from 'moment';
 import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord } from '../actions/records';
 import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
-import { updateAccountBalance } from '../actions';
+import { updateAccount } from '../actions';
 import { getUpdatedAccountBalance } from '../utils';
 
 class NewRecordModal extends React.Component {
@@ -88,7 +88,7 @@ class NewRecordModal extends React.Component {
 
 	createNewRecordAndGoBack() {
 		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, id, isEdit } = this.state;
-		const { _createNewRecord, _updateRecord, _updateAccountBalance, navigation } = this.props;
+		const { _createNewRecord, _updateRecord, _updateAccount, navigation } = this.props;
 
 		const record = {
 			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
@@ -109,14 +109,16 @@ class NewRecordModal extends React.Component {
 		// e.g. amount value
 		if ( ! isEdit ) {
 			const newBalance = getUpdatedAccountBalance( this.props, record );
-			_updateAccountBalance( account, newBalance );
+			account.balance = newBalance;
 			_createNewRecord( record );
+			_updateAccount( account );
 		} else {
 			record.id = id;
 			// this should be called _before_ updating the account and after record got assigned an id
 			const newBalance = getUpdatedAccountBalance( this.props, record );
-			_updateAccountBalance( account, newBalance );
+			account.balance = newBalance;
 			_updateRecord( record );
+			_updateAccount( account );
 		}
 
 		navigation.navigate( 'Main' );
@@ -296,7 +298,7 @@ const mapDispatchToProps = ( dispatch ) => {
 	return {
 		_createNewRecord: ( record ) => dispatch( createNewRecord( record ) ),
 		_updateRecord: ( record ) => dispatch( updateRecord( record ) ),
-		_updateAccountBalance: ( account, newBalance ) => dispatch( updateAccountBalance( account, newBalance ) ),
+		_updateAccount: ( account ) => dispatch( updateAccount( account ) ),
 	};
 };
 
