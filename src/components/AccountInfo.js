@@ -6,7 +6,7 @@ import { StyleSheet, ScrollView, Platform } from 'react-native';
 import { ListItem, Input } from 'react-native-elements';
 import PropTypes from 'prop-types';
 
-const AccountInfo = ( { navigate, onStateChange, name, balance, colorCode, iconName, currencyCode, onPressCurrency } ) => <ScrollView style={ styles.container } keyboardShouldPersistTaps="always" >
+const AccountInfo = ( { navigate, onStateChange, name, balance, colorCode, iconName, currencyCode, onPressCurrency, onDelete } ) => <ScrollView style={ styles.container } keyboardShouldPersistTaps="always" >
 	<ListItem
 		title="Name"
 		rightTitle={ <Input
@@ -90,6 +90,26 @@ const AccountInfo = ( { navigate, onStateChange, name, balance, colorCode, iconN
 		chevron
 		rightTitle={ 'Select' }
 		onPress={ () => navigate( 'IconSelector', { onStateChange } ) }
+
+		containerStyle={ styles.itemContainer }
+		contentContainerStyle={ { flex: 2 } }
+		rightContentContainerStyle={ { flex: 1 } }
+	/>
+
+	<ListItem
+		title="Delete account"
+		bottomDivider={ true }
+		topDivider={ true }
+		leftIcon={ {
+			name: 'trash',
+			type: 'font-awesome',
+			color: 'black',
+			size: 42,
+			containerStyle: { margin: -2 },
+		} }
+		chevron
+		rightTitle={ 'Select' }
+		onPress={ onDelete }
 
 		containerStyle={ styles.itemContainer }
 		contentContainerStyle={ { flex: 2 } }
