@@ -2,13 +2,13 @@
  * External dependencies
  */
 import React from 'react';
-import { Button } from 'react-native';
+import { Button, Alert } from 'react-native';
 import { connect } from 'react-redux';
 
 /**
  * Internal dependencies
  */
-import { addNewAccount, updateAccount } from '../actions';
+import { addNewAccount, updateAccount, deleteAccount } from '../actions';
 import AccountInfo from '../components/AccountInfo';
 import { getCurrencyById, getAccountById } from '../selectors';
 
@@ -64,7 +64,7 @@ class NewAccountScreen extends React.Component {
 
 		const account = {
 			name,
-			balance,
+			balance: Number( balance ),
 			colorCode,
 			iconName,
 			currencyId,
@@ -86,6 +86,27 @@ class NewAccountScreen extends React.Component {
 		}
 	}
 
+	onDelete = () => {
+		const { isEdit, id } = this.state;
+		if ( ! isEdit ) {
+			return;
+		}
+
+		Alert.alert(
+			'Alert Title',
+			'My Alert Msg',
+			[
+				{
+					text: 'Cancel',
+					onPress: () => console.log( 'Cancel Pressed' ),
+					style: 'cancel',
+				},
+				{ text: 'OK', onPress: () => this.props._deleteAccount( id ) },
+			],
+			{ cancelable: false },
+		);
+	}
+
 	render() {
 		const { name, balance, colorCode, iconName, currencyId, isEdit } = this.state;
 		const { navigation } = this.props;
@@ -102,6 +123,7 @@ class NewAccountScreen extends React.Component {
 				navigate={ navigation.navigate }
 				onStateChange={ this.onStateChange }
 				onPressCurrency={ this.onPressCurrency }
+				onDelete={ this.onDelete }
 			/>
 		);
 	}
@@ -119,6 +141,7 @@ const mapDispatchToProps = ( dispatch ) => {
 	return {
 		_addNewAccount: ( account ) => dispatch( addNewAccount( account ) ),
 		_updateAccount: ( account ) => dispatch( updateAccount( account ) ),
+		_deleteAccount: ( accountId ) => dispatch( deleteAccount( accountId ) ),
 	};
 };
 
