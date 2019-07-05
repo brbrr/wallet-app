@@ -6,6 +6,7 @@ export const ADD_NEW_ACCOUNT = 'ADD_NEW_ACCOUNT';
 export const UPDATE_ACCOUNT = 'UPDATE_ACCOUNT';
 export const UPDATE_ACCOUNT_BALANCE = 'UPDATE_ACCOUNT_BALANCE';
 export const UPDATE_ACCOUNTS_ORDER = 'UPDATE_ACCOUNTS_ORDER';
+export const DELETE_ACCOUNT = 'DELETE_ACCOUNT';
 export const SELECT_RECORD_TYPE = 'SELECT_RECORD_TYPE';
 export const SELECT_RECORD_DATE = 'SELECT_RECORD_DATE';
 export const UPDATE_DRAFT_WITH_RECORD = 'UPDATE_DRAFT_WITH_RECORD';
@@ -44,6 +45,10 @@ export function updateAccountBalance( account, newBalance ) {
 
 export function updateAccountsOrder( newOrder ) {
 	return { type: UPDATE_ACCOUNTS_ORDER, newOrder };
+}
+
+export function deleteAccount( accountId ) {
+	return { type: DELETE_ACCOUNT, accountId };
 }
 
 // Records / Drafts
