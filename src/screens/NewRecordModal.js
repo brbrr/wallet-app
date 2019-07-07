@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Button, Text, StyleSheet } from 'react-native';
+import { View, ScrollView, Button, Text, StyleSheet } from 'react-native';
 import { Input, ListItem, ButtonGroup, Button as EButton } from 'react-native-elements';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -11,10 +11,11 @@ import moment from 'moment';
  * Internal dependencies
  */
 import DatePicker from '../components/DatePickerModal';
-import { createNewRecord, updateRecord } from '../actions/records';
+import { createNewRecord, updateRecord, deleteRecord } from '../actions/records';
 import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
 import { updateAccount } from '../actions';
 import { getUpdatedAccountBalance } from '../utils';
+import DeleteListItem from '../components/list-items/Delete';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -86,12 +87,12 @@ class NewRecordModal extends React.Component {
 		);
 	}
 
-	createNewRecordAndGoBack() {
+	getRecordFromState() {
 		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, id, isEdit } = this.state;
-		const { _createNewRecord, _updateRecord, _updateAccount, navigation } = this.props;
 
 		const record = {
-			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
+			amount: amount ? Number( amount ) : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
+			amountInAccountCurrency: 0,
 			description,
 			currencyId,
 			accountId,
@@ -100,6 +101,15 @@ class NewRecordModal extends React.Component {
 			typeId,
 			type: 'expense',
 		};
+
+		return record;
+	}
+
+	createNewRecordAndGoBack() {
+		const { accountId, id, isEdit } = this.state;
+		const { _createNewRecord, _updateRecord, _updateAccount, navigation } = this.props;
+
+		const record = this.getRecordFromState();
 
 		// TODO: make it work for the updated tx
 		const account = getAccountById( this.props, accountId );
@@ -120,6 +130,28 @@ class NewRecordModal extends React.Component {
 			_updateRecord( record );
 			_updateAccount( account );
 		}
+
+		navigation.navigate( 'Main' );
+	}
+
+	onDeleteAccount = () => {
+		const { navigation, _deleteRecord, _updateAccount } = this.props;
+		const { accountId, id } = this.state;
+
+		const record = this.getRecordFromState();
+		record.id = id;
+		record.typeId = -1; // deletion ID
+		record.amount = 0;
+		const account = getAccountById( this.props, accountId );
+		console.log( 'THIS IS RECORD!' );
+
+		console.log( record );
+
+		const newBalance = getUpdatedAccountBalance( this.props, record );
+		account.balance = newBalance;
+
+		_deleteRecord( id );
+		_updateAccount( account );
 
 		navigation.navigate( 'Main' );
 	}
@@ -178,7 +210,7 @@ class NewRecordModal extends React.Component {
 	render() {
 		console.log( '!!!!!!!! NewRecordModal screen render' );
 
-		const { amount, description, accountId, currencyId, categoryId, typeId } = this.state;
+		const { amount, description, accountId, currencyId, categoryId, typeId, id, isEdit } = this.state;
 		const { navigation } = this.props;
 
 		const category = getCategoryById( this.props, categoryId );
@@ -188,7 +220,7 @@ class NewRecordModal extends React.Component {
 		const buttons = [ 'expense', 'income', 'transfer' ];
 
 		return (
-			<View style={ { backgroundColor: '#f9f9f9' } }>
+			<ScrollView style={ { backgroundColor: '#f9f9f9' } }>
 				<ButtonGroup
 					onPress={ ( id ) => this.setState( { typeId: id } ) }
 					selectedIndex={ typeId }
@@ -277,7 +309,9 @@ class NewRecordModal extends React.Component {
 						containerStyle: { paddingLeft: 15, paddingRight: 14 },
 					} }
 				/>
-			</View>
+
+				{ isEdit ? <DeleteListItem onPress={ this.onDeleteAccount } /> : null }
+			</ScrollView>
 		);
 	}
 }
@@ -299,6 +333,7 @@ const mapDispatchToProps = ( dispatch ) => {
 		_createNewRecord: ( record ) => dispatch( createNewRecord( record ) ),
 		_updateRecord: ( record ) => dispatch( updateRecord( record ) ),
 		_updateAccount: ( account ) => dispatch( updateAccount( account ) ),
+		_deleteRecord: ( id ) => dispatch( deleteRecord( id ) ),
 	};
 };
 
