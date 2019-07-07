@@ -25,8 +25,10 @@ export function getRecordAmount( { amount, typeId } ) {
 	switch ( typeId ) {
 		case 0:
 			return c( -1 ).multiply( amount );
+		case -1:
+			return c( amount );
 		default:
-			return amount;
+			return c( amount );
 	}
 }
 
@@ -58,8 +60,8 @@ function convertAmount( amount, { from = 'USD', to = 'EUR' } = {} ) {
 
 function convertRecordAmountToAccountCurrency( state, record ) {
 	const account = getAccountById( state, record.accountId );
-	const toCurrency = getCurrencyById( state, account.currencyId );
 	const fromCurrency = getCurrencyById( state, record.currencyId );
+	const toCurrency = getCurrencyById( state, account.currencyId );
 	console.log( record.amount, { from: fromCurrency.code, to: toCurrency.code } );
 
 	return convertAmount( record.amount, { from: fromCurrency.code, to: toCurrency.code } );
@@ -71,6 +73,7 @@ function convertRecordAmountToAccountCurrency( state, record ) {
  * - new expense - when balance get decreased
  * - updated expense - when balance get updated with positive or negative diff amount
  * - new/updated income - when balance get increased
+ * - TODO: Add support for deleting record
  * - maybe some other cases?
  *
  * @param {Object} state Redux state

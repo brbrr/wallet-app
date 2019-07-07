@@ -13,3 +13,14 @@ export function getMaxId( ids ) {
 	return sortedIds.slice( -1 )[ 0 ] || 0;
 }
 
+export function deleteItem( id, state ) {
+	const byId = Object.values( state.byId ).reduce( ( acc, item ) => {
+		if ( item.id !== id ) {
+			acc[ item.id ] = state.byId[ item.id ];
+		}
+		return acc;
+	}, {} );
+	const allIds = state.allIds.filter( ( idx ) => idx !== id );
+	return { byId, allIds };
+}
+

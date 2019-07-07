@@ -10,8 +10,8 @@ const defaultIcon = {
 	name: 'trash',
 	type: 'font-awesome',
 	color: 'black',
-	size: 42,
-	containerStyle: { margin: -2 },
+	size: 25,
+	containerStyle: { paddingLeft: 15, paddingRight: 14 },
 };
 
 const defaultTitle = 'Delete';
@@ -38,17 +38,12 @@ export default DeleteListItem;
 
 const styles = StyleSheet.create( {
 	container: {
-		flex: 1,
-		backgroundColor: '#eee',
-
-		...Platform.select( {
-			ios: {
-				paddingTop: 20,
-			},
-		} ),
+		paddingTop: 3,
+		paddingBottom: 3,
+		height: 55,
 	},
-	contentContainer: { flex: 2 },
-	rightContentContainer: { flex: 1 },
+	// contentContainer: { flex: 2 },
+	// rightContentContainer: { flex: 1 },
 } );
 
 DeleteListItem.propTypes = {

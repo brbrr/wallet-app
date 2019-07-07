@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { ADD_NEW_RECORD, UPDATE_RECORD } from '../actions/records';
-import { addNewItem } from '../utils/reducerHelper';
+import { ADD_NEW_RECORD, UPDATE_RECORD, DELETE_RECORD } from '../actions/records';
+import { addNewItem, deleteItem } from '../utils/reducerHelper';
 
 const initialState = {
 	byId: {
@@ -106,9 +106,12 @@ export default function records( state = initialState, action ) {
 			return addNewItem( action.record, state );
 		case UPDATE_RECORD:
 			return {
+				...state,
 				byId: { ...state.byId, [ action.record.id ]: action.record },
-				allIds: [ ...state.allIds ],
 			};
+
+		case DELETE_RECORD:
+			return deleteItem( action.id, state );
 		default:
 			return state;
 	}
