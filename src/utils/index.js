@@ -32,6 +32,8 @@ export function getRecordAmount( { amount, typeId } ) {
 
 // TODO: Set a expected currency, e.g. in which to convert
 export function getTotalSpent( records ) {
+	// console.log( 'getTotalSpent' );
+
 	const state = store.getState();
 
 	return records.reduce( ( acc, record ) => {
@@ -56,12 +58,22 @@ function convertAmount( amount, { from = 'USD', to = 'EUR' } = {} ) {
 	return fx.convert( amount, { from, to } );
 }
 
+/**
+ * Converts record amount into record's account currency
+	* @param {Object} state Redux state, or part of it which should include accounts, currencies and records
+	* @param {Object} record Record object from redux state
+	* @return {number} converted amount
+ */
 function convertRecordAmountToAccountCurrency( state, record ) {
 	const account = getAccountById( state, record.accountId );
 	const toCurrency = getCurrencyById( state, account.currencyId );
 	const fromCurrency = getCurrencyById( state, record.currencyId );
 	console.log( record.amount, { from: fromCurrency.code, to: toCurrency.code } );
+	if ( toCurrency === fromCurrency ) {
+		return record.amount;
+	}
 
+	// TODO: BUG: base currency affects same currency conversion. Maybe just skip conversion?
 	return convertAmount( record.amount, { from: fromCurrency.code, to: toCurrency.code } );
 }
 
@@ -82,6 +94,7 @@ export function getUpdatedAccountBalance( state, record ) {
 	// currencies not match, need to convert
 	let recordAmount = record.amount;
 	const account = getAccountById( state, record.accountId );
+	let balance = c( account.balance );
 
 	const isExistingRecord = !! record.id;
 
@@ -106,7 +119,7 @@ export function getUpdatedAccountBalance( state, record ) {
 			existingRecordAmount = convertRecordAmountToAccountCurrency( state, existingRecord );
 		}
 
-		account.balance = c( account.balance ).subtract( getRecordAmount( { amount: existingRecordAmount, typeId: existingRecord.typeId } ) );
+		balance = c( balance ).subtract( getRecordAmount( { amount: existingRecordAmount, typeId: existingRecord.typeId } ) );
 		/**
 		 * Er: -23; new r: -34; initial balance: 12
 		 * 1: 12 + (-23) = -11
@@ -119,5 +132,5 @@ export function getUpdatedAccountBalance( state, record ) {
 		recordAmount = convertRecordAmountToAccountCurrency( state, record );
 	}
 	recordAmount = getRecordAmount( { amount: recordAmount, typeId: record.typeId } );
-	return c( account.balance ).add( recordAmount );
+	return c( balance ).add( recordAmount );
 }
