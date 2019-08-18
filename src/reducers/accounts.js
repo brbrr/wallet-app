@@ -7,7 +7,7 @@ import { addNewItem } from '../utils/reducerHelper';
 const initialState = {
 	byId: {
 		1: {
-			balance: 0,
+			balance: -343.32,
 			name: 'USD Cash',
 			id: 1,
 			currencyId: 1,
@@ -15,7 +15,7 @@ const initialState = {
 			iconName: 'google-wallet',
 		},
 		2: {
-			balance: 0,
+			balance: -5639.5,
 			name: 'UAH Bank',
 			id: 2,
 			currencyId: 2,

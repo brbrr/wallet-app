@@ -8,6 +8,7 @@ const initialState = {
 	byId: {
 		1: {
 			amount: 22,
+			amountInAccountCurrency: 22,
 			createdAt: 1555534119211,
 			description: 'Ice cream',
 			id: 1,
@@ -18,6 +19,7 @@ const initialState = {
 		},
 		2: {
 			amount: 2343.2,
+			amountInAccountCurrency: 2343.2,
 			createdAt: 1555534417211,
 			description: 'Pizza',
 			id: 2,
@@ -28,6 +30,7 @@ const initialState = {
 		},
 		3: {
 			amount: 321.32,
+			amountInAccountCurrency: 321.32,
 			createdAt: 1555554819211,
 			description: 'Random transaction',
 			id: 3,
@@ -38,6 +41,7 @@ const initialState = {
 		},
 		4: {
 			amount: 243.6,
+			amountInAccountCurrency: 243.6,
 			createdAt: 1555597817211,
 			description: 'Whatever',
 			id: 4,
@@ -48,16 +52,18 @@ const initialState = {
 		},
 		5: {
 			amount: 32.6,
+			amountInAccountCurrency: 884.927,
 			createdAt: 1555697817211,
 			description: 'Whatever',
 			id: 5,
 			accountId: 2,
 			categoryId: 1,
-			currencyId: 2,
+			currencyId: 1,
 			typeId: 0,
 		},
 		6: {
 			amount: 765.1,
+			amountInAccountCurrency: 765.1,
 			createdAt: 1552597817211,
 			description: 'Whatever',
 			id: 6,
@@ -68,6 +74,7 @@ const initialState = {
 		},
 		7: {
 			amount: 1600,
+			amountInAccountCurrency: 1600,
 			createdAt: 1555397817211,
 			description: 'Whatever',
 			id: 7,
@@ -78,6 +85,7 @@ const initialState = {
 		},
 		8: {
 			amount: 123,
+			amountInAccountCurrency: 123,
 			createdAt: 1555567817211,
 			description: 'Whatever',
 			id: 8,
@@ -88,6 +96,7 @@ const initialState = {
 		},
 		9: {
 			amount: 532,
+			amountInAccountCurrency: 532,
 			createdAt: 1555591817211,
 			description: 'Whatever',
 			id: 9,

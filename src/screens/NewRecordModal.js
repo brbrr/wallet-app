@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Button, Text, StyleSheet } from 'react-native';
+import { ScrollView, Button, Text, StyleSheet } from 'react-native';
 import { Input, ListItem, ButtonGroup, Button as EButton } from 'react-native-elements';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -14,7 +14,7 @@ import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord } from '../actions/records';
 import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
 import { updateAccountBalance } from '../actions';
-import { getUpdatedAccountBalance } from '../utils';
+import { getUpdatedAccountBalance, convertRecordAmountToAccountCurrency } from '../utils';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -86,12 +86,12 @@ class NewRecordModal extends React.Component {
 		);
 	}
 
-	createNewRecordAndGoBack() {
-		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, id, isEdit } = this.state;
-		const { _createNewRecord, _updateRecord, _updateAccountBalance, navigation } = this.props;
+	getRecordFromState() {
+		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, isEdit, id } = this.state;
 
 		const record = {
-			amount: amount ? amount : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
+			amount: amount ? Number( amount ) : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
+			amountInAccountCurrency: 0,
 			description,
 			currencyId,
 			accountId,
@@ -101,21 +101,32 @@ class NewRecordModal extends React.Component {
 			type: 'expense',
 		};
 
-		// TODO: make it work for the updated tx
+		// If amount, currencyId, or accountId don't changed - we not need to re-calculate this value. Maybe a room for optimization?
+		record.amountInAccountCurrency = convertRecordAmountToAccountCurrency( this.props, record );
+
+		if ( isEdit ) {
+			record.id = id;
+		}
+
+		return record;
+	}
+
+	createNewRecordAndGoBack() {
+		const { accountId, isEdit } = this.state;
+		const { _createNewRecord, _updateRecord, _updateAccountBalance, navigation } = this.props;
 		const account = getAccountById( this.props, accountId );
+		const record = this.getRecordFromState();
+
+		// TODO: make it work for the updated tx
 		console.log( record, account );
 
-		// Sanitize record object!
-		// e.g. amount value
+		// Sanitize record object! e.g. amount value
+		// this should be called _before_ updating the account and after record got assigned an id
+		const newBalance = getUpdatedAccountBalance( this.props, record );
+		_updateAccountBalance( account, newBalance );
 		if ( ! isEdit ) {
-			const newBalance = getUpdatedAccountBalance( this.props, record );
-			_updateAccountBalance( account, newBalance );
 			_createNewRecord( record );
 		} else {
-			record.id = id;
-			// this should be called _before_ updating the account and after record got assigned an id
-			const newBalance = getUpdatedAccountBalance( this.props, record );
-			_updateAccountBalance( account, newBalance );
 			_updateRecord( record );
 		}
 
@@ -186,7 +197,7 @@ class NewRecordModal extends React.Component {
 		const buttons = [ 'expense', 'income', 'transfer' ];
 
 		return (
-			<View style={ { backgroundColor: '#f9f9f9' } }>
+			<ScrollView style={ { backgroundColor: '#f9f9f9' } }>
 				<ButtonGroup
 					onPress={ ( id ) => this.setState( { typeId: id } ) }
 					selectedIndex={ typeId }
@@ -275,7 +286,7 @@ class NewRecordModal extends React.Component {
 						containerStyle: { paddingLeft: 15, paddingRight: 14 },
 					} }
 				/>
-			</View>
+			</ScrollView>
 		);
 	}
 }
