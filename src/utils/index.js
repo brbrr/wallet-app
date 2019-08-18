@@ -34,20 +34,8 @@ export function getRecordAmount( { amount, typeId } ) {
 export function getTotalSpent( records ) {
 	// console.log( 'getTotalSpent' );
 
-	const state = store.getState();
-
 	return records.reduce( ( acc, record ) => {
-		const account = getAccountById( state, record.accountId );
-		// const toCurrency = getCurrencyById( state, recordAccount.currencyId );
-		// const fromCurrency = getCurrencyById( state, record.currencyId );
-
-		// const amount = convertAmount( record.amount, { from: fromCurrency.code, to: toCurrency.code } );
-		// const amount = convertAmount( record.amount, { from: fromCurrency.code, to: 'UAH' } );
-		// const amount = convertRecordAmountToAccountCurrency( state, record );
-		let amount = record.amount;
-		if ( account.currencyId !== record.currencyId ) {
-			amount = convertRecordAmountToAccountCurrency( state, record );
-		}
+		const amount = record.amountInAccountCurrency;
 		return acc.add( amount );
 	}, c( 0 ) ).value;
 }
@@ -64,7 +52,7 @@ function convertAmount( amount, { from = 'USD', to = 'EUR' } = {} ) {
 	* @param {Object} record Record object from redux state
 	* @return {number} converted amount
  */
-function convertRecordAmountToAccountCurrency( state, record ) {
+export function convertRecordAmountToAccountCurrency( state, record ) {
 	const account = getAccountById( state, record.accountId );
 	const toCurrency = getCurrencyById( state, account.currencyId );
 	const fromCurrency = getCurrencyById( state, record.currencyId );
@@ -105,16 +93,15 @@ export function getUpdatedAccountBalance( state, record ) {
 	 */
 
 	if ( isExistingRecord ) {
+		// TODO: Add a case when account is changed
+		// For this we need to update values for both accounts, add back to old account, and remove from new one
 		const existingRecord = getRecordById( state, record.id );
 		let existingRecordAmount = existingRecord.amount;
 
 		// If record currency differs from account currency
 		if (
-			(
-				( record.currencyId === existingRecord.currencyId ) &&
-				( account.currencyId !== record.currencyId )
-			) ||
-			( record.currencyId !== existingRecord.currencyId )
+			( record.currencyId !== existingRecord.currencyId ) || // record currency have changed
+			( account.currencyId !== record.currencyId ) // record currency haven't changed, but switched to other account with differnet account currency
 		) {
 			existingRecordAmount = convertRecordAmountToAccountCurrency( state, existingRecord );
 		}
