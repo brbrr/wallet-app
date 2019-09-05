@@ -12,16 +12,16 @@ import { getRecordAmountWithCurrency } from '../../utils';
 import DayHeader from './DayHeader';
 
 // TODO: separate in two components: RecordsList & FullList(?) components
-export const RecordsList = ( { records, accounts, categories, currencies, navigateEditRecordScreen } ) => {
-	if ( records.length === 0 ) {
+export const RecordsList = ( { recordsArray, accounts, categories, currencies, navigateEditRecordScreen } ) => {
+	if ( recordsArray.length === 0 ) {
 		return (
 			<Text style={ styles.getStartedText }>{ 'No records yet.' }</Text>
 		);
 	}
 
-	records.sort( ( a, b ) => a.createdAt < b.createdAt );
+	recordsArray.sort( ( a, b ) => a.createdAt < b.createdAt );
 
-	const list = records.reduce( ( acc, record ) => {
+	const list = recordsArray.reduce( ( acc, record ) => {
 		const date = new Date( record.createdAt );
 		const recordDate = date.toISOString().split( 'T' )[ 0 ];
 
@@ -49,9 +49,9 @@ export const RecordsList = ( { records, accounts, categories, currencies, naviga
 		);
 
 		itemsList.forEach( ( record, index ) => {
-			const category = categories[ record.categoryId ];
-			const account = accounts[ record.accountId ];
-			const amount = getRecordAmountWithCurrency( record, currencies );
+			const category = categories.byId[ record.categoryId ];
+			const account = accounts.byId[ record.accountId ];
+			const amount = getRecordAmountWithCurrency( record, currencies.byId );
 			result.push( <RecordsItem
 				key={ `${ idx }-${ index }` }
 				record={ record }
