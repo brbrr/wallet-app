@@ -9,7 +9,7 @@ import c from 'currency.js';
  */
 import data from './conversion-rates.js';
 import store from './create-store';
-import { getAccountById, getCurrencyById, getRecordById } from '../selectors/index.js';
+import { getAccountById, getCurrencyById, getRecordById, getDefaultAccount } from '../selectors/index.js';
 
 export function getRecordAmountWithCurrency( { currencyId, amount, typeId }, currencies ) {
 	const currency = currencies[ currencyId ];
@@ -31,12 +31,53 @@ export function getRecordAmount( { amount, typeId } ) {
 }
 
 // TODO: Set a expected currency, e.g. in which to convert
+// Now it's just a sum of all `amountInAccountCurrency`, instead we should convert them into some base currency
 export function getTotalSpent( records ) {
 	// console.log( 'getTotalSpent' );
 
 	return records.reduce( ( acc, record ) => {
 		const amount = record.amountInAccountCurrency;
 		return acc.add( amount );
+	}, c( 0 ) ).value;
+}
+
+/**
+ * Calculates the total sum of of records in specified currency
+ * Useful when need to figure out intermediate sum, e.g. for daily expense.
+ *
+ * @param {Array} records Records array
+ * @param {number} currencyId currency id
+ * @return {number} sum of provided records balances in specified currency
+ */
+export function getTotalSpentInCurrency( records, currencyId ) {
+	const state = store.getState();
+	const toCurrency = getCurrencyById( state, currencyId );
+
+	return records.reduce( ( acc, record ) => {
+		const amount = record.amountInAccountCurrency;
+		const fromCurrency = getCurrencyById( state, record.currencyId );
+		const convertedAmount = convertAmount( amount, { from: fromCurrency.code, to: toCurrency.code } );
+		return acc.add( convertedAmount );
+	}, c( 0 ) ).value;
+}
+
+/**
+ * Calculates the total sum of accounts in default account currency
+ * @param {Object} accounts object of accounts indexed by their id
+ * @return {number} total sum of accounts in default currency
+ */
+export function getAccountsTotalsInCurrency( accounts ) {
+	const state = store.getState();
+	const defaultAccount = getDefaultAccount( state );
+	const defaultCurrency = getCurrencyById( state, defaultAccount.currencyId );
+
+	return Object.values( accounts ).reduce( ( acc, account ) => {
+		const balance = account.balance;
+		const fromCurrency = getCurrencyById( state, account.currencyId );
+		const convertedAmount = convertAmount( balance, { from: fromCurrency.code, to: defaultCurrency.code } );
+		console.log( `Converting ${ balance } ${ fromCurrency.code }, to: ${ defaultCurrency.code }: ${ convertedAmount }` );
+
+		return acc.add( convertedAmount );
 	}, c( 0 ) ).value;
 }
 
@@ -119,5 +160,5 @@ export function getUpdatedAccountBalance( state, record ) {
 		recordAmount = convertRecordAmountToAccountCurrency( state, record );
 	}
 	recordAmount = getRecordAmount( { amount: recordAmount, typeId: record.typeId } );
-	return c( balance ).add( recordAmount );
+	return c( balance ).add( recordAmount ).value;
 }
