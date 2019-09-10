@@ -35,10 +35,10 @@ class HomeScreen extends React.Component {
 
 	componentDidUpdate( prevProps, prevState ) {
 		Object.entries( this.props ).forEach( ( [ key, val ] ) =>
-			prevProps[ key ] !== val && console.log( `Prop '${ key }' changed` )
+			prevProps[ key ] !== val && console.log( `**** Prop '${ key }' from: ${ prevProps[ key ] } to: ${ val }` )
 		);
 		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
-			prevState[ key ] !== val && console.log( `State '${ key }' changed` )
+			prevState[ key ] !== val && console.log( `**** State '${ key }' changed from: ${ prevState[ key ] } to: ${ val }` )
 		);
 	}
 
@@ -46,7 +46,7 @@ class HomeScreen extends React.Component {
 		const screenCenter = Dimensions.get( 'window' ).height / 2;
 		const dotElementCenter = ( 8 / 2 ) + 3; // 8px height & 3 px marginTop from default DotElement: https://github.com/leecade/react-native-swiper
 		const placeholderViewCenter = y - ( height / 2 ) - screenCenter - dotElementCenter;
-		this.setState( { viewCenter: placeholderViewCenter, isReady: true } );
+		this.setState( { viewCenter: placeholderViewCenter } );
 	}
 
 	renderRecordsLists() {
