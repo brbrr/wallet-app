@@ -14,7 +14,7 @@ export default class SettingsScreen extends React.Component {
 		return (
 			<ScrollView style={ styles.container }>
 				<ListItem
-					containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55 } }
+					containerStyle={ styles.itemContainer }
 					contentContainerStyle={ { flex: 2 } }
 					rightContentContainerStyle={ { flex: 1 } }
 					title="Accounts"
@@ -33,7 +33,7 @@ export default class SettingsScreen extends React.Component {
 				/>
 
 				<ListItem
-					containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55 } }
+					containerStyle={ styles.itemContainer }
 					contentContainerStyle={ { flex: 2 } }
 					rightContentContainerStyle={ { flex: 1 } }
 					title="Currencies"
@@ -50,6 +50,25 @@ export default class SettingsScreen extends React.Component {
 					rightTitle={ 'Select' }
 					onPress={ () => this.props.navigation.navigate( 'SettingsCurrencies', { isEdit: true } ) }
 				/>
+
+				<ListItem
+					containerStyle={ styles.itemContainer }
+					contentContainerStyle={ { flex: 2 } }
+					rightContentContainerStyle={ { flex: 1 } }
+					title="Categories"
+					bottomDivider={ true }
+					topDivider={ true }
+					leftIcon={ {
+						name: 'circle',
+						type: 'font-awesome',
+						color: 'blue',
+						size: 42,
+						containerStyle: { margin: -2 },
+					} }
+					chevron
+					rightTitle={ 'Select' }
+					onPress={ () => this.props.navigation.navigate( 'SettingsCategories', { isEdit: true } ) }
+				/>
 			</ScrollView>
 		);
 	}
@@ -64,7 +83,9 @@ const styles = StyleSheet.create( {
 			ios: {
 				paddingTop: 20,
 			},
-		} ) },
+		} ),
+	},
+	itemContainer: { paddingTop: 3, paddingBottom: 3, height: 55 },
 	iconContainer: {
 		marginTop: 20,
 		marginBottom: 20,

@@ -47,7 +47,7 @@ export class NewCategoryScreen extends React.Component {
 		const { name, colorCode, iconName } = this.state;
 		const { navigation, _addNewCategory } = this.props;
 		_addNewCategory( { name, colorCode, iconName } );
-		navigation.goBack();
+		navigation.goBack( null );
 	}
 
 	render() {
@@ -126,6 +126,19 @@ export default connect(
 	() => ( {} ),
 	mapDispatchToProps
 )( NewCategoryScreen );
+
+class SNewAccountScreen extends NewCategoryScreen {
+	onPressCurrency = () => {
+		if ( ! this.state.isEdit ) {
+			this.props.navigation.navigate( 'SettingsCategories', { onStateChange: this.onStateChange } );
+		}
+	}
+}
+
+export const SettingsNewCategoriesScreen = connect(
+	() => ( {} ),
+	mapDispatchToProps
+)( SNewAccountScreen );
 
 const styles = StyleSheet.create( {
 	container: { backgroundColor: '#f9f9f9', flex: 1 },
