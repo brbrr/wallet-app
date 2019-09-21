@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { ScrollView, Button, Text, StyleSheet } from 'react-native';
+import { ScrollView, Button, Text, StyleSheet, Alert } from 'react-native';
 import { Input, ListItem, ButtonGroup, Button as EButton } from 'react-native-elements';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -145,7 +145,6 @@ class NewRecordModal extends React.Component {
 		const { _deleteRecord, _updateAccountBalance, navigation } = this.props;
 
 		if ( ! isEdit ) {
-			console.log( 'DO SOMETHING!' );
 			return null;
 		}
 
@@ -153,10 +152,25 @@ class NewRecordModal extends React.Component {
 		const account = getAccountById( this.props, record.accountId );
 
 		const updatedBalance = getUpdatedAccountBalanceAfterDeletedRecord( this.props, record.id );
-		_updateAccountBalance( account, updatedBalance );
 
-		_deleteRecord( record );
-		navigation.navigate( 'Main' );
+		Alert.alert(
+			'Delete record',
+			'Are you sure you want to delete this record?',
+			[
+				{
+					text: 'Cancel',
+					onPress: () => console.log( 'Cancel Pressed' ),
+					style: 'cancel',
+				},
+				{ text: 'OK', onPress: () => {
+					_updateAccountBalance( account, updatedBalance );
+
+					_deleteRecord( record );
+					navigation.navigate( 'Main' );
+				} },
+			],
+			{ cancelable: false },
+		);
 	}
 
 	onStateChange = ( state ) => this.setState( state )
