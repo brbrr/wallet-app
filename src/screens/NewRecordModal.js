@@ -11,21 +11,19 @@ import moment from 'moment';
  * Internal dependencies
  */
 import DatePicker from '../components/DatePickerModal';
-import { createNewRecord, updateRecord } from '../actions/records';
+import { createNewRecord, updateRecord, deleteRecord } from '../actions/records';
 import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
 import { updateAccountBalance } from '../actions';
-import { getUpdatedAccountBalance, convertRecordAmountToAccountCurrency } from '../utils';
+import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord } from '../utils';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
-		const title = navigation.state.params && navigation.state.params.isEdit ? 'Edit' : 'Done';
-
 		return {
 			title: 'Add record',
 			headerRight: (
 				<Button
-					onPress={ () => navigation.state.params.createNewRecordAndGoBack() }
-					title={ title }
+					onPress={ () => navigation.state.params.saveRecordAndGoBack() }
+					title={ 'Save' }
 				/>
 			),
 			headerLeft: (
@@ -64,7 +62,7 @@ class NewRecordModal extends React.Component {
 
 		props.navigation.setParams(
 			{
-				createNewRecordAndGoBack: this.createNewRecordAndGoBack.bind( this ),
+				saveRecordAndGoBack: this.saveRecordAndGoBack.bind( this ),
 				isEdit,
 			}
 		);
@@ -111,25 +109,53 @@ class NewRecordModal extends React.Component {
 		return record;
 	}
 
-	createNewRecordAndGoBack() {
+	saveRecordAndGoBack() {
 		const { accountId, isEdit } = this.state;
 		const { _createNewRecord, _updateRecord, _updateAccountBalance, navigation } = this.props;
 		const account = getAccountById( this.props, accountId );
 		const record = this.getRecordFromState();
 
-		// TODO: make it work for the updated tx
 		console.log( record, account );
 
 		// Sanitize record object! e.g. amount value
 		// this should be called _before_ updating the account and after record got assigned an id
-		const newBalance = getUpdatedAccountBalance( this.props, record );
-		_updateAccountBalance( account, newBalance );
+		const updateDirective = getAccountsUpdateDirective( this.props, record );
+		Object.entries( updateDirective ).forEach( ( [ accId, newBalance ] ) => {
+			const acc = getAccountById( this.props, accId );
+			_updateAccountBalance( acc, newBalance );
+		} );
 		if ( ! isEdit ) {
 			_createNewRecord( record );
 		} else {
 			_updateRecord( record );
 		}
 
+		navigation.navigate( 'Main' );
+	}
+
+	/**
+	 * Removes a record from the redux state. Also updates the account balance.
+	 * Redirect back to home screen after removal
+	 *
+	 * @return {void}
+	 */
+	deleteRecordAndGoBack = () => {
+		const { isEdit } = this.state;
+
+		const { _deleteRecord, _updateAccountBalance, navigation } = this.props;
+
+		if ( ! isEdit ) {
+			console.log( 'DO SOMETHING!' );
+			return null;
+		}
+
+		const record = this.getRecordFromState();
+		const account = getAccountById( this.props, record.accountId );
+
+		const updatedBalance = getUpdatedAccountBalanceAfterDeletedRecord( this.props, record.id );
+		_updateAccountBalance( account, updatedBalance );
+
+		_deleteRecord( record );
 		navigation.navigate( 'Main' );
 	}
 
@@ -187,7 +213,7 @@ class NewRecordModal extends React.Component {
 	render() {
 		console.log( '!!!!!!!! NewRecordModal screen render' );
 
-		const { amount, description, accountId, currencyId, categoryId, typeId } = this.state;
+		const { amount, description, accountId, currencyId, categoryId, typeId, isEdit } = this.state;
 		const { navigation } = this.props;
 
 		const category = getCategoryById( this.props, categoryId );
@@ -256,10 +282,13 @@ class NewRecordModal extends React.Component {
 					bottomDivider={ true }
 					topDivider={ true }
 					leftIcon={ {
-						name: 'ios-wallet',
-						type: 'ionicon',
-						size: 25,
-						containerStyle: { paddingLeft: 15, paddingRight: 14 },
+						name: account.iconName,
+						type: 'font-awesome',
+						reverse: true,
+						reverseColor: 'white',
+						color: account.colorCode,
+						size: 20,
+						containerStyle: { margin: -4 },
 					} }
 					onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange } ) }
 				/>
@@ -286,14 +315,25 @@ class NewRecordModal extends React.Component {
 						containerStyle: { paddingLeft: 15, paddingRight: 14 },
 					} }
 				/>
+
+				{ isEdit && <ListItem
+					containerStyle={ styles.iconContainer }
+					title={
+						<Button
+							onPress={ this.deleteRecordAndGoBack }
+							title="Delete"
+							color="red"
+						/>
+					}
+					bottomDivider={ true }
+					topDivider={ true }
+				/> }
 			</ScrollView>
 		);
 	}
 }
 
 const mapStateToProps = ( state ) => {
-	// console.log( state );
-
 	const { categories, currencies, accounts, records } = state;
 	return {
 		records,
@@ -308,6 +348,7 @@ const mapDispatchToProps = ( dispatch ) => {
 		_createNewRecord: ( record ) => dispatch( createNewRecord( record ) ),
 		_updateRecord: ( record ) => dispatch( updateRecord( record ) ),
 		_updateAccountBalance: ( account, newBalance ) => dispatch( updateAccountBalance( account, newBalance ) ),
+		_deleteRecord: ( record ) => dispatch( deleteRecord( record ) ),
 	};
 };
 

@@ -7,7 +7,7 @@ import c from 'currency.js';
 /**
  * Internal dependencies
  */
-import { getUpdatedAccountBalance } from '..';
+import { getAccountsUpdateDirective } from '..';
 import data from '../conversion-rates';
 import { getRecordById, getAccountById, getCurrencyById } from '../../selectors';
 fx.base = data.base;
@@ -21,9 +21,10 @@ describe( 'Currency utils', () => {
 				byId: {
 					1: {
 						id: 1,
-						amount: 22,
-						accountId: 1,
-						currencyId: 2,
+						amount: 22, // UAH in USD account > ~ 0.81 USD
+						amountInAccountCurrency: 0.81,
+						accountId: 1, // USD
+						currencyId: 2, // UAH
 						typeId: 0,
 					},
 				},
@@ -31,155 +32,180 @@ describe( 'Currency utils', () => {
 			accounts: {
 				byId: {
 					1: {
+						id: 1,
 						balance: 10,
 						currencyId: 1,
 					},
 					2: {
+						id: 2,
 						balance: 20,
-						currencyId: 3,
+						currencyId: 2,
 					},
 				},
 			},
 			currencies: {
 				byId: {
 					1: {
+						id: 1,
 						code: 'USD',
 					},
 					2: {
+						id: 2,
 						code: 'UAH',
 					},
 					3: {
+						id: 3,
 						code: 'EUR',
 					},
 				},
 			},
 		};
 	} );
-	describe( 'getUpdatedAccountBalance', () => {
-		it( 'returns the correct amount for new expense with matching currencyId', () => {
-			const record = {
-				amount: 34.5,
-				accountId: 1,
-				currencyId: 1,
-				typeId: 0,
-			};
+	describe( 'getAccountsUpdateDirective', () => {
+		describe( 'For new expense', () => {
+			it( 'returns the correct amount with matching currencyId', () => {
+				const record = {
+					amount: 34.5,
+					accountId: 1,
+					currencyId: 1,
+					typeId: 0,
+				};
 
-			// const expectedBalance = -24.5;
-			const expectedBalance = c( getAccountById( state, 1 ).balance ).subtract( record.amount );
+				// const expectedBalance = -24.5;
+				const account = getAccountById( state, record.accountId );
+				const expectedDirective = { [ account.id ]: c( account.balance ).subtract( record.amount ).value };
 
-			const balance = getUpdatedAccountBalance( state, record );
-			expect( balance ).toEqual( expectedBalance );
+				const directive = getAccountsUpdateDirective( state, record );
+				expect( directive ).toEqual( expectedDirective );
+			} );
+
+			it( 'returns the correct amount with different currencyId', () => {
+				const record = {
+					amount: '22',
+					accountId: 1,
+					currencyId: 2,
+					typeId: 0,
+				};
+
+				const account = getAccountById( state, record.accountId );
+				const expectedAmount = -1 * fx.convert( record.amount, { from: 'UAH', to: 'USD' } );
+				const expectedDirective = { [ account.id ]: c( account.balance ).add( expectedAmount ).value };
+
+				const directive = getAccountsUpdateDirective( state, record );
+				expect( directive ).toEqual( expectedDirective );
+			} );
 		} );
 
-		it( 'returns the correct amount for new expense with different currencyId', () => {
-			const record = {
-				amount: '22',
-				accountId: 1,
-				currencyId: 2,
-				typeId: 0,
-			};
+		describe( 'For updated expense', () => {
+			it( 'returns the correct amount with matching currencyId', () => {
+				const newRecord = {
+					id: 1,
+					amount: 53.2,
+					amountInAccountCurrency: 53.2,
+					accountId: 1,
+					currencyId: 1,
+					typeId: 0,
+				};
 
-			const expectedAmount = -1 * fx.convert( record.amount, { from: 'UAH', to: 'USD' } );
-			const expectedBalance = c( getAccountById( state, 1 ).balance ).add( expectedAmount );
+				const existingRecord = {
+					id: 1,
+					amount: 22,
+					amountInAccountCurrency: 22,
+					accountId: 1,
+					currencyId: 1,
+					typeId: 0,
+				};
 
-			const balance = getUpdatedAccountBalance( state, record );
-			expect( balance ).toEqual( expectedBalance );
-		} );
+				// Inject updated existing record
+				state = { ...state, records: { ...state.records, byId: { ...state.records.byId, 1: existingRecord } } };
 
-		it( 'returns the correct amount for updated expense with matching currencyId', () => {
-			const newRecord = {
-				id: 1,
-				amount: 53.2,
-				accountId: 1,
-				currencyId: 1,
-				typeId: 0,
-			};
+				const directive = getAccountsUpdateDirective( state, newRecord );
+				assertMatchingAccountUpdateDirectives( directive, newRecord );
+			} );
 
-			const existingRecord = {
-				id: 1,
-				amount: 22,
-				accountId: 1,
-				currencyId: 1,
-				typeId: 0,
-			};
+			it( 'returns the correct amount with different currencyId', () => {
+				// ( record.currencyId !== existingRecord.currencyId ) || // record currency have changed
+				// 1: {
+				// 	id: 1,
+				// 	amount: 22, // UAH in USD account > ~ 0.81 USD
+				// 	accountId: 1, // USD
+				// 	currencyId: 2, // UAH
+				// 	typeId: 0,
+				// },
+				const newRecord = {
+					id: 1,
+					amount: 53.2,
+					amountInAccountCurrency: 53.2,
+					accountId: 1,
+					currencyId: 1,
+					typeId: 0,
+				};
 
-			// Inject updated existing record
-			state = { ...state, records: { ...state.records, byId: { ...state.records.byId, 1: existingRecord } } };
-			const expectedBalance = c( getAccountById( state, 1 ).balance ).add( existingRecord.amount ).subtract( newRecord.amount );
+				const directive = getAccountsUpdateDirective( state, newRecord );
+				assertMatchingAccountUpdateDirectives( directive, newRecord );
+			} );
 
-			const balance = getUpdatedAccountBalance( state, newRecord );
-			expect( balance ).toEqual( expectedBalance );
-		} );
+			it( 'returns the correct amount when account is changed from USD to UAH', () => {
+				// We should return 22 UAH back to the USD account, and subtract 22 UAH from UAH account
+				// which means the TX should look like this:
+				// - initial TX: USD.balance + toUSD( record.amount )
+				// - revert: USD.balance - toUSD( -record.amount ): 10 + 0.81 = 10.81;
+				// - update: UAH.balance + toUAH( -record.amount ): UAH: 20 - 22 = -2;
+				// 1: {
+				// 	id: 1,
+				// 	amount: 22,
+				// 	accountId: 1, // USD
+				// 	currencyId: 2, // UAH
+				// 	typeId: 0,
+				// },
 
-		it( 'returns the correct amount for updated expense with different currencyId', () => {
-			// ( record.currencyId !== existingRecord.currencyId ) || // record currency have changed
-			const newRecord = {
-				id: 1,
-				amount: 53.2,
-				accountId: 1,
-				currencyId: 1,
-				typeId: 0,
-			};
+				const newRecord = {
+					id: 1,
+					amount: 22,
+					amountInAccountCurrency: 22,
+					accountId: 2, // UAH
+					currencyId: 2, // UAH
+					typeId: 0,
+				};
 
-			const newRecordAmount = -1 * newRecord.amount;
-			const oldRecordAmount = -1 * fx.convert( getRecordById( state, 1 ).amount, { from: 'UAH', to: 'USD' } );
-			const expectedBalance = c( getAccountById( state, 1 ).balance ).subtract( oldRecordAmount ).add( newRecordAmount );
+				const directive = getAccountsUpdateDirective( state, newRecord );
 
-			const balance = getUpdatedAccountBalance( state, newRecord );
-			expect( balance ).toEqual( expectedBalance );
-		} );
+				assertMatchingAccountUpdateDirectives( directive, newRecord );
+			} );
 
-		it( 'returns the correct amount for updated expense when account is changed', () => {
-			const newRecord = {
-				id: 1,
-				amount: 22,
-				accountId: 2,
-				currencyId: 2,
-				typeId: 0,
-			};
+			it( 'returns the correct amount with changed currencyId and account', () => {
+				// the case when updating existing record and changing both account and currency
+				// id: 1,
+				// amount: 22,
+				// amountInAccountCurrency: 0.81,
+				// accountId: 1,
+				// currencyId: 2,
+				// typeId: 0,
 
-			const newRecordAmount = -1 * fx.convert( newRecord.amount, { from: 'UAH', to: 'EUR' } );
-			const oldRecordAmount = -1 * fx.convert( getRecordById( state, 1 ).amount, { from: 'UAH', to: 'USD' } );
-			const expectedBalance = c( getAccountById( state, 2 ).balance ).subtract( oldRecordAmount ).add( newRecordAmount );
+				const newRecord = {
+					id: 1,
+					amount: 22,
+					amountInAccountCurrency: 597.19,
+					accountId: 2,
+					currencyId: 1,
+					typeId: 0,
+				};
 
-			const balance = getUpdatedAccountBalance( state, newRecord );
-			expect( balance ).toEqual( expectedBalance );
-		} );
+				const directive = getAccountsUpdateDirective( state, newRecord );
+				assertMatchingAccountUpdateDirectives( directive, newRecord );
+			} );
 
-		it( 'returns the correct amount for updated expense with changed currencyId and account', () => {
-			// the case when updating existing record and changing both account and currency
-			// id: 1,
-			// amount: 22,
-			// accountId: 1,
-			// currencyId: 2,
-			// typeId: 0,
-			const newRecord = {
-				id: 1,
-				amount: 22,
-				accountId: 2,
-				currencyId: 1,
-				typeId: 0,
-			};
-
-			const oldRecordAmount = -1 * fx.convert( getRecordById( state, newRecord.id ).amount, { from: 'UAH', to: 'USD' } );
-			const newRecordAmount = -1 * fx.convert( newRecord.amount, { from: 'USD', to: 'EUR' } );
-			const balance = getUpdatedAccountBalance( state, newRecord );
-			const expectedBalance = c( getAccountById( state, newRecord.accountId ).balance ).subtract( oldRecordAmount ).add( newRecordAmount );
-
-			expect( balance ).toEqual( expectedBalance );
+			// it( 'converts from expense to income', () => {} );
+			// it( 'converts from income to expense', () => {} );
 		} );
 
 		it( 'do stuff', () => {
 			// ( account.currencyId !== record.currencyId ) // record currency haven't changed, but switched to other account with differnet account currency
 		} );
 	} );
-
-	describe( '', () => {
-
-	} );
 } );
 
-function assertMatchingBalances( balance, newRecord ) {
+function assertMatchingAccountUpdateDirectives( updateDirective, newRecord ) {
 	const oldRecord = getRecordById( state, newRecord.id );
 	const oldAccount = getAccountById( state, oldRecord.accountId );
 	const newAccount = getAccountById( state, newRecord.accountId );
@@ -188,9 +214,22 @@ function assertMatchingBalances( balance, newRecord ) {
 	const oldAccountCurrency = getCurrencyById( state, oldAccount.currencyId );
 	const newAccountCurrency = getCurrencyById( state, newAccount.currencyId );
 
+	// console.log( newRecord.amount, { from: newRecordCurrency.code, to: newAccountCurrency.code } );
+	// console.log( oldRecord.amount, { from: oldRecordCurrency.code, to: oldAccountCurrency.code } );
+
 	const newRecordAmount = -1 * fx.convert( newRecord.amount, { from: newRecordCurrency.code, to: newAccountCurrency.code } );
 	const oldRecordAmount = -1 * fx.convert( oldRecord.amount, { from: oldRecordCurrency.code, to: oldAccountCurrency.code } );
-	const expectedBalance = c( getAccountById( state, newRecord.accountId ).balance ).subtract( oldRecordAmount ).add( newRecordAmount );
 
-	expect( balance ).toEqual( expectedBalance );
+	let expectedDirective = { [ oldAccount.id ]: c( newAccount.balance ).subtract( oldRecordAmount ).add( newRecordAmount ).value };
+
+	if ( oldAccount !== newAccount ) {
+		const fromAccountNewBalance = c( oldAccount.balance ).subtract( oldRecordAmount ).value;
+		const toAccountNewBalance = c( newAccount.balance ).add( newRecordAmount ).value;
+
+		expectedDirective = { [ oldAccount.id ]: fromAccountNewBalance, [ newAccount.id ]: toAccountNewBalance };
+	}
+
+	console.log( '!!!!=== ', updateDirective, expectedDirective );
+
+	expect( updateDirective ).toEqual( expectedDirective );
 }
