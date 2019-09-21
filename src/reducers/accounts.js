@@ -20,7 +20,7 @@ const initialState = {
 			id: 2,
 			currencyId: 2,
 			colorCode: 'blue',
-			iconName: 'google-wallet',
+			iconName: 'bank',
 		},
 	},
 	allIds: [ 1, 2 ],
@@ -41,7 +41,8 @@ export default function accounts( state = initialState, action ) {
 			return {
 				byId: { ...state.byId, [ account.id ]: account },
 				allIds: [ ...state.allIds ],
-			};		case UPDATE_ACCOUNTS_ORDER:
+			};
+		case UPDATE_ACCOUNTS_ORDER:
 			return {
 				...state,
 				allIds: action.newOrder,

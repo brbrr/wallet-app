@@ -13,7 +13,6 @@ import { connect } from 'react-redux';
  */
 import { RecordsList } from '../components/records/RecordsList';
 import Overview from '../components/Overview';
-import { getRecordsById, getAccountsById, getCategoriesById, getCurrenciesById } from '../selectors';
 import Swiper from 'react-native-swiper';
 
 class HomeScreen extends React.Component {
@@ -36,26 +35,26 @@ class HomeScreen extends React.Component {
 
 	componentDidUpdate( prevProps, prevState ) {
 		Object.entries( this.props ).forEach( ( [ key, val ] ) =>
-			prevProps[ key ] !== val && console.log( `Prop '${ key }' changed` )
+			prevProps[ key ] !== val && console.log( `**** Prop '${ key }' from: ${ prevProps[ key ] } to: ${ val }` )
 		);
 		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
-			prevState[ key ] !== val && console.log( `State '${ key }' changed` )
+			prevState[ key ] !== val && console.log( `**** State '${ key }' changed from: ${ prevState[ key ] } to: ${ val }` )
 		);
 	}
 
-	findDimentions( { y, height } ) {
+	findDimensions( { y, height } ) {
 		const screenCenter = Dimensions.get( 'window' ).height / 2;
-		const dotElementCenter = ( 8 / 2 ) + 3; // 8px height & 3 px marginTop from deafult DotElement: https://github.com/leecade/react-native-swiper
+		const dotElementCenter = ( 8 / 2 ) + 3; // 8px height & 3 px marginTop from default DotElement: https://github.com/leecade/react-native-swiper
 		const placeholderViewCenter = y - ( height / 2 ) - screenCenter - dotElementCenter;
 		this.setState( { viewCenter: placeholderViewCenter } );
 	}
 
 	renderRecordsLists() {
 		const { records, accounts } = this.props;
-		const recordsArray = Object.values( records );
-		const recordsLists = [ this.recordList( 0, recordsArray )	];
+		const recordsArray = Object.values( records.byId );
+		const recordsLists = [ this.recordList( 0, recordsArray ) ];
 
-		Object.values( accounts ).forEach( ( account, id ) => {
+		Object.values( accounts.byId ).forEach( ( account, id ) => {
 			const accountRecords = recordsArray.filter( ( record ) => record.accountId === account.id );
 			recordsLists.push( this.recordList( id + 1, accountRecords, account ) );
 		} );
@@ -63,7 +62,7 @@ class HomeScreen extends React.Component {
 		return recordsLists;
 	}
 
-	recordList( id, records, account ) {
+	recordList( id, recordsArray, account ) {
 		const { accounts, categories, currencies } = this.props;
 
 		return (
@@ -76,17 +75,17 @@ class HomeScreen extends React.Component {
 					backgroundColor: '#e3eef2',
 				} }
 			>
-				<Overview records={ records } account={ account } />
+				<Overview account={ account } accounts={ accounts } />
 				<View
 					style={ {
 						flex: 0.3,
 						backgroundColor: '#b6b1b8',
 					} }
-					onLayout={ ( event ) => this.findDimentions( event.nativeEvent.layout ) }
+					onLayout={ ( event ) => this.findDimensions( event.nativeEvent.layout ) }
 				/>
 				<View style={ { flex: 3 } }>
 					<RecordsList
-						records={ records }
+						recordsArray={ recordsArray }
 						accounts={ accounts }
 						categories={ categories }
 						currencies={ currencies }
@@ -115,10 +114,10 @@ class HomeScreen extends React.Component {
 
 const mapStateToProps = ( state ) => {
 	return {
-		records: getRecordsById( state ),
-		accounts: getAccountsById( state ),
-		categories: getCategoriesById( state ),
-		currencies: getCurrenciesById( state ),
+		records: state.records,
+		accounts: state.accounts,
+		categories: state.categories,
+		currencies: state.currencies,
 	};
 };
 

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { ADD_NEW_RECORD, UPDATE_RECORD } from '../actions/records';
+import { ADD_NEW_RECORD, UPDATE_RECORD, DELETE_RECORD } from '../actions/records';
 import { addNewItem } from '../utils/reducerHelper';
 
 const initialState = {
@@ -116,6 +116,14 @@ export default function records( state = initialState, action ) {
 		case UPDATE_RECORD:
 			return {
 				byId: { ...state.byId, [ action.record.id ]: action.record },
+				allIds: [ ...state.allIds ],
+			};
+		// TODO: google how to correctly delete redux entries
+		case DELETE_RECORD:
+			const byId = Object.assign( {}, state.byId );
+			delete byId[ action.record.id ];
+			return {
+				byId,
 				allIds: [ ...state.allIds ],
 			};
 		default:
