@@ -22,8 +22,16 @@ const initialState = {
 			colorCode: 'blue',
 			iconName: 'bank',
 		},
+		3: {
+			balance: 100,
+			name: 'UAH ZZZ',
+			id: 3,
+			currencyId: 2,
+			colorCode: 'blue',
+			iconName: 'bank',
+		},
 	},
-	allIds: [ 1, 2 ],
+	allIds: [ 1, 2, 3 ],
 };
 
 export default function accounts( state = initialState, action ) {

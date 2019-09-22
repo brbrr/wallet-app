@@ -68,12 +68,6 @@ export class AccountsScreen extends Component {
 		);
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( ! isEqual( this.state.localAccountOrder, nextProps.accountOrder ) ) {
-			this.setState( { localAccountOrder: nextProps.accountOrder } );
-		}
-	}
-
 	onReorderToggle = () => this.props.navigation.setParams( { isReorderEnabled: true } )
 
 	onChangeOrder = ( key, newAccountOrder ) => {

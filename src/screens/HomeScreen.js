@@ -42,11 +42,10 @@ class HomeScreen extends React.Component {
 		);
 	}
 
+	// Find dots dimensions
 	findDimensions( { y, height } ) {
-		const screenCenter = Dimensions.get( 'window' ).height / 2;
 		const dotElementCenter = ( 8 / 2 ) + 3; // 8px height & 3 px marginTop from default DotElement: https://github.com/leecade/react-native-swiper
-		const placeholderViewCenter = y - ( height / 2 ) - screenCenter - dotElementCenter;
-		this.setState( { viewCenter: placeholderViewCenter } );
+		this.setState( { viewCenter: y + ( height / 2 ) - dotElementCenter } );
 	}
 
 	renderRecordsLists() {
@@ -102,7 +101,7 @@ class HomeScreen extends React.Component {
 		return (
 			<Swiper
 				loop={ false }
-				paginationStyle={ { position: 'absolute', top: this.state.viewCenter } }
+				paginationStyle={ { position: 'absolute', alignItems: 'top', top: this.state.viewCenter } }
 				bounces={ true }
 				showsButtons={ false }
 			>
