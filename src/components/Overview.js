@@ -16,7 +16,7 @@ import { getDefaultAccount, getCurrencyById } from '../selectors';
 import store from '../utils/create-store';
 
 const Overview = ( { account, accounts } ) => {
-	const backgroundColor = account ? account.colorCode : '#8B9FBB';
+	let backgroundColor = account ? account.colorCode : '#8B9FBB';
 	const state = store.getState();
 
 	let content = '';
@@ -34,6 +34,7 @@ const Overview = ( { account, accounts } ) => {
 	} else {
 		const acc = getDefaultAccount( { accounts } );
 		const currency = getCurrencyById( state, acc.currencyId );
+		backgroundColor = acc.colorCode;
 
 		content =
 			<>
