@@ -59,6 +59,6 @@ export default Overview;
 
 const styles = StyleSheet.create( {
 	container: {},
-	title: { fontSize: 20, fontWeight: 'bold', paddingTop: 30, textAlign: 'center' },
-	subTitle: { fontSize: 16, fontWeight: 'bold', left: 30 },
+	title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
+	subTitle: { fontSize: 16, fontWeight: 'bold', left: 30, paddingTop: 10 },
 } );
