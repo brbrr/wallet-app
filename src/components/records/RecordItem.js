@@ -19,14 +19,13 @@ const RecordsItem = ( { category, accountColor, amount, record, navigateEditReco
 			rightContentContainerStyle={ { flex: 1 } }
 
 			rightTitle={ amount }
-			rightTitleStyle={ { fontWeight: 'bold', color: 'black' } }
+			rightTitleStyle={ { fontWeight: 'bold', color: 'black', fontSize: 14 } }
 
 			subtitle={ record.description }
-			subtitleStyle={ { fontSize: 12 } }
+			subtitleStyle={ { fontSize: 12, color: 'gray' } }
 
 			rightSubtitle={ getTime( record.createdAt ) }
 			rightSubtitleStyle={ { fontSize: 12 } }
-			bottomDivider={ true }
 			leftIcon={
 				<View >
 					<Icon

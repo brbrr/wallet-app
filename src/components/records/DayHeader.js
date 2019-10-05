@@ -2,7 +2,9 @@
  * External dependencies
  */
 import React from 'react';
-import { ListItem } from 'react-native-elements';
+import { ListItem, Text } from 'react-native-elements';
+import { View } from 'react-native';
+
 import moment from 'moment';
 /**
  * Internal dependencies
@@ -15,12 +17,22 @@ const DayHeader = ( { records } ) => {
 
 	return (
 		<ListItem
-			containerStyle={ { paddingTop: 3, paddingBottom: 3 } }
+			containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 40 } }
 			title={ niceDate }
+			titleStyle={ { fontWeight: 'bold', color: 'black' } }
 			rightContentContainerStyle={ { flex: 1 } }
-			rightTitle={ totalPerDay.toString() }
-			rightTitleStyle={ { fontWeight: 'bold', color: 'black' } }
-			bottomDivider={ true }
+			rightTitle={
+				<View style={ {
+					borderRadius: 12,
+					borderColor: 'lightgrey',
+					borderWidth: 5,
+					backgroundColor: 'lightgrey',
+					borderLeftWidth: 15,
+					borderRightWidth: 15,
+				} }>
+					<Text style={ { fontWeight: 'bold', color: 'black', fontSize: 13 } }>{ totalPerDay.toString() }</Text>
+				</View>
+			}
 		/>
 	);
 };

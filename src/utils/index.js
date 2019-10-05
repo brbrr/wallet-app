@@ -36,7 +36,7 @@ export function getTotalSpent( records ) {
 	// console.log( 'getTotalSpent' );
 
 	return records.reduce( ( acc, record ) => {
-		const amount = record.amountInAccountCurrency;
+		const amount = getRecordAmount( { amount: record.amountInAccountCurrency, typeId: record.typeId } );
 		return acc.add( amount );
 	}, c( 0 ) ).value;
 }

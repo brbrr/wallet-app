@@ -11,16 +11,6 @@ export const SELECT_RECORD_DATE = 'SELECT_RECORD_DATE';
 export const UPDATE_DRAFT_WITH_RECORD = 'UPDATE_DRAFT_WITH_RECORD';
 export const RESET_DRAFT_RECORD = 'RESET_DRAFT_RECORD';
 
-// Categories
-export function selectRecordCategory( id ) {
-	return { type: SELECT_RECORD_CATEGORY, id };
-}
-
-// Currencies
-export function selectRecordCurrency( id ) {
-	return { type: SELECT_RECORD_CURRENCY, id };
-}
-
 export function addNewCurrency( currency ) {
 	return { type: ADD_NEW_CURRENCY, currency };
 }
@@ -48,16 +38,26 @@ export function updateAccountsOrder( newOrder ) {
 
 // Records / Drafts
 
-export function selectRecordType( id ) {
-	return { type: SELECT_RECORD_TYPE, id };
-}
+// // Categories
+// export function selectRecordCategory( id ) {
+// 	return { type: SELECT_RECORD_CATEGORY, id };
+// }
 
-export function selectRecordDate( date ) {
-	return { type: SELECT_RECORD_DATE, date };
-}
+// // Currencies
+// export function selectRecordCurrency( id ) {
+// 	return { type: SELECT_RECORD_CURRENCY, id };
+// }
 
-export function updateDraftWithRecord( record ) {
-	return { type: UPDATE_DRAFT_WITH_RECORD, record };
-}
+// export function selectRecordType( id ) {
+// 	return { type: SELECT_RECORD_TYPE, id };
+// }
 
-export const resetDraftRecord = () => ( { type: RESET_DRAFT_RECORD } );
+// export function selectRecordDate( date ) {
+// 	return { type: SELECT_RECORD_DATE, date };
+// }
+
+// export function updateDraftWithRecord( record ) {
+// 	return { type: UPDATE_DRAFT_WITH_RECORD, record };
+// }
+
+// export const resetDraftRecord = () => ( { type: RESET_DRAFT_RECORD } );
