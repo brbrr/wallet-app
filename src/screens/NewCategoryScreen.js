@@ -10,43 +10,62 @@ import { ScrollView } from 'react-native-gesture-handler';
 /**
  * Internal dependencies
  */
-import { addNewCategory } from '../actions/categories';
+import { addNewCategory, updateCategory } from '../actions/categories';
+import { getCategoryById } from '../selectors';
 
 export class NewCategoryScreen extends React.Component {
-	static navigationOptions = ( { navigation } ) => ( {
-		title: 'New Category',
-		headerRight: (
-			<Button
-				onPress={ () => navigation.state.params.createNewCategoryAndGoBack() }
-				title="Add"
-			/>
-		),
-		headerLeft: (
-			<Button
-				onPress={ () => navigation.goBack( null ) }
-				title="Back"
-			/>
-		),
-	} );
+	static navigationOptions = ( { navigation } ) => {
+		const rightButtonTitle = navigation.state.params && navigation.state.params.isEdit ? 'Save' : 'Add';
+		const title = navigation.state.params && navigation.state.params.isEdit ? 'Edit Category' : 'New Category';
+
+		return {
+			title,
+			headerRight: (
+				<Button
+					onPress={ () => navigation.state.params.createNewCategoryAndGoBack() }
+					title={ rightButtonTitle }
+				/>
+			),
+			headerLeft: (
+				<Button
+					onPress={ () => navigation.goBack( null ) }
+					title="Back"
+				/>
+			) };
+	};
 
 	constructor( props ) {
 		super( props );
+		const isEdit = props.navigation.getParam( 'isEdit', false );
+
 		this.state = {
 			name: null,
 			colorCode: 'grey',
 			iconName: 'shopping-cart',
+			isEdit,
 		};
+		if ( isEdit ) {
+			const categoryId = props.navigation.getParam( 'categoryId', null );
+			const category = getCategoryById( props, categoryId );
+			this.state = Object.assign( {}, this.state, category );
+		}
+
 		this.props.navigation.setParams(
-			{ createNewCategoryAndGoBack: this.createNewCategoryAndGoBack.bind( this ) }
+			{ createNewCategoryAndGoBack: this.createNewCategoryAndGoBack }
 		);
 	}
 
 	onStateChange = ( state ) => this.setState( state )
 
-	createNewCategoryAndGoBack() {
-		const { name, colorCode, iconName } = this.state;
-		const { navigation, _addNewCategory } = this.props;
-		_addNewCategory( { name, colorCode, iconName } );
+	createNewCategoryAndGoBack = () => {
+		const { name, colorCode, iconName, id, isEdit } = this.state;
+		const { navigation, _addNewCategory, _updateCategory } = this.props;
+
+		if ( isEdit ) {
+			_updateCategory( { name, colorCode, iconName, id } );
+		} else {
+			_addNewCategory( { name, colorCode, iconName } );
+		}
 		navigation.goBack( null );
 	}
 
@@ -57,7 +76,6 @@ export class NewCategoryScreen extends React.Component {
 		return (
 			<ScrollView style={ styles.container }>
 				<ListItem
-					containerStyle={ styles.iconContainer }
 					title="Name"
 					rightTitle={ <Input
 						inputContainerStyle={ { borderBottomWidth: 0 } }
@@ -67,19 +85,14 @@ export class NewCategoryScreen extends React.Component {
 						onChangeText={ ( n ) => this.setState( { name: n } ) }
 						autoFocus
 					/> }
-					contentContainerStyle={ { flex: 2 } }
-					rightContentContainerStyle={ { flex: 4 } }
+					containerStyle={ styles.iconContainer }
+					rightContentContainerStyle={ styles.wideContainer }
 					bottomDivider={ true }
 					topDivider={ true }
 				/>
 
 				<ListItem
-					containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55 } }
-					contentContainerStyle={ { flex: 2 } }
-					rightContentContainerStyle={ { flex: 1 } }
 					title={ 'Color' }
-					bottomDivider={ true }
-					topDivider={ true }
 					leftIcon={ {
 						name: 'circle',
 						type: 'font-awesome',
@@ -87,19 +100,18 @@ export class NewCategoryScreen extends React.Component {
 						size: 42,
 						containerStyle: { margin: -2 },
 					} }
-					chevron
 					rightTitle={ 'Select' }
 					onPress={ () => navigation.navigate( 'ColorSelector', { onStateChange: this.onStateChange } ) }
+					containerStyle={ styles.rowContainer }
+					contentContainerStyle={ styles.wideContainer }
+					rightTitleStyle={ styles.smallText }
+					bottomDivider={ true }
+					topDivider={ true }
+					chevron
 				/>
 
 				<ListItem
-					containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55 } }
-					contentContainerStyle={ { flex: 2 } }
-					rightContentContainerStyle={ { flex: 1 } }
-
 					title={ 'Icon ' + iconName }
-					bottomDivider={ true }
-					topDivider={ true }
 					leftIcon={ {
 						name: iconName,
 						type: 'font-awesome',
@@ -107,38 +119,38 @@ export class NewCategoryScreen extends React.Component {
 						size: 42,
 						containerStyle: { margin: -2 },
 					} }
-					chevron
 					rightTitle={ 'Select' }
 					onPress={ () => navigation.navigate( 'IconSelector', { onStateChange: this.onStateChange } ) }
+					containerStyle={ styles.rowContainer }
+					contentContainerStyle={ styles.wideContainer }
+					rightTitleStyle={ styles.smallText }
+					bottomDivider={ true }
+					topDivider={ true }
+					chevron
 				/>
 			</ScrollView>
 		);
 	}
 }
 
+const mapStateToProps = ( state ) => {
+	const { categories } = state;
+	return {
+		categories,
+	};
+};
+
 const mapDispatchToProps = ( dispatch ) => {
 	return {
 		_addNewCategory: ( category ) => dispatch( addNewCategory( category ) ),
+		_updateCategory: ( category ) => dispatch( updateCategory( category ) ),
 	};
 };
 
 export default connect(
-	() => ( {} ),
+	mapStateToProps,
 	mapDispatchToProps
 )( NewCategoryScreen );
-
-class SNewAccountScreen extends NewCategoryScreen {
-	onPressCurrency = () => {
-		if ( ! this.state.isEdit ) {
-			this.props.navigation.navigate( 'SettingsCategories', { onStateChange: this.onStateChange } );
-		}
-	}
-}
-
-export const SettingsNewCategoriesScreen = connect(
-	() => ( {} ),
-	mapDispatchToProps
-)( SNewAccountScreen );
 
 const styles = StyleSheet.create( {
 	container: { backgroundColor: '#f9f9f9', flex: 1 },
@@ -148,22 +160,8 @@ const styles = StyleSheet.create( {
 		height: 55,
 		flexDirection: 'row',
 	},
-	currencyButton: {
-		color: 'grey',
-		padding: 3,
-		borderWidth: 1,
-		borderColor: 'grey',
-		borderRadius: 3,
-		backgroundColor: '#f9f9f9',
-		marginLeft: 7,
-		marginRight: 9,
-	},
-	amountTitle: { fontSize: 12, marginTop: 2 },
+	wideContainer: { flex: 2 },
+	rowContainer: { paddingTop: 3, paddingBottom: 3, height: 55 },
 	amountInput: { color: 'black', textAlign: 'right' },
-	colorBox: ( size, color ) => ( {
-		width: size,
-		height: size,
-		backgroundColor: color,
-		margin: 3,
-	} ),
+	smallText: { fontSize: 14 },
 } );
