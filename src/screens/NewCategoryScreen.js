@@ -133,12 +133,7 @@ export class NewCategoryScreen extends React.Component {
 	}
 }
 
-const mapStateToProps = ( state ) => {
-	const { categories } = state;
-	return {
-		categories,
-	};
-};
+const mapStateToProps = ( { categories } ) => ( { categories } );
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {

@@ -45,23 +45,29 @@ class NewCurrencyScreen extends React.Component {
 	render() {
 		const { search } = this.state;
 
+		const addedCurrenciesList = Object.values( this.props.currencies.byId );
 		const currencies = Object.entries( currenciesList )
-			.filter( ( [ code, name ] ) => code.toLowerCase().includes( search.toLowerCase() ) || name.toLowerCase().includes( search.toLowerCase() ) )
-			.map( ( [ code, name ], id ) => {
-				return (
-					<ListItem
-						key={ id }
-						containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55 } }
-						contentContainerStyle={ { flex: 2 } }
-						rightContentContainerStyle={ { flex: 1 } }
-						title={ name }
-						rightTitle={ code }
-						bottomDivider={ true }
-						topDivider={ true }
-						onPress={ () => this.addNewCurrencyAndGoBack( code, name ) }
-					/>
-				);
-			} );
+			.filter( ( [ code ] ) => ! addedCurrenciesList.find( ( c ) => c.code === code ) )
+			.filter( ( [ code, name ] ) => {
+				if ( search.length > 1 ) {
+					return code.toLowerCase().includes( search.toLowerCase() ) || name.toLowerCase().includes( search.toLowerCase() );
+				}
+				return true;
+			} )
+			.map( ( [ code, name ], id ) => (
+				<ListItem
+					key={ id }
+					containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55 } }
+					contentContainerStyle={ { flex: 2 } }
+					rightContentContainerStyle={ { flex: 1 } }
+					title={ name }
+					rightTitle={ code }
+					bottomDivider={ true }
+					topDivider={ true }
+					onPress={ () => this.addNewCurrencyAndGoBack( code, name ) }
+				/>
+			) );
+
 		return (
 			<ScrollView style={ styles.container } keyboardShouldPersistTaps="always" >
 				<SearchBar
@@ -76,6 +82,7 @@ class NewCurrencyScreen extends React.Component {
 	}
 }
 
+const mapStateToProps = ( { currencies } ) => ( { currencies } );
 const mapDispatchToProps = ( dispatch ) => {
 	return {
 		_addNewCurrency: ( account ) => dispatch( addNewCurrency( account ) ),
@@ -83,7 +90,7 @@ const mapDispatchToProps = ( dispatch ) => {
 };
 
 export default connect(
-	() => ( {} ),
+	mapStateToProps,
 	mapDispatchToProps
 )( NewCurrencyScreen );
 
