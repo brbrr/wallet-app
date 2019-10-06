@@ -27,7 +27,7 @@ class CategoriesScreen extends React.Component {
 		),
 	} );
 
-	selectItemAndGoBack = ( categoryId ) => {
+	selectItem = ( categoryId ) => {
 		const { navigation } = this.props;
 		const onStateChange = navigation.getParam( 'onStateChange' );
 
@@ -41,20 +41,14 @@ class CategoriesScreen extends React.Component {
 		return (
 			<RecordOptionSelector
 				items={ Object.values( categories.byId ) }
-				selectItem={ ( categoryId ) => this.selectItemAndGoBack( categoryId ) }
+				selectItem={ ( categoryId ) => this.selectItem( categoryId ) }
 				navigation={ navigation }
 			/>
 		);
 	}
 }
 
-const mapStateToProps = ( state ) => {
-	const { categories } = state;
-
-	return {
-		categories,
-	};
-};
+const mapStateToProps = ( { categories } ) => ( { categories } );
 
 const mapDispatchToProps = () => ( {} );
 
@@ -62,4 +56,15 @@ export default connect(
 	mapStateToProps,
 	mapDispatchToProps
 )( CategoriesScreen );
+
+class SCategoriesScreen extends CategoriesScreen {
+	selectItem = ( categoryId ) => {
+		this.props.navigation.navigate( 'NewCategory', { categoryId, isEdit: true } );
+	}
+}
+
+export const SettingsCategoriesScreen = connect(
+	mapStateToProps,
+	mapDispatchToProps
+)( SCategoriesScreen );
 

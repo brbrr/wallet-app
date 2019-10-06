@@ -10,10 +10,7 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
  */
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import SettingsScreen from '../screens/SettingsScreen';
-import { CurrenciesStack, CategoriesStack } from './NewRecordNavigator';
-import { SettingsAccountsScreen } from '../screens/AccountsScreen';
-import { NewAccountStack } from './AccountsNavigator';
+import SettingsStack from './SettingsNavigator';
 
 const HomeStack = createStackNavigator( {
 	Home: HomeScreen,
@@ -29,28 +26,6 @@ HomeStack.navigationOptions = {
 					`ios-information-circle${ focused ? '' : '-outline' }` :
 					'md-information-circle'
 			}
-		/>
-	),
-};
-
-export const SettingsAccountsStack = createStackNavigator( {
-	SettingsAccountsList: { screen: SettingsAccountsScreen, params: { isSettings: true } },
-	NewAccount: NewAccountStack,
-} );
-
-const SettingsStack = createStackNavigator( {
-	Settings: SettingsScreen,
-	SettingsAccounts: { screen: SettingsAccountsStack, navigationOptions: { header: null } },
-	SettingsCurrencies: { screen: CurrenciesStack, navigationOptions: { header: null } },
-	SettingsCategories: { screen: CategoriesStack, navigationOptions: { header: null } },
-} );
-
-SettingsStack.navigationOptions = {
-	tabBarLabel: 'Settings',
-	tabBarIcon: ( { focused } ) => (
-		<TabBarIcon
-			focused={ focused }
-			name={ Platform.OS === 'ios' ? 'ios-options' : 'md-options' }
 		/>
 	),
 };
