@@ -8,6 +8,7 @@ export const getDefaultAccount = ( state ) => getAccountById( state, getAccountO
 export const getCurrencies = ( state ) => state.currencies;
 export const getCurrenciesById = ( state ) => getCurrencies( state ).byId;
 export const getCurrencyById = ( state, currencyId ) => getCurrenciesById( state )[ currencyId ];
+export const getDefaultAccountCurrency = ( state ) => getCurrencyById( state, getDefaultAccount( state ).currencyId );
 
 export const getCategories = ( state ) => state.categories;
 export const getCategoriesById = ( state ) => getCategories( state ).byId;

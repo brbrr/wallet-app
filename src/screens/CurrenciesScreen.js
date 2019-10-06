@@ -27,7 +27,7 @@ class CurrenciesScreen extends React.Component {
 		),
 	} );
 
-	selectItemAndGoBack = ( currencyId ) => {
+	selectItem = ( currencyId ) => {
 		const { navigation } = this.props;
 		const onStateChange = navigation.getParam( 'onStateChange' );
 
@@ -41,7 +41,7 @@ class CurrenciesScreen extends React.Component {
 		return (
 			<RecordOptionSelector
 				items={ Object.values( currencies.byId ) }
-				selectItem={ ( currencyId ) => this.selectItemAndGoBack( currencyId ) }
+				selectItem={ ( currencyId ) => this.selectItem( currencyId ) }
 				navigation={ navigation }
 				nameValue="code"
 			/>
@@ -49,13 +49,7 @@ class CurrenciesScreen extends React.Component {
 	}
 }
 
-const mapStateToProps = ( state ) => {
-	const { currencies } = state;
-
-	return {
-		currencies,
-	};
-};
+const mapStateToProps = ( { currencies } ) => ( { currencies } );
 
 const mapDispatchToProps = () => ( {} );
 
@@ -63,4 +57,15 @@ export default connect(
 	mapStateToProps,
 	mapDispatchToProps
 )( CurrenciesScreen );
+
+class SCurrenciesScreen extends CurrenciesScreen {
+	selectItem = ( currencyId ) => {
+		this.props.navigation.navigate( 'Currency', { currencyId } );
+	}
+}
+
+export const SettingsCurrenciesScreen = connect(
+	mapStateToProps,
+	mapDispatchToProps
+)( SCurrenciesScreen );
 

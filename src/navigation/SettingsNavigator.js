@@ -10,26 +10,34 @@ import { createStackNavigator } from 'react-navigation';
  */
 import TabBarIcon from '../components/TabBarIcon';
 import SettingsScreen from '../screens/SettingsScreen';
-import { CurrenciesStack } from './NewRecordNavigator';
 import { SettingsAccountsScreen } from '../screens/AccountsScreen';
 import { NewAccountStack } from './AccountsNavigator';
 import { SettingsCategoriesScreen } from '../screens/CategoriesScreen';
 import { NewCategoryStack } from './CategoriesStack';
+import { SettingsCurrenciesScreen } from '../screens/CurrenciesScreen';
+import CurrencyScreen from '../screens/CurrencyScreen';
+import { NewCurrencyStack } from './CurrenciesNavigator';
 
 const SettingsAccountsStack = createStackNavigator( {
-	SettingsAccountsList: { screen: SettingsAccountsScreen, params: { isSettings: true } },
+	SettingsAccountsList: { screen: SettingsAccountsScreen },
 	NewAccount: NewAccountStack,
 } );
 
 const SettingsCategoriesStack = createStackNavigator( {
-	SettingsCategoriesList: { screen: SettingsCategoriesScreen, params: { isSettings: true } },
+	SettingsCategoriesList: { screen: SettingsCategoriesScreen },
 	NewCategory: NewCategoryStack,
+} );
+
+const SettingsCurrenciesStack = createStackNavigator( {
+	SettingsCurrenciesList: { screen: SettingsCurrenciesScreen },
+	NewCurrency: NewCurrencyStack,
+	Currency: CurrencyScreen,
 } );
 
 const SettingsStack = createStackNavigator( {
 	Settings: SettingsScreen,
 	SettingsAccounts: { screen: SettingsAccountsStack, navigationOptions: { header: null } },
-	SettingsCurrencies: { screen: CurrenciesStack, navigationOptions: { header: null } },
+	SettingsCurrencies: { screen: SettingsCurrenciesStack, navigationOptions: { header: null } },
 	SettingsCategories: { screen: SettingsCategoriesStack, navigationOptions: { header: null } },
 } );
 
