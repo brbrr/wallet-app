@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { ADD_NEW_CATEGORY } from '../actions/categories';
+import { ADD_NEW_CATEGORY, UPDATE_CATEGORY } from '../actions/categories';
 import { addNewItem } from '../utils/reducerHelper';
 
 const initialState = {
@@ -29,9 +29,16 @@ const initialState = {
 };
 
 export default function categories( state = initialState, action ) {
-	switch ( action.type ) {
+	const { category, type } = action;
+
+	switch ( type ) {
 		case ADD_NEW_CATEGORY:
-			return addNewItem( action.category, state );
+			return addNewItem( category, state );
+		case UPDATE_CATEGORY:
+			return {
+				byId: { ...state.byId, [ category.id ]: category },
+				allIds: [ ...state.allIds ],
+			};
 		default:
 			return state;
 	}
