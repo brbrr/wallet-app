@@ -15,6 +15,7 @@ import { createNewRecord, updateRecord, deleteRecord } from '../actions/records'
 import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
 import { updateAccountBalance } from '../actions';
 import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord } from '../utils';
+import { logComponentUpdates } from '../utils/debug-utils';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -76,12 +77,7 @@ class NewRecordModal extends React.Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		Object.entries( this.props ).forEach( ( [ key, val ] ) =>
-			prevProps[ key ] !== val && console.log( `Prop '${ key }' changed` )
-		);
-		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
-			prevState[ key ] !== val && console.log( `State '${ key }' changed` )
-		);
+		logComponentUpdates( this, prevProps, prevState );
 	}
 
 	getRecordFromState() {
@@ -96,7 +92,6 @@ class NewRecordModal extends React.Component {
 			categoryId,
 			createdAt,
 			typeId,
-			type: 'expense',
 		};
 
 		// If amount, currencyId, or accountId don't changed - we not need to re-calculate this value. Maybe a room for optimization?

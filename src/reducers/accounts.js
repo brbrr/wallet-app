@@ -45,9 +45,9 @@ export default function accounts( state = initialState, action ) {
 				allIds: [ ...state.allIds ],
 			};
 		case UPDATE_ACCOUNT_BALANCE:
-			account.balance = action.newBalance;
+			const acc = { ...account, balance: action.newBalance };
 			return {
-				byId: { ...state.byId, [ account.id ]: account },
+				byId: { ...state.byId, [ acc.id ]: acc },
 				allIds: [ ...state.allIds ],
 			};
 		case UPDATE_ACCOUNTS_ORDER:
