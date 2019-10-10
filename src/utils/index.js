@@ -10,24 +10,32 @@ import c from 'currency.js';
 import data from './conversion-rates.js';
 import store from './create-store';
 import { getAccountById, getCurrencyById, getRecordById, getDefaultAccount } from '../selectors/index.js';
+import { EXPENSE, INCOME, TRANSFER } from '../constants/Records.js';
 
-export function getRecordAmountWithCurrency( { currencyId, amount, typeId }, currencies ) {
-	const currency = currencies[ currencyId ];
+export function getAmountAsString( { amount, typeId } ) {
+	return getAmountSign( typeId ) + amount.toString();
+}
+
+export function getAmountSign( typeId ) {
 	switch ( typeId ) {
-		case 0:
-			return `-${ amount } ${ currency.code }`;
+		case EXPENSE:
+			return '-';
+		case INCOME:
+			return '+';
+		case TRANSFER:
+			return '';
 		default:
-			return `${ amount } ${ currency.code }`;
+			throw	new Error( 'typeID does not exist' );
 	}
 }
 
-export function getRecordAmount( { amount, typeId } ) {
-	switch ( typeId ) {
-		case 0:
-			return c( -1 ).multiply( Math.abs( amount ) );
-		default:
-			return amount;
-	}
+export function getRecordAmountWithCurrency( record, currencies ) {
+	const currency = currencies[ record.currencyId ];
+	return `${ getAmountAsString( record ) } ${ currency.code }`;
+}
+
+export function getRecordAmount( record ) {
+	return c( getAmountAsString( record ) );
 }
 
 // TODO: Set a expected currency, e.g. in which to convert

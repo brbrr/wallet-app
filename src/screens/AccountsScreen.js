@@ -4,6 +4,7 @@
 import React, { Component } from 'react';
 import { Button } from 'react-native';
 import { connect } from 'react-redux';
+import { omit } from 'lodash';
 /**
  * Internal dependencies
  */
@@ -75,15 +76,23 @@ export class AccountsScreen extends Component {
 	onListRowPress = ( accountId ) => {
 		const { navigation } = this.props;
 		const onStateChange = navigation.getParam( 'onStateChange' );
+		const idName = navigation.getParam( 'idName', 'accountId' );
 
-		onStateChange( { accountId } );
+		onStateChange( { [ idName ]: accountId } );
 		navigation.goBack( null );
 	}
 
 	render() {
-		const { accountsById, navigation } = this.props;
-		const { localAccountOrder } = this.state;
+		let { accountsById, navigation } = this.props;
+		let { localAccountOrder } = this.state;
 		const isReorderEnabled = navigation.getParam( 'isReorderEnabled', false );
+		const selectedId = navigation.getParam( 'selectedId', false );
+		const enableReorder = navigation.getParam( 'enableReorder', false );
+
+		if ( selectedId ) {
+			accountsById = omit( accountsById, selectedId );
+			localAccountOrder = localAccountOrder.filter( ( id ) => id !== selectedId );
+		}
 
 		return (
 			<AccountsList
@@ -93,6 +102,7 @@ export class AccountsScreen extends Component {
 				onReorderToggle={ this.onReorderToggle }
 				onListRowPress={ this.onListRowPress }
 				isReorderEnabled={ isReorderEnabled }
+				enableReorder={ enableReorder }
 			/>
 		);
 	}
