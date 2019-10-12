@@ -56,20 +56,19 @@ export default class AccountListRow extends Component {
 
 	// TODO: extract into helper function
 	getIconConfiguration( item ) {
-		let iconConfiguration = null;
-		if ( item.iconName ) {
-			iconConfiguration = {
-				name: item.iconName,
-				type: 'font-awesome',
-				reverse: true,
-				reverseColor: 'white',
-				color: item.colorCode,
-				size: 16,
-				containerStyle: { margin: -2 },
-			};
+		if ( ! item.iconName ) {
+			return null;
 		}
 
-		return iconConfiguration;
+		return {
+			name: item.iconName,
+			type: 'font-awesome',
+			reverse: true,
+			reverseColor: 'white',
+			color: item.colorCode,
+			size: 16,
+			containerStyle: { margin: -2 },
+		};
 	}
 
 	render() {

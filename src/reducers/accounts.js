@@ -30,16 +30,18 @@ const initialState = {
 			colorCode: 'red',
 			iconName: 'bank',
 		},
-		99: {
+		'-99': {
 			balance: 100,
 			name: 'Out of wallet',
-			id: 99,
+			id: -99,
 			currencyId: 2,
 			colorCode: 'pink',
 			iconName: 'bank',
+			hidden: true,
 		},
 	},
-	allIds: [ 1, 2, 3, 99 ],
+	allIds: [ 1, 2, 3 ],
+	serviceAccountId: -99,
 };
 
 export default function accounts( state = initialState, action ) {
