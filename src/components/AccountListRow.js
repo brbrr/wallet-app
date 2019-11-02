@@ -2,10 +2,8 @@
  * External dependencies
  */
 import React, { Component } from 'react';
-import { Animated, Easing, StyleSheet, Dimensions, Platform } from 'react-native';
+import { Animated, Easing, Platform } from 'react-native';
 import { ListItem } from 'react-native-elements';
-
-const window = Dimensions.get( 'window' );
 
 export default class AccountListRow extends Component {
 	constructor( props ) {
