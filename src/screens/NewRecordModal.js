@@ -19,6 +19,7 @@ import { updateAccountBalance } from '../actions';
 import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord, getAmountSign, getTxUpdateDirective } from '../utils';
 import { logComponentUpdates } from '../utils/debug-utils';
 import { TRANSFER } from '../constants/Records';
+import AccountListItem from '../components/accounts/AccountListItem';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -399,24 +400,6 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 		);
 	}
 }
-
-const AccountListItem = ( { account, onPress } ) =>
-	<ListItem
-		containerStyle={ styles.iconContainer }
-		title={ account.name }
-		bottomDivider={ true }
-		topDivider={ true }
-		leftIcon={ {
-			name: account.iconName,
-			type: 'font-awesome',
-			reverse: true,
-			reverseColor: 'white',
-			color: account.colorCode,
-			size: 20,
-			containerStyle: { margin: -4 },
-		} }
-		onPress={ onPress }
-	/>;
 
 const mapStateToProps = ( state ) => {
 	const { categories, currencies, accounts, records } = state;
