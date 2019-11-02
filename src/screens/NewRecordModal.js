@@ -6,6 +6,8 @@ import { ScrollView, Button, Text, StyleSheet, Alert, View } from 'react-native'
 import { Input, ListItem, ButtonGroup, Button as EButton, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import c from 'currency.js';
+import _ from 'lodash';
 
 /**
  * Internal dependencies
@@ -14,7 +16,7 @@ import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord, deleteRecord } from '../actions/records';
 import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
 import { updateAccountBalance } from '../actions';
-import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord, getAmountSign } from '../utils';
+import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord, getAmountSign, getTxUpdateDirective } from '../utils';
 import { logComponentUpdates } from '../utils/debug-utils';
 import { TRANSFER } from '../constants/Records';
 
@@ -54,7 +56,7 @@ class NewRecordModal extends React.Component {
 			createdAt: Date.now(),
 			typeId: 0,
 			isEdit,
-			toAccountId: 99, // Out of wallet
+			toAccountId: -99, // Out of wallet
 		};
 
 		if ( isEdit ) {
@@ -83,7 +85,7 @@ class NewRecordModal extends React.Component {
 	}
 
 	getRecordFromState() {
-		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, isEdit, id } = this.state;
+		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, isEdit, id, toAccountId } = this.state;
 
 		const record = {
 			amount: amount ? Number( amount ) : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
@@ -103,6 +105,16 @@ class NewRecordModal extends React.Component {
 			record.id = id;
 		}
 
+		// if ( toAccountId ) {
+		if ( typeId === TRANSFER ) {
+			record.toAccountId = toAccountId;
+			//FIXME: This is a hacky way to force `convertRecordAmountToAccountCurrency` to use `toAccountId` for amount calculations.
+			const hackyRecord = Object.assign( {}, record, { accountId: toAccountId } );
+			record.amountInToAccountCurrency = convertRecordAmountToAccountCurrency( this.props, hackyRecord );
+
+			delete record.categoryId;
+		}
+
 		return record;
 	}
 
@@ -112,14 +124,28 @@ class NewRecordModal extends React.Component {
 		const account = getAccountById( this.props, accountId );
 		const record = this.getRecordFromState();
 
-		console.log( record, account );
-
 		// Sanitize record object! e.g. amount value
 		// this should be called _before_ updating the account and after record got assigned an id
 		const updateDirective = getAccountsUpdateDirective( this.props, record );
+		const newUpdateDirective = getTxUpdateDirective( this.props, record );
+		console.log( record, account, updateDirective, newUpdateDirective, _.isEqual( updateDirective, newUpdateDirective ) );
+
 		Object.entries( updateDirective ).forEach( ( [ accId, newBalance ] ) => {
 			const acc = getAccountById( this.props, accId );
-			_updateAccountBalance( acc, newBalance );
+			const newAccBalance = c( acc.balance ).add( newUpdateDirective[ accId ] ).value;
+
+			if ( newAccBalance !== newBalance ) {
+				console.error(
+					`old: ${ newBalance }, new: ${ newAccBalance };
+isEqual: ${ _.isEqual( updateDirective, newUpdateDirective ) };
+oldDirective: ${ JSON.stringify( updateDirective ) };
+newDirective: ${ JSON.stringify( newUpdateDirective ) }`
+				);
+
+				throw new Error( `OUCH: old updateDirective is different from new one. check logs` );
+			}
+
+			_updateAccountBalance( acc, newAccBalance );
 		} );
 		if ( ! isEdit ) {
 			_createNewRecord( record );
@@ -263,7 +289,7 @@ class NewRecordModal extends React.Component {
 
 		const account = getAccountById( this.props, accountId );
 
-		return <AccountListItem account={ account } onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange, selectedId: account.id } ) } />;
+		return <AccountListItem account={ account } onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange } ) } />;
 	}
 
 	renderTransferItems() {
@@ -274,8 +300,8 @@ class NewRecordModal extends React.Component {
 		const toAccount = getAccountById( this.props, toAccountId );
 		return (
 			<View>
-				<AccountListItem account={ fromAccount } onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange, selectedId: fromAccount.id } ) } />
-				<AccountListItem account={ toAccount } onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange, idName: 'toAccountId', selectedId: toAccount.id } ) } />
+				<AccountListItem account={ fromAccount } onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange, hideId: toAccount.id } ) } />
+				<AccountListItem account={ toAccount } onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange, idName: 'toAccountId', hideId: fromAccount.id } ) } />
 			</View>
 		);
 	}
