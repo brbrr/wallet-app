@@ -2,10 +2,8 @@
  * External dependencies
  */
 import React, { Component } from 'react';
-import { Animated, Easing, StyleSheet, Dimensions, Platform } from 'react-native';
+import { Animated, Easing, Platform } from 'react-native';
 import { ListItem } from 'react-native-elements';
-
-const window = Dimensions.get( 'window' );
 
 export default class AccountListRow extends Component {
 	constructor( props ) {
@@ -56,20 +54,19 @@ export default class AccountListRow extends Component {
 
 	// TODO: extract into helper function
 	getIconConfiguration( item ) {
-		let iconConfiguration = null;
-		if ( item.iconName ) {
-			iconConfiguration = {
-				name: item.iconName,
-				type: 'font-awesome',
-				reverse: true,
-				reverseColor: 'white',
-				color: item.colorCode,
-				size: 16,
-				containerStyle: { margin: -2 },
-			};
+		if ( ! item.iconName ) {
+			return null;
 		}
 
-		return iconConfiguration;
+		return {
+			name: item.iconName,
+			type: 'font-awesome',
+			reverse: true,
+			reverseColor: 'white',
+			color: item.colorCode,
+			size: 16,
+			containerStyle: { margin: -2 },
+		};
 	}
 
 	render() {
@@ -91,63 +88,3 @@ export default class AccountListRow extends Component {
 		);
 	}
 }
-
-const styles = StyleSheet.create( {
-	container: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: '#eee',
-	},
-
-	title: {
-		fontSize: 20,
-		paddingVertical: 20,
-		color: '#999999',
-	},
-
-	list: {
-		flex: 1,
-	},
-
-	contentContainer: {
-		width: window.width,
-	},
-
-	row: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: '#fff',
-		// padding: 16,
-		height: 80,
-		flex: 1,
-		// marginTop: 7,
-		// marginBottom: 12,
-
-		...Platform.select( {
-			ios: {
-				shadowColor: 'rgba(0,0,0,0.2)',
-				shadowOpacity: 1,
-				shadowOffset: { height: 2, width: 2 },
-				shadowRadius: 2,
-			},
-
-			android: {
-				elevation: 0,
-				marginHorizontal: 30,
-			},
-		} ),
-	},
-
-	image: {
-		width: 50,
-		height: 50,
-		marginRight: 30,
-		borderRadius: 25,
-	},
-
-	text: {
-		fontSize: 16,
-		color: '#222222',
-	},
-} );

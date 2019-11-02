@@ -3,6 +3,7 @@
  */
 import fx from 'money';
 import c from 'currency.js';
+import _ from 'lodash';
 
 /**
  * Internal dependencies
@@ -10,24 +11,32 @@ import c from 'currency.js';
 import data from './conversion-rates.js';
 import store from './create-store';
 import { getAccountById, getCurrencyById, getRecordById, getDefaultAccount } from '../selectors/index.js';
+import { EXPENSE, INCOME, TRANSFER } from '../constants/Records.js';
 
-export function getRecordAmountWithCurrency( { currencyId, amount, typeId }, currencies ) {
-	const currency = currencies[ currencyId ];
+export function getAmountAsString( { amountInAccountCurrency, typeId } ) {
+	return getAmountSign( typeId ) + amountInAccountCurrency.toString();
+}
+
+export function getAmountSign( typeId ) {
 	switch ( typeId ) {
-		case 0:
-			return `-${ amount } ${ currency.code }`;
+		case EXPENSE:
+			return '-';
+		case INCOME:
+			return '+';
+		case TRANSFER:
+			return '';
 		default:
-			return `${ amount } ${ currency.code }`;
+			throw	new Error( 'typeID does not exist' );
 	}
 }
 
-export function getRecordAmount( { amount, typeId } ) {
-	switch ( typeId ) {
-		case 0:
-			return c( -1 ).multiply( Math.abs( amount ) );
-		default:
-			return amount;
-	}
+export function getRecordAmountWithCurrency( { amount, currencyId, typeId }, currencies ) {
+	const currency = currencies[ currencyId ];
+	return `${ getAmountSign( typeId ) + amount.toString() } ${ currency.code }`;
+}
+
+export function getRecordAmount( record ) {
+	return c( getAmountAsString( record ) );
 }
 
 // TODO: Set a expected currency, e.g. in which to convert
@@ -36,7 +45,7 @@ export function getTotalSpent( records ) {
 	// console.log( 'getTotalSpent' );
 
 	return records.reduce( ( acc, record ) => {
-		const amount = getRecordAmount( { amount: record.amountInAccountCurrency, typeId: record.typeId } );
+		const amount = getRecordAmount( record );
 		return acc.add( amount );
 	}, c( 0 ) ).value;
 }
@@ -121,8 +130,16 @@ export function convertRecordAmountToAccountCurrency( state, record ) {
  * @return {Object} Object map where keys are account id's and values are updated account balances
  */
 export function getAccountsUpdateDirective( state, record ) {
-	const isExistingRecord = !! record.id;
+	if ( ! record.amountInAccountCurrency ) {
+		throw new Error( 'Record object does not include `amountInAccountCurrency` property' );
+	}
+	const isTransfer = !! record.toAccountId;
 
+	if ( isTransfer ) {
+		return getAccountBalanceDirectiveForTransfer( state, record );
+	}
+
+	const isExistingRecord = !! record.id;
 	if ( isExistingRecord ) {
 		return getAccountsUpdateDirectiveForUpdatedRecord( state, record );
 	}
@@ -131,13 +148,12 @@ export function getAccountsUpdateDirective( state, record ) {
 }
 
 function getAccountsUpdateDirectiveForNewRecord( state, record ) {
-	let recordAmount = record.amount;
 	const account = getAccountById( state, record.accountId );
+	let recordAmount = getRecordAmount( record );
 
-	if ( ! isEqualCurrencies( account, record ) ) {
-		recordAmount = convertRecordAmountToAccountCurrency( state, record );
+	if ( record.typeId === TRANSFER ) {
+		recordAmount = c( -1 ).multiply( recordAmount );
 	}
-	recordAmount = getRecordAmount( { amount: recordAmount, typeId: record.typeId } );
 
 	return { [ account.id ]: c( account.balance ).add( recordAmount ).value };
 }
@@ -148,8 +164,8 @@ function getAccountsUpdateDirectiveForUpdatedRecord( state, record ) {
 	const existingRecord = getRecordById( state, record.id );
 	const existingAccount = getAccountById( state, existingRecord.accountId );
 
-	const existingRecordAmount = getRecordAmount( { amount: existingRecord.amountInAccountCurrency, typeId: existingRecord.typeId } );
-	const recordAmount = getRecordAmount( { amount: record.amountInAccountCurrency, typeId: record.typeId } );
+	const existingRecordAmount = getRecordAmount( existingRecord );
+	const recordAmount = getRecordAmount( record );
 
 	let accountBalance = c( account.balance );
 	// Return value for redux update action(s)
@@ -168,11 +184,35 @@ function getAccountsUpdateDirectiveForUpdatedRecord( state, record ) {
 	return directive;
 }
 
+function getAccountBalanceDirectiveForTransfer( state, record ) {
+	// const recordAmount = record.amount;
+	const toAccount = getAccountById( state, record.toAccountId );
+
+	// It's an "Out of Wallet" id, which means we should just deduct the amount from the "from" account
+	if ( toAccount.id === state.accounts.serviceAccountId ) {
+		console.log( 'XXXX', getAccountsUpdateDirectiveForNewRecord( state, record ) );
+
+		return getAccountsUpdateDirectiveForNewRecord( state, record );
+	}
+
+	const fromAccount = getAccountById( state, record.accountId );
+
+	// record amount in fromAccount currency
+	const recordAmountInFromAccount = convertRecordAmountToAccountCurrency( state, record );
+	// record amount in toAccount currency
+	const recordAmountInToAccount = convertRecordAmountToAccountCurrency( state, Object.assign( {}, record, { accountId: record.toAccountId } ) );
+
+	return {
+		[ fromAccount.id ]: c( fromAccount.balance ).subtract( recordAmountInFromAccount ).value,
+		[ toAccount.id ]: c( toAccount.balance ).add( recordAmountInToAccount ).value,
+	};
+}
+
 export function getUpdatedAccountBalanceAfterDeletedRecord( state, recordId ) {
 	const record = getRecordById( state, recordId );
 	const account = getAccountById( state, record.accountId );
 
-	const recordAmount = getRecordAmount( { amount: record.amountInAccountCurrency, typeId: record.typeId } );
+	const recordAmount = getRecordAmount( record );
 	const accountBalance = c( account.balance );
 
 	return accountBalance.subtract( recordAmount ).value;
@@ -182,6 +222,108 @@ function isEqualAccounts( firstRecord, secondRecord ) {
 	return firstRecord.accountId === secondRecord.accountId;
 }
 
-function isEqualCurrencies( firstObj, secondObj ) {
-	return firstObj.currencyId === secondObj.currencyId;
+export function getTxUpdateDirective( state, record ) {
+	if ( ! record.amountInAccountCurrency ) {
+		throw new Error( 'Record object does not include `amountInAccountCurrency` property' );
+	}
+
+	const isTransfer = !! record.toAccountId;
+	const isExistingRecord = !! record.id;
+	const directives = [];
+
+	if ( isExistingRecord ) {
+		const existingRecord = getRecordById( state, record.id );
+		const revertDirective = getTxRevertDirective( state, existingRecord );
+		directives.push( revertDirective );
+	}
+
+	if ( isTransfer ) {
+		const toTransferDirective = getTxDirectiveForTransfer( state, record );
+		directives.push( toTransferDirective );
+	} else {
+		const newTxDirective = getNewTxDirective( record );
+		directives.push( newTxDirective );
+	}
+
+	return consolidateDirectives( directives );
+}
+
+function getNewTxDirective( record ) {
+	// correct TX sign is handled by `getRecordAmount`
+	const recordAmount = getRecordAmount( record );
+	return { [ record.accountId ]: recordAmount };
+}
+
+/**
+ * The result should be directive which commands how to revert passed record
+ * EXPENSE: we should add back
+ * INCOME: we should substract
+ * TRANSFER: we should update 2 accounts
+ * @param {Object} state
+ * @param {Object} record
+ *
+ * @return {Object} directive
+ */
+function getTxRevertDirective( state, record ) {
+	const isNewRecord = ! record.id;
+	const isTransfer = !! record.toAccountId;
+
+	if ( isNewRecord ) {
+		return null;
+	}
+
+	if ( isTransfer ) {
+		// const hackyRecord = Object.assign( {}, record, { accountId: record.toAccountId } );
+		// const toAccountRecordAmount = c( -1 ).multiply( convertRecordAmountToAccountCurrency( state, hackyRecord ) );
+		// const f = getTxDirectiveForTransfer( state, record, -1 );
+
+		// const d = {
+		// 	[ record.accountId ]: recordAmount,
+		// 	[ record.toAccountId ]: toAccountRecordAmount,
+		// };
+
+		return getTxDirectiveForTransfer( state, record, -1 );
+	}
+
+	const recordAmount = getRecordAmount( record );
+	return { [ record.accountId ]: c( -1 ).multiply( recordAmount ) };
+}
+
+function getTxDirectiveForTransfer( state, record, sign = 1 ) {
+	if ( record.accountId === record.toAccountId ) {
+		throw new InvalidTransactionError( 'From account and to account are the same' );
+	}
+	const directive = {};
+
+	// fromAccount
+	const newTxDirective = c( -1 ).multiply( sign ).multiply( getRecordAmount( record ) );
+	directive[ record.accountId ] = newTxDirective;
+
+	// toAccount
+	if ( record.toAccountId !== -99 ) {
+	//FIXME: This is a hacky way to force `convertRecordAmountToAccountCurrency` to use `toAccountId` for amount calculations.
+		const hackyRecord = Object.assign( {}, record, { accountId: record.toAccountId } );
+		const recordAmount = c( convertRecordAmountToAccountCurrency( state, hackyRecord ) );
+		directive[ record.toAccountId ] = c( sign ).multiply( recordAmount );
+	}
+
+	return directive;
+}
+
+function consolidateDirectives( directivesArray ) {
+	console.log( 'consolidateDirectives: ', JSON.stringify( directivesArray ) );
+
+	return _.mergeWith( ...directivesArray, ( objValue, srcValue ) => objValue ? objValue.add( srcValue ) : srcValue );
+}
+
+export class InvalidTransactionError extends Error {
+	constructor( message ) {
+		super( message );
+		// Ensure the name of this error is the same as the class name
+		this.name = this.constructor.name;
+		// This clips the constructor invocation from the stack trace.
+		// It's not absolutely essential, but it does make the stack trace a little nicer.
+		//  @see Node.js reference (bottom)
+		Error.captureStackTrace( this, this.constructor );
+	}
 }

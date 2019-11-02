@@ -13,6 +13,7 @@ import { connect } from 'react-redux';
 import { RecordsList } from '../components/records/RecordsList';
 import Overview from '../components/Overview';
 import Swiper from 'react-native-swiper';
+import { logComponentUpdates } from '../utils/debug-utils';
 
 class HomeScreen extends React.Component {
 	static navigationOptions = {
@@ -33,12 +34,7 @@ class HomeScreen extends React.Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		Object.entries( this.props ).forEach( ( [ key, val ] ) =>
-			prevProps[ key ] !== val && console.log( `**** Prop '${ key }' from: ${ prevProps[ key ] } to: ${ val }` )
-		);
-		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
-			prevState[ key ] !== val && console.log( `**** State '${ key }' changed from: ${ prevState[ key ] } to: ${ val }` )
-		);
+		logComponentUpdates( this, prevProps, prevState );
 	}
 
 	// Find dots dimensions

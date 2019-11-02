@@ -27,11 +27,21 @@ const initialState = {
 			name: 'UAH ZZZ',
 			id: 3,
 			currencyId: 2,
-			colorCode: 'blue',
+			colorCode: 'red',
 			iconName: 'bank',
+		},
+		'-99': {
+			balance: 0,
+			name: 'Out of wallet',
+			id: -99,
+			currencyId: 2,
+			colorCode: 'pink',
+			iconName: 'bank',
+			hidden: true,
 		},
 	},
 	allIds: [ 1, 2, 3 ],
+	serviceAccountId: -99,
 };
 
 export default function accounts( state = initialState, action ) {
@@ -41,13 +51,15 @@ export default function accounts( state = initialState, action ) {
 			return addNewItem( account, state );
 		case UPDATE_ACCOUNT:
 			return {
+				...state,
 				byId: { ...state.byId, [ account.id ]: account },
 				allIds: [ ...state.allIds ],
 			};
 		case UPDATE_ACCOUNT_BALANCE:
-			account.balance = action.newBalance;
+			const acc = { ...account, balance: action.newBalance };
 			return {
-				byId: { ...state.byId, [ account.id ]: account },
+				...state,
+				byId: { ...state.byId, [ acc.id ]: acc },
 				allIds: [ ...state.allIds ],
 			};
 		case UPDATE_ACCOUNTS_ORDER:

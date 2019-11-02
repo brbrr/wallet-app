@@ -14,6 +14,7 @@ import { getTotalSpent } from '../../utils';
 const DayHeader = ( { records } ) => {
 	const niceDate = moment( records[ 0 ].createdAt ).format( 'MMMM D' );
 	const totalPerDay = getTotalSpent( records );
+	const niceTotalPerDay = totalPerDay > 0 ? `+${ totalPerDay }` : totalPerDay.toString();
 
 	return (
 		<ListItem
@@ -30,7 +31,7 @@ const DayHeader = ( { records } ) => {
 					borderLeftWidth: 15,
 					borderRightWidth: 15,
 				} }>
-					<Text style={ { fontWeight: 'bold', color: 'black', fontSize: 13 } }>{ totalPerDay.toString() }</Text>
+					<Text style={ { fontWeight: 'bold', color: 'black', fontSize: 13 } }>{ niceTotalPerDay }</Text>
 				</View>
 			}
 		/>

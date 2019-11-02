@@ -29,7 +29,7 @@ export default class SettingsScreen extends React.Component {
 					} }
 					chevron
 					rightTitle={ 'Select' }
-					onPress={ () => this.props.navigation.navigate( 'SettingsAccounts', { isEdit: true } ) }
+					onPress={ () => this.props.navigation.navigate( 'SettingsAccounts', { enableReorder: true } ) }
 				/>
 
 				<ListItem

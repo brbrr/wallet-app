@@ -4,13 +4,14 @@
 import React, { Component } from 'react';
 import { Button } from 'react-native';
 import { connect } from 'react-redux';
-import { isEqual } from 'lodash';
+import { omit } from 'lodash';
 /**
  * Internal dependencies
  */
 import { selectRecordAccount, updateAccountsOrder } from '../actions';
 import { getAccountsById, getAccountOrder } from '../selectors';
 import AccountsList from '../components/AccountsList';
+import { logComponentUpdates } from '../utils/debug-utils';
 
 export class AccountsScreen extends Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -35,12 +36,14 @@ export class AccountsScreen extends Component {
 			title: 'Accounts',
 			headerRight: (
 				<Button
+					testID="headerRight"
 					onPress={ headersConfig.rightOnPress }
 					title={ headersConfig.rightTitle }
 				/>
 			),
 			headerLeft: (
 				<Button
+					testID="headerLeft"
 					onPress={ headersConfig.leftOnPress }
 					title={ headersConfig.leftTitle }
 				/>
@@ -54,18 +57,13 @@ export class AccountsScreen extends Component {
 		this.state = { localAccountOrder: props.accountOrder };
 
 		props.navigation.setParams( {
-			updateAccountsOrder: this.props._updateAccountsOrder.bind( this ),
+			updateAccountsOrder: props._updateAccountsOrder.bind( this ),
 			localAccountOrder: props.accountOrder,
 		} );
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		Object.entries( this.props ).forEach( ( [ key, val ] ) =>
-			prevProps[ key ] !== val && console.log( `Prop '${ key }' changed` )
-		);
-		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
-			prevState[ key ] !== val && console.log( `State '${ key }' changed` )
-		);
+		logComponentUpdates( this, prevProps, prevState );
 	}
 
 	onReorderToggle = () => this.props.navigation.setParams( { isReorderEnabled: true } )
@@ -78,24 +76,44 @@ export class AccountsScreen extends Component {
 	onListRowPress = ( accountId ) => {
 		const { navigation } = this.props;
 		const onStateChange = navigation.getParam( 'onStateChange' );
+		const idName = navigation.getParam( 'idName', 'accountId' );
 
-		onStateChange( { accountId } );
+		onStateChange( { [ idName ]: accountId } );
 		navigation.goBack( null );
 	}
 
 	render() {
-		const { accountsById, navigation } = this.props;
-		const { localAccountOrder } = this.state;
+		const { accountsById, navigation, serviceAccountId } = this.props;
+		let { localAccountOrder } = this.state;
 		const isReorderEnabled = navigation.getParam( 'isReorderEnabled', false );
+		const enableReorder = navigation.getParam( 'enableReorder', false );
+		let accounts = accountsById;
+
+		/**
+		 * hideId is a param used to hide specific account from the list.
+		 * It's useful _only_ for account selection for transfers (to hide already selected account)
+		 */
+		const hideId = navigation.getParam( 'hideId', false );
+		if ( hideId ) {
+			accounts = omit( accountsById, hideId );
+			localAccountOrder = localAccountOrder.filter( ( id ) => id !== hideId );
+			if ( hideId !== serviceAccountId ) {
+				localAccountOrder.push( serviceAccountId );
+			}
+		}
+
+		console.log( '### ACCOUNTS BY ID ###' );
+		console.log( accounts );
 
 		return (
 			<AccountsList
-				accounts={ accountsById }
+				accounts={ accounts }
 				accountOrder={ localAccountOrder }
 				onChangeOrder={ this.onChangeOrder }
 				onReorderToggle={ this.onReorderToggle }
 				onListRowPress={ this.onListRowPress }
 				isReorderEnabled={ isReorderEnabled }
+				enableReorder={ enableReorder }
 			/>
 		);
 	}
@@ -105,6 +123,7 @@ const mapStateToProps = ( state ) => {
 	return {
 		accountsById: getAccountsById( state ),
 		accountOrder: getAccountOrder( state ),
+		serviceAccountId: state.accounts.serviceAccountId,
 	};
 };
 

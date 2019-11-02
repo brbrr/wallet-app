@@ -7,7 +7,7 @@ import { Text, ScrollView } from 'react-native';
 /**
  * Internal dependencies
  */
-import RecordsItem from './RecordItem';
+import RecordsItem, { TransferItem } from './RecordItem';
 import { getRecordAmountWithCurrency } from '../../utils';
 import DayHeader from './DayHeader';
 
@@ -52,14 +52,24 @@ export const RecordsList = ( { recordsArray, accounts, categories, currencies, n
 			const category = categories.byId[ record.categoryId ];
 			const account = accounts.byId[ record.accountId ];
 			const amount = getRecordAmountWithCurrency( record, currencies.byId );
-			result.push( <RecordsItem
-				key={ `${ idx }-${ index }` }
-				record={ record }
-				category={ category }
-				accountColor={ account.colorCode }
-				amount={ amount }
-				navigateEditRecordScreen={ navigateEditRecordScreen }
-			/> );
+			if ( category ) {
+				result.push( <RecordsItem
+					key={ `${ idx }-${ index }` }
+					record={ record }
+					category={ category }
+					accountColor={ account.colorCode }
+					amount={ amount }
+					navigateEditRecordScreen={ navigateEditRecordScreen }
+				/> );
+			} else {
+				result.push( <TransferItem
+					key={ `${ idx }-${ index }` }
+					record={ record }
+					accountColor={ account.colorCode }
+					amount={ amount }
+					navigateEditRecordScreen={ navigateEditRecordScreen }
+				/> );
+			}
 		} );
 	} );
 

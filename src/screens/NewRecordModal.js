@@ -2,10 +2,12 @@
  * External dependencies
  */
 import React from 'react';
-import { ScrollView, Button, Text, StyleSheet, Alert } from 'react-native';
-import { Input, ListItem, ButtonGroup, Button as EButton } from 'react-native-elements';
+import { ScrollView, Button, Text, StyleSheet, Alert, View } from 'react-native';
+import { Input, ListItem, ButtonGroup, Button as EButton, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import c from 'currency.js';
+import _ from 'lodash';
 
 /**
  * Internal dependencies
@@ -14,7 +16,9 @@ import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord, deleteRecord } from '../actions/records';
 import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
 import { updateAccountBalance } from '../actions';
-import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord } from '../utils';
+import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord, getAmountSign, getTxUpdateDirective } from '../utils';
+import { logComponentUpdates } from '../utils/debug-utils';
+import { TRANSFER } from '../constants/Records';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -44,7 +48,7 @@ class NewRecordModal extends React.Component {
 		const account = getDefaultAccount( props );
 		const category = getDefaultCategory( props );
 		this.state = {
-			amount: 0,
+			amount: '',
 			description: '',
 			accountId: account.id,
 			currencyId: account.currencyId,
@@ -52,6 +56,7 @@ class NewRecordModal extends React.Component {
 			createdAt: Date.now(),
 			typeId: 0,
 			isEdit,
+			toAccountId: -99, // Out of wallet
 		};
 
 		if ( isEdit ) {
@@ -76,16 +81,11 @@ class NewRecordModal extends React.Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		Object.entries( this.props ).forEach( ( [ key, val ] ) =>
-			prevProps[ key ] !== val && console.log( `Prop '${ key }' changed` )
-		);
-		Object.entries( this.state ).forEach( ( [ key, val ] ) =>
-			prevState[ key ] !== val && console.log( `State '${ key }' changed` )
-		);
+		logComponentUpdates( this, prevProps, prevState );
 	}
 
 	getRecordFromState() {
-		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, isEdit, id } = this.state;
+		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, isEdit, id, toAccountId } = this.state;
 
 		const record = {
 			amount: amount ? Number( amount ) : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
@@ -96,7 +96,6 @@ class NewRecordModal extends React.Component {
 			categoryId,
 			createdAt,
 			typeId,
-			type: 'expense',
 		};
 
 		// If amount, currencyId, or accountId don't changed - we not need to re-calculate this value. Maybe a room for optimization?
@@ -104,6 +103,16 @@ class NewRecordModal extends React.Component {
 
 		if ( isEdit ) {
 			record.id = id;
+		}
+
+		// if ( toAccountId ) {
+		if ( typeId === TRANSFER ) {
+			record.toAccountId = toAccountId;
+			//FIXME: This is a hacky way to force `convertRecordAmountToAccountCurrency` to use `toAccountId` for amount calculations.
+			const hackyRecord = Object.assign( {}, record, { accountId: toAccountId } );
+			record.amountInToAccountCurrency = convertRecordAmountToAccountCurrency( this.props, hackyRecord );
+
+			delete record.categoryId;
 		}
 
 		return record;
@@ -115,14 +124,28 @@ class NewRecordModal extends React.Component {
 		const account = getAccountById( this.props, accountId );
 		const record = this.getRecordFromState();
 
-		console.log( record, account );
-
 		// Sanitize record object! e.g. amount value
 		// this should be called _before_ updating the account and after record got assigned an id
 		const updateDirective = getAccountsUpdateDirective( this.props, record );
+		const newUpdateDirective = getTxUpdateDirective( this.props, record );
+		console.log( record, account, updateDirective, newUpdateDirective, _.isEqual( updateDirective, newUpdateDirective ) );
+
 		Object.entries( updateDirective ).forEach( ( [ accId, newBalance ] ) => {
 			const acc = getAccountById( this.props, accId );
-			_updateAccountBalance( acc, newBalance );
+			const newAccBalance = c( acc.balance ).add( newUpdateDirective[ accId ] ).value;
+
+			if ( newAccBalance !== newBalance ) {
+				console.error(
+					`old: ${ newBalance }, new: ${ newAccBalance };
+isEqual: ${ _.isEqual( updateDirective, newUpdateDirective ) };
+oldDirective: ${ JSON.stringify( updateDirective ) };
+newDirective: ${ JSON.stringify( newUpdateDirective ) }`
+				);
+
+				throw new Error( `OUCH: old updateDirective is different from new one. check logs` );
+			}
+
+			_updateAccountBalance( acc, newAccBalance );
 		} );
 		if ( ! isEdit ) {
 			_createNewRecord( record );
@@ -177,6 +200,9 @@ class NewRecordModal extends React.Component {
 
 	// Don't allow multiple periods in amount
 	onAmountChange( amount ) {
+		if ( this.state.amount === '0' && amount.length === 2 ) {
+			return this.onStateChange( { amount: amount[ 1 ] } );
+		}
 		const periodCount = ( amount.match( /\./g ) || [] ).length;
 		if ( periodCount < 2 ) {
 			this.onStateChange( { amount } );
@@ -224,24 +250,76 @@ class NewRecordModal extends React.Component {
 		);
 	}
 
+	renderCategoryItem() {
+		const { categoryId, typeId } = this.state;
+		const { navigation } = this.props;
+
+		if ( typeId === TRANSFER ) {
+			return null;
+		}
+		const category = getCategoryById( this.props, categoryId );
+
+		return (
+			<ListItem
+				containerStyle={ styles.iconContainer }
+				title={ category.name }
+				bottomDivider={ true }
+				topDivider={ true }
+				leftIcon={ {
+					name: category.iconName,
+					type: 'font-awesome',
+					reverse: true,
+					reverseColor: 'white',
+					color: category.colorCode,
+					size: 20,
+					containerStyle: { margin: -4 },
+				} }
+				onPress={ () => navigation.navigate( 'Categories', { onStateChange: this.onStateChange } ) }
+			/>
+		);
+	}
+
+	renderAccountItem() {
+		const { accountId, typeId } = this.state;
+		const { navigation } = this.props;
+
+		if ( typeId === TRANSFER ) {
+			return this.renderTransferItems();
+		}
+
+		const account = getAccountById( this.props, accountId );
+
+		return <AccountListItem account={ account } onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange } ) } />;
+	}
+
+	renderTransferItems() {
+		const { accountId, toAccountId } = this.state;
+		const { navigation } = this.props;
+
+		const fromAccount = getAccountById( this.props, accountId );
+		const toAccount = getAccountById( this.props, toAccountId );
+		return (
+			<View>
+				<AccountListItem account={ fromAccount } onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange, hideId: toAccount.id } ) } />
+				<AccountListItem account={ toAccount } onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange, idName: 'toAccountId', hideId: fromAccount.id } ) } />
+			</View>
+		);
+	}
+
 	render() {
 		console.log( '!!!!!!!! NewRecordModal screen render' );
 
-		const { amount, description, accountId, currencyId, categoryId, typeId, isEdit } = this.state;
+		const { amount, description, currencyId, typeId, isEdit } = this.state;
 		const { navigation } = this.props;
 
-		const category = getCategoryById( this.props, categoryId );
-		const account = getAccountById( this.props, accountId );
 		const currency = getCurrencyById( this.props, currencyId );
-
-		const buttons = [ 'expense', 'income', 'transfer' ];
 
 		return (
 			<ScrollView style={ { backgroundColor: '#f9f9f9' } }>
 				<ButtonGroup
 					onPress={ ( id ) => this.setState( { typeId: id } ) }
 					selectedIndex={ typeId }
-					buttons={ buttons }
+					buttons={ [ 'expense', 'income', 'transfer' ] }
 					containerStyle={ { borderRadius: 5, height: 25 } }
 				/>
 
@@ -250,16 +328,21 @@ class NewRecordModal extends React.Component {
 					title="Amount"
 					titleStyle={ styles.amountTitle }
 					subtitle={
-						<Input
-							containerStyle={ { paddingHorizontal: 0 } }
-							inputContainerStyle={ { borderBottomWidth: 0 } }
-							inputStyle={ styles.amountInput }
-							keyboardType="numeric"
-							value={ amount.toString() }
-							placeholder="0.0"
-							onChangeText={ ( amnt ) => this.onAmountChange( amnt ) }
-							autoFocus
-						/>
+						<View style={ { flexDirection: 'row' } }>
+							<Text style={ [ styles.amountInput, { alignSelf: 'center' } ] }>{ getAmountSign( typeId ) }</Text>
+							<Input
+								containerStyle={ { paddingHorizontal: 0 } }
+								inputContainerStyle={ { borderBottomWidth: 0 } }
+								inputStyle={ styles.amountInput }
+								keyboardType="numeric"
+								value={ amount.toString() }
+								placeholder="0"
+								placeholderTextColor="black"
+								caretHidden
+								onChangeText={ ( amnt ) => this.onAmountChange( amnt ) }
+								autoFocus
+							/>
+						</View>
 					}
 					bottomDivider={ true }
 					topDivider={ true }
@@ -273,39 +356,9 @@ class NewRecordModal extends React.Component {
 					}
 				/>
 
-				<ListItem
-					containerStyle={ styles.iconContainer }
-					title={ category.name }
-					bottomDivider={ true }
-					topDivider={ true }
-					leftIcon={ {
-						name: category.iconName,
-						type: 'font-awesome',
-						reverse: true,
-						reverseColor: 'white',
-						color: category.colorCode,
-						size: 20,
-						containerStyle: { margin: -4 },
-					} }
-					onPress={ () => navigation.navigate( 'Categories', { onStateChange: this.onStateChange } ) }
-				/>
+				{ this.renderCategoryItem() }
 
-				<ListItem
-					containerStyle={ styles.iconContainer }
-					title={ account.name }
-					bottomDivider={ true }
-					topDivider={ true }
-					leftIcon={ {
-						name: account.iconName,
-						type: 'font-awesome',
-						reverse: true,
-						reverseColor: 'white',
-						color: account.colorCode,
-						size: 20,
-						containerStyle: { margin: -4 },
-					} }
-					onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange } ) }
-				/>
+				{ this.renderAccountItem() }
 
 				{ this.renderDatePicker() }
 
@@ -346,6 +399,24 @@ class NewRecordModal extends React.Component {
 		);
 	}
 }
+
+const AccountListItem = ( { account, onPress } ) =>
+	<ListItem
+		containerStyle={ styles.iconContainer }
+		title={ account.name }
+		bottomDivider={ true }
+		topDivider={ true }
+		leftIcon={ {
+			name: account.iconName,
+			type: 'font-awesome',
+			reverse: true,
+			reverseColor: 'white',
+			color: account.colorCode,
+			size: 20,
+			containerStyle: { margin: -4 },
+		} }
+		onPress={ onPress }
+	/>;
 
 const mapStateToProps = ( state ) => {
 	const { categories, currencies, accounts, records } = state;
