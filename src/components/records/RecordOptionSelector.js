@@ -4,28 +4,14 @@
 import React from 'react';
 import { Text, ScrollView } from 'react-native';
 import { ListItem } from 'react-native-elements';
+/**
+ * Internal dependencies
+ */
+import { getIconConfiguration } from '../helper';
 
 export default class RecordOptionSelector extends React.Component {
 	static defaultProps = {
 		nameValue: 'name',
-	}
-
-	// TODO: extract into shared function
-	getIconConfiguration( item ) {
-		let iconConfiguration = null;
-		if ( item.iconName ) {
-			iconConfiguration = {
-				name: item.iconName,
-				type: 'font-awesome',
-				reverse: true,
-				reverseColor: 'white',
-				color: item.colorCode,
-				size: 20,
-				containerStyle: { margin: -2 },
-			};
-		}
-
-		return iconConfiguration;
 	}
 
 	render() {
@@ -48,7 +34,7 @@ export default class RecordOptionSelector extends React.Component {
 								title={ item[ nameValue ] }
 								bottomDivider={ true }
 								topDivider={ true }
-								leftIcon={ this.getIconConfiguration( item ) }
+								leftIcon={ getIconConfiguration( item, { size: 20 } ) }
 								onPress={ () => selectItem( item.id ) }
 							/>
 						);

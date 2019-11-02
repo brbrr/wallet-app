@@ -4,6 +4,10 @@
 import React, { Component } from 'react';
 import { Animated, Easing, Platform } from 'react-native';
 import { ListItem } from 'react-native-elements';
+/**
+ * Internal dependencies
+ */
+import { getIconConfiguration } from './helper';
 
 export default class AccountListRow extends Component {
 	constructor( props ) {
@@ -52,23 +56,6 @@ export default class AccountListRow extends Component {
 		}
 	}
 
-	// TODO: extract into helper function
-	getIconConfiguration( item ) {
-		if ( ! item.iconName ) {
-			return null;
-		}
-
-		return {
-			name: item.iconName,
-			type: 'font-awesome',
-			reverse: true,
-			reverseColor: 'white',
-			color: item.colorCode,
-			size: 16,
-			containerStyle: { margin: -2 },
-		};
-	}
-
 	render() {
 		const { item, disabled, onStateChange } = this.props;
 
@@ -79,7 +66,7 @@ export default class AccountListRow extends Component {
 				title={ item.name }
 				bottomDivider={ true }
 				topDivider={ true }
-				leftIcon={ this.getIconConfiguration( item, disabled ) }
+				leftIcon={ getIconConfiguration( item, disabled ) }
 
 				chevron={ disabled ? true : { name: 'bars', type: 'font-awesome' } }
 				rightTitle={ disabled ? 'Select' : null }
