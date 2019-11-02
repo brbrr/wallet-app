@@ -119,7 +119,7 @@ export class AccountsScreen extends Component {
 	}
 }
 
-const mapStateToProps = ( state ) => {
+export const mapStateToProps = ( state ) => {
 	return {
 		accountsById: getAccountsById( state ),
 		accountOrder: getAccountOrder( state ),
@@ -127,7 +127,7 @@ const mapStateToProps = ( state ) => {
 	};
 };
 
-const mapDispatchToProps = ( dispatch ) => {
+export const mapDispatchToProps = ( dispatch ) => {
 	return {
 		selectItem: ( id ) => dispatch( selectRecordAccount( id ) ),
 		_updateAccountsOrder: ( newOrder ) => dispatch( updateAccountsOrder( newOrder ) ),
@@ -138,17 +138,4 @@ export default connect(
 	mapStateToProps,
 	mapDispatchToProps
 )( AccountsScreen );
-
-class SAccountsScreen extends AccountsScreen {
-	onListRowPress = ( accountId ) => {
-		console.log( 'QWEQWEQW', accountId );
-		const { navigation } = this.props;
-		navigation.navigate( 'NewAccount', { accountId, isEdit: true } );
-	}
-}
-
-export const SettingsAccountsScreen = connect(
-	mapStateToProps,
-	mapDispatchToProps
-)( SAccountsScreen );
 
