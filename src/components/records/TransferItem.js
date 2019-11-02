@@ -10,11 +10,11 @@ import { Icon, ListItem } from 'react-native-elements';
 import styles from './styles';
 import { getTime } from '../../utils/time-helper';
 
-const RecordsItem = ( { category, accountColor, amount, record, navigateEditRecordScreen } ) => {
+const TransferItem = ( { accountColor, amount, record, navigateEditRecordScreen } ) => {
 	return (
 		<ListItem
 			containerStyle={ { paddingTop: 3, paddingBottom: 3 } }
-			title={ category.name }
+			title="Transfer"
 
 			rightContentContainerStyle={ { flex: 1 } }
 
@@ -29,11 +29,11 @@ const RecordsItem = ( { category, accountColor, amount, record, navigateEditReco
 			leftIcon={
 				<View >
 					<Icon
-						name={ category.iconName }
+						name="exchange"
 						type="font-awesome"
 						reverse
 						reverseColor="white"
-						color={ category.colorCode }
+						color={ 'black' }
 						size={ 20 }
 					/>
 					<View style={ styles.accountIndicator( accountColor ) } />
@@ -44,4 +44,4 @@ const RecordsItem = ( { category, accountColor, amount, record, navigateEditReco
 	);
 };
 
-export default RecordsItem;
+export default TransferItem;
