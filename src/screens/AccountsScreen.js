@@ -57,7 +57,7 @@ export class AccountsScreen extends Component {
 		this.state = { localAccountOrder: props.accountOrder };
 
 		props.navigation.setParams( {
-			updateAccountsOrder: this.props._updateAccountsOrder.bind( this ),
+			updateAccountsOrder: props._updateAccountsOrder.bind( this ),
 			localAccountOrder: props.accountOrder,
 		} );
 	}
@@ -83,20 +83,31 @@ export class AccountsScreen extends Component {
 	}
 
 	render() {
-		let { accountsById, navigation } = this.props;
+		const { accountsById, navigation, serviceAccountId } = this.props;
 		let { localAccountOrder } = this.state;
 		const isReorderEnabled = navigation.getParam( 'isReorderEnabled', false );
-		const selectedId = navigation.getParam( 'selectedId', false );
 		const enableReorder = navigation.getParam( 'enableReorder', false );
+		let accounts = accountsById;
 
-		if ( selectedId ) {
-			accountsById = omit( accountsById, selectedId );
-			localAccountOrder = localAccountOrder.filter( ( id ) => id !== selectedId );
+		/**
+		 * hideId is a param used to hide specific account from the list.
+		 * It's useful _only_ for account selection for transfers (to hide already selected account)
+		 */
+		const hideId = navigation.getParam( 'hideId', false );
+		if ( hideId ) {
+			accounts = omit( accountsById, hideId );
+			localAccountOrder = localAccountOrder.filter( ( id ) => id !== hideId );
+			if ( hideId !== serviceAccountId ) {
+				localAccountOrder.push( serviceAccountId );
+			}
 		}
+
+		console.log( '### ACCOUNTS BY ID ###' );
+		console.log( accounts );
 
 		return (
 			<AccountsList
-				accounts={ accountsById }
+				accounts={ accounts }
 				accountOrder={ localAccountOrder }
 				onChangeOrder={ this.onChangeOrder }
 				onReorderToggle={ this.onReorderToggle }
@@ -112,6 +123,7 @@ const mapStateToProps = ( state ) => {
 	return {
 		accountsById: getAccountsById( state ),
 		accountOrder: getAccountOrder( state ),
+		serviceAccountId: state.accounts.serviceAccountId,
 	};
 };
 

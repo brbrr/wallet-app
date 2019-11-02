@@ -31,7 +31,7 @@ const initialState = {
 			iconName: 'bank',
 		},
 		'-99': {
-			balance: 100,
+			balance: 0,
 			name: 'Out of wallet',
 			id: -99,
 			currencyId: 2,
@@ -51,12 +51,14 @@ export default function accounts( state = initialState, action ) {
 			return addNewItem( account, state );
 		case UPDATE_ACCOUNT:
 			return {
+				...state,
 				byId: { ...state.byId, [ account.id ]: account },
 				allIds: [ ...state.allIds ],
 			};
 		case UPDATE_ACCOUNT_BALANCE:
 			const acc = { ...account, balance: action.newBalance };
 			return {
+				...state,
 				byId: { ...state.byId, [ acc.id ]: acc },
 				allIds: [ ...state.allIds ],
 			};
