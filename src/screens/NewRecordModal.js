@@ -19,7 +19,8 @@ import { updateAccountBalance } from '../actions';
 import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord, getAmountSign, getTxUpdateDirective } from '../utils';
 import { logComponentUpdates } from '../utils/debug-utils';
 import { TRANSFER } from '../constants/Records';
-import AccountListItem from '../components/accounts/AccountListItem';
+import AccountListItem from '../components/record-modal/AccountListItem';
+import { getIconConfiguration } from '../components/helper';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -266,15 +267,7 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 				title={ category.name }
 				bottomDivider={ true }
 				topDivider={ true }
-				leftIcon={ {
-					name: category.iconName,
-					type: 'font-awesome',
-					reverse: true,
-					reverseColor: 'white',
-					color: category.colorCode,
-					size: 20,
-					containerStyle: { margin: -4 },
-				} }
+				leftIcon={ getIconConfiguration( category ), { size: 20, containerStyle: { margin: -4 } } }
 				onPress={ () => navigation.navigate( 'Categories', { onStateChange: this.onStateChange } ) }
 			/>
 		);

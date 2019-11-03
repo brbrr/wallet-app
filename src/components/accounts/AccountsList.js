@@ -2,13 +2,14 @@
  * External dependencies
  */
 import React from 'react';
-import { StyleSheet, Text, View, Dimensions, Button } from 'react-native';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import SortableList from 'react-native-sortable-list';
 import PropTypes from 'prop-types';
 /**
  * Internal dependencies
  */
-import AccountListRow from '../components/AccountListRow';
+import { ChangeOrderButton } from '../ChangeOrderButton';
+import AccountListRow from './AccountListRow';
 
 const AccountsList = ( { accounts, accountOrder, onChangeOrder, onReorderToggle, isReorderEnabled, onListRowPress, enableReorder } ) => {
 	console.log( '!!!! AccountsList screen' );
@@ -36,17 +37,6 @@ const AccountsList = ( { accounts, accountOrder, onChangeOrder, onReorderToggle,
 		</View>
 	);
 };
-
-const ChangeOrderButton = ( { isReorderEnabled, onReorderToggle } ) =>
-	<View style={ { flex: 0.1, justifyContent: 'flex-end' } }>
-		<Button
-			buttonStyle={ { backgroundColor: 'white', borderTopWidth: 1 } }
-			type="clear"
-			title="Change order"
-			disabled={ !! isReorderEnabled }
-			onPress={ onReorderToggle }
-		/>
-	</View>;
 
 export default AccountsList;
 

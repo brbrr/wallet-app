@@ -10,13 +10,13 @@ import { createStackNavigator } from 'react-navigation';
  */
 import TabBarIcon from '../components/TabBarIcon';
 import SettingsScreen from '../screens/SettingsScreen';
-import { SettingsAccountsScreen } from '../screens/AccountsScreen';
 import { NewAccountStack } from './AccountsNavigator';
 import { SettingsCategoriesScreen } from '../screens/CategoriesScreen';
 import { NewCategoryStack } from './CategoriesStack';
 import { SettingsCurrenciesScreen } from '../screens/CurrenciesScreen';
 import CurrencyScreen from '../screens/CurrencyScreen';
 import { NewCurrencyStack } from './CurrenciesNavigator';
+import { SettingsAccountsScreen } from '../screens/settings/SettingsAccountsScreen';
 
 const SettingsAccountsStack = createStackNavigator( {
 	SettingsAccountsList: { screen: SettingsAccountsScreen },

@@ -1,8 +1,13 @@
 /**
  * External dependencies
  */
+import React from 'react';
 import { ListItem } from 'react-native-elements';
 import { StyleSheet } from 'react-native';
+/**
+ * Internal dependencies
+ */
+import { getIconConfiguration } from '../helper';
 
 const AccountListItem = ( { account, onPress } ) =>
 	<ListItem
@@ -10,15 +15,7 @@ const AccountListItem = ( { account, onPress } ) =>
 		title={ account.name }
 		bottomDivider={ true }
 		topDivider={ true }
-		leftIcon={ {
-			name: account.iconName,
-			type: 'font-awesome',
-			reverse: true,
-			reverseColor: 'white',
-			color: account.colorCode,
-			size: 20,
-			containerStyle: { margin: -4 },
-		} }
+		leftIcon={ getIconConfiguration( account, { size: 20, containerStyle: { margin: -4 } } ) }
 		onPress={ onPress }
 	/>;
 
@@ -29,5 +26,5 @@ const styles = StyleSheet.create( {
 		paddingTop: 3,
 		paddingBottom: 3,
 		height: 55,
-  }
-);
+	},
+} );

@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import { addNewAccount, updateAccount } from '../actions';
-import AccountInfo from '../components/AccountInfo';
+import AccountInfo from '../components/accounts/AccountInfo';
 import { getCurrencyById, getAccountById } from '../selectors';
 
 class NewAccountScreen extends React.Component {

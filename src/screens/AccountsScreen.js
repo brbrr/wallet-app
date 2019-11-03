@@ -10,7 +10,7 @@ import { omit } from 'lodash';
  */
 import { selectRecordAccount, updateAccountsOrder } from '../actions';
 import { getAccountsById, getAccountOrder } from '../selectors';
-import AccountsList from '../components/AccountsList';
+import AccountsList from '../components/accounts/AccountsList';
 import { logComponentUpdates } from '../utils/debug-utils';
 
 export class AccountsScreen extends Component {

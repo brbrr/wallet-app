@@ -7,7 +7,7 @@ import { ListItem } from 'react-native-elements';
 /**
  * Internal dependencies
  */
-import { getIconConfiguration } from './helper';
+import { getIconConfiguration } from '../helper';
 
 export default class AccountListRow extends Component {
 	constructor( props ) {
