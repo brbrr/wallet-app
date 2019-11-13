@@ -2,25 +2,27 @@
  * External dependencies
  */
 import React from 'react';
-import { ScrollView, Button, Text, StyleSheet, Alert, View } from 'react-native';
-import { Input, ListItem, ButtonGroup, Button as EButton, Icon } from 'react-native-elements';
+import { ScrollView, Button, StyleSheet, Alert, View } from 'react-native';
+import { ButtonGroup } from 'react-native-elements';
 import { connect } from 'react-redux';
-import moment from 'moment';
 import c from 'currency.js';
 import _ from 'lodash';
 
 /**
  * Internal dependencies
  */
-import DatePicker from '../components/DatePickerModal';
 import { createNewRecord, updateRecord, deleteRecord } from '../actions/records';
 import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
 import { updateAccountBalance } from '../actions';
-import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord, getAmountSign, getTxUpdateDirective } from '../utils';
+import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord, getTxUpdateDirective } from '../utils';
 import { logComponentUpdates } from '../utils/debug-utils';
 import { TRANSFER } from '../constants/Records';
 import AccountListItem from '../components/record-modal/AccountListItem';
-import { getIconConfiguration } from '../components/helper';
+import AmountListItem from '../components/record-modal/AmountListItem';
+import DatePickerListItem from '../components/record-modal/DatePickerListItem';
+import DescriptionListItem from '../components/record-modal/DescriptionListItem';
+import DeleteButtonListItem from '../components/record-modal/DeleteButtonListItem';
+import CategoryListItem from '../components/record-modal/CategoryListItem';
 
 class NewRecordModal extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -50,7 +52,8 @@ class NewRecordModal extends React.Component {
 		const account = getDefaultAccount( props );
 		const category = getDefaultCategory( props );
 		this.state = {
-			amount: '',
+			amount: Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM,
+			amountInAccountCurrency: '0',
 			description: '',
 			accountId: account.id,
 			currencyId: account.currencyId,
@@ -90,7 +93,7 @@ class NewRecordModal extends React.Component {
 		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, isEdit, id, toAccountId } = this.state;
 
 		const record = {
-			amount: amount ? Number( amount ) : Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM
+			amount,
 			amountInAccountCurrency: 0,
 			description,
 			currencyId,
@@ -107,8 +110,7 @@ class NewRecordModal extends React.Component {
 			record.id = id;
 		}
 
-		// if ( toAccountId ) {
-		if ( typeId === TRANSFER ) {
+		if ( typeId === TRANSFER ) { // if ( toAccountId ) {
 			record.toAccountId = toAccountId;
 			//FIXME: This is a hacky way to force `convertRecordAmountToAccountCurrency` to use `toAccountId` for amount calculations.
 			const hackyRecord = Object.assign( {}, record, { accountId: toAccountId } );
@@ -198,79 +200,30 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 		);
 	}
 
-	onStateChange = ( state ) => this.setState( state )
+	onStateChange = ( state ) => {
+		if ( state.currencyId || state.accountId ) {
+			const { amount } = this.state;
+			const accountId = state.accountId || this.state.accountId;
+			const currencyId = state.currencyId || this.state.currencyId;
+			const amountInAccountCurrency = convertRecordAmountToAccountCurrency( this.props, { amount, accountId, currencyId } );
+			this.setState( { amountInAccountCurrency } );
+		}
+		this.setState( state );
+	}
 
 	// Don't allow multiple periods in amount
-	onAmountChange( amount ) {
+	onAmountChange = ( amount ) => {
 		if ( this.state.amount === '0' && amount.length === 2 ) {
 			return this.onStateChange( { amount: amount[ 1 ] } );
 		}
+
 		const periodCount = ( amount.match( /\./g ) || [] ).length;
 		if ( periodCount < 2 ) {
-			this.onStateChange( { amount } );
+			const { accountId, currencyId } = this.state;
+			const amountInAccountCurrency = convertRecordAmountToAccountCurrency( this.props, { amount, accountId, currencyId } );
+
+			this.onStateChange( { amount, amountInAccountCurrency } );
 		}
-	}
-
-	renderDatePicker() {
-		const { createdAt } = this.state;
-		const isToday = moment( createdAt ).isSame( Date.now(), 'day' );
-		const dateTitle = isToday ? 'Today' : moment( createdAt ).format( 'dddd, D MMM' );
-
-		return (
-			<DatePicker
-				startDate={ new Date( createdAt ) }
-				renderDate={ () => (
-					<ListItem
-						containerStyle={ styles.iconContainer }
-						title={ dateTitle }
-						bottomDivider={ true }
-						topDivider={ true }
-						leftIcon={ {
-							name: 'ios-calendar',
-							type: 'ionicon',
-							size: 25,
-							containerStyle: { paddingLeft: 15, paddingRight: 14 },
-						} }
-						rightElement={
-							<EButton
-								title={ isToday ? 'Yesterday?' : 'Today?' }
-								type="clear"
-								titleStyle={ { fontSize: 13 } }
-								onPress={ () => {
-									let date = new Date(); // Today!
-									if ( isToday ) {
-										date = date.setDate( date.getDate() - 1 ); // Yesterday
-									}
-									return this.onStateChange( { createdAt: date } );
-								} }
-							/>
-						}
-					/>
-				) }
-				onDateChanged={ ( { date } ) => this.onStateChange( { createdAt: Date.parse( date ) } ) }
-			/>
-		);
-	}
-
-	renderCategoryItem() {
-		const { categoryId, typeId } = this.state;
-		const { navigation } = this.props;
-
-		if ( typeId === TRANSFER ) {
-			return null;
-		}
-		const category = getCategoryById( this.props, categoryId );
-
-		return (
-			<ListItem
-				containerStyle={ styles.iconContainer }
-				title={ category.name }
-				bottomDivider={ true }
-				topDivider={ true }
-				leftIcon={ getIconConfiguration( category ), { size: 20, containerStyle: { margin: -4 } } }
-				onPress={ () => navigation.navigate( 'Categories', { onStateChange: this.onStateChange } ) }
-			/>
-		);
 	}
 
 	renderAccountItem() {
@@ -278,7 +231,7 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 		const { navigation } = this.props;
 
 		if ( typeId === TRANSFER ) {
-			return this.renderTransferItems();
+			return this.renderAccountTransferItems();
 		}
 
 		const account = getAccountById( this.props, accountId );
@@ -286,7 +239,7 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 		return <AccountListItem account={ account } onPress={ () => navigation.navigate( 'Accounts', { onStateChange: this.onStateChange } ) } />;
 	}
 
-	renderTransferItems() {
+	renderAccountTransferItems() {
 		const { accountId, toAccountId } = this.state;
 		const { navigation } = this.props;
 
@@ -303,10 +256,13 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 	render() {
 		console.log( '!!!!!!!! NewRecordModal screen render' );
 
-		const { amount, description, currencyId, typeId, isEdit } = this.state;
+		const { amount, description, currencyId, categoryId, accountId, toAccountId, typeId, isEdit } = this.state;
 		const { navigation } = this.props;
 
 		const currency = getCurrencyById( this.props, currencyId );
+		const category = getCategoryById( this.props, categoryId );
+		const account = getAccountById( this.props, accountId );
+		const toAccount = getAccountById( this.props, toAccountId );
 
 		return (
 			<ScrollView style={ { backgroundColor: '#f9f9f9' } }>
@@ -317,78 +273,35 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 					containerStyle={ { borderRadius: 5, height: 25 } }
 				/>
 
-				<ListItem
-					containerStyle={ Object.assign( {}, styles.iconContainer, { height: 100 } ) }
-					title="Amount"
-					titleStyle={ styles.amountTitle }
-					subtitle={
-						<View style={ { flexDirection: 'row' } }>
-							<Text style={ [ styles.amountInput, { alignSelf: 'center' } ] }>{ getAmountSign( typeId ) }</Text>
-							<Input
-								containerStyle={ { paddingHorizontal: 0 } }
-								inputContainerStyle={ { borderBottomWidth: 0 } }
-								inputStyle={ styles.amountInput }
-								keyboardType="numeric"
-								value={ amount.toString() }
-								placeholder="0"
-								placeholderTextColor="black"
-								caretHidden
-								onChangeText={ ( amnt ) => this.onAmountChange( amnt ) }
-								autoFocus
-							/>
-						</View>
-					}
-					bottomDivider={ true }
-					topDivider={ true }
-					leftElement={
-						<Text
-							onPress={ () => navigation.navigate( 'Currencies', { onStateChange: this.onStateChange } ) }
-							style={ styles.currencyButton }
-						>
-							{ currency.code }
-						</Text>
-					}
+				<AmountListItem
+					amount={ amount }
+					currency={ currency }
+					account={ account }
+					toAccount={ toAccount }
+					typeId={ typeId }
+					record={ this.getRecordFromState() }
+					amountInAccountCurrency={ this.state.amountInAccountCurrency }
+					onNavigation={ () => navigation.navigate( 'Currencies', { onStateChange: this.onStateChange } ) }
+					onAmountChange={ this.onAmountChange }
 				/>
 
-				{ this.renderCategoryItem() }
+				<CategoryListItem
+					category={ category }
+					typeId={ typeId }
+					onNavigation={ () => navigation.navigate( 'Categories', { onStateChange: this.onStateChange } ) }
+				/>
 
 				{ this.renderAccountItem() }
 
-				{ this.renderDatePicker() }
+				<DatePickerListItem
+					createdAt={ this.state.createdAt }
+					onStateChange={ this.onStateChange } />
 
-				<ListItem
-					containerStyle={ Object.assign( {}, styles.iconContainer, { height: 70 } ) }
-					title={
-						<Input
-							containerStyle={ { paddingHorizontal: 0 } }
-							inputContainerStyle={ { borderBottomWidth: 0 } }
-							value={ description }
-							placeholder="Description"
-							onChangeText={ ( desc ) => this.setState( { description: desc } ) }
-						/>
-					}
-					bottomDivider={ true }
-					topDivider={ true }
-					leftIcon={ {
-						name: 'md-text',
-						type: 'ionicon',
-						size: 25,
-						containerStyle: { paddingLeft: 15, paddingRight: 14 },
-					} }
-				/>
+				<DescriptionListItem
+					description={ description }
+					onStateChange={ this.onStateChange } />
 
-				{ isEdit && <ListItem
-					containerStyle={ styles.iconContainer }
-					title={
-						<Button
-							onPress={ this.deleteRecordAndGoBack }
-							title="Delete"
-							color="red"
-						/>
-					}
-					bottomDivider={ true }
-					topDivider={ true }
-				/> }
+				{ isEdit && <DeleteButtonListItem onPress={ this.deleteRecordAndGoBack } /> }
 			</ScrollView>
 		);
 	}

@@ -102,9 +102,6 @@ export class AccountsScreen extends Component {
 			}
 		}
 
-		console.log( '### ACCOUNTS BY ID ###' );
-		console.log( accounts );
-
 		return (
 			<AccountsList
 				accounts={ accounts }
