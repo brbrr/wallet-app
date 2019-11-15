@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { ScrollView, Button, StyleSheet, Alert, View } from 'react-native';
+import { ScrollView, Button, Alert, View } from 'react-native';
 import { ButtonGroup } from 'react-native-elements';
 import { connect } from 'react-redux';
 import c from 'currency.js';
@@ -12,7 +12,7 @@ import _ from 'lodash';
  * Internal dependencies
  */
 import { createNewRecord, updateRecord, deleteRecord } from '../actions/records';
-import { getCurrencyById, getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
+import { getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
 import { updateAccountBalance } from '../actions';
 import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord, getTxUpdateDirective } from '../utils';
 import { logComponentUpdates } from '../utils/debug-utils';
@@ -256,13 +256,10 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 	render() {
 		console.log( '!!!!!!!! NewRecordModal screen render' );
 
-		const { amount, description, currencyId, categoryId, accountId, toAccountId, typeId, isEdit } = this.state;
+		const { description, categoryId, typeId, isEdit, createdAt } = this.state;
 		const { navigation } = this.props;
 
-		const currency = getCurrencyById( this.props, currencyId );
 		const category = getCategoryById( this.props, categoryId );
-		const account = getAccountById( this.props, accountId );
-		const toAccount = getAccountById( this.props, toAccountId );
 
 		return (
 			<ScrollView style={ { backgroundColor: '#f9f9f9' } }>
@@ -274,13 +271,7 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 				/>
 
 				<AmountListItem
-					amount={ amount }
-					currency={ currency }
-					account={ account }
-					toAccount={ toAccount }
-					typeId={ typeId }
 					record={ this.getRecordFromState() }
-					amountInAccountCurrency={ this.state.amountInAccountCurrency }
 					onNavigation={ () => navigation.navigate( 'Currencies', { onStateChange: this.onStateChange } ) }
 					onAmountChange={ this.onAmountChange }
 				/>
@@ -294,7 +285,7 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 				{ this.renderAccountItem() }
 
 				<DatePickerListItem
-					createdAt={ this.state.createdAt }
+					createdAt={ createdAt }
 					onStateChange={ this.onStateChange } />
 
 				<DescriptionListItem
@@ -330,24 +321,3 @@ export default connect(
 	mapStateToProps,
 	mapDispatchToProps
 )( NewRecordModal );
-
-const styles = StyleSheet.create( {
-	iconContainer: {
-		paddingTop: 3,
-		paddingBottom: 3,
-		height: 55,
-	},
-	currencyButton: {
-		color: 'grey',
-		padding: 3,
-		borderWidth: 1,
-		borderColor: 'grey',
-		borderRadius: 3,
-		backgroundColor: '#f9f9f9',
-		marginLeft: 7,
-		marginRight: 9,
-	},
-	amountTitle: { fontSize: 14, marginTop: 2 },
-	amountInput: { fontSize: 26, color: 'black' },
-} );
-
