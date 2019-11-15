@@ -5,6 +5,7 @@ import React from 'react';
 import { Text, View, StyleSheet, TextInput } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import c from 'currency.js';
+import { connect } from 'react-redux';
 
 /**
  * Internal dependencies
@@ -12,8 +13,15 @@ import c from 'currency.js';
 import { getAmountSign } from '../../utils';
 import styles from './styles';
 import { TRANSFER, INCOME, EXPENSE } from '../../constants/Records';
+import { getCurrencyById, getAccountById } from '../../selectors';
 
-const AmountListItem = ( { amount, amountInAccountCurrency, typeId, account, toAccount, currency, onNavigation, onAmountChange } ) => {
+const AmountListItem = ( props ) => {
+	const { record, onNavigation, onAmountChange } = props;
+	const { amount, amountInAccountCurrency, typeId, accountId, toAccountId, currencyId } = record;
+	const currency = getCurrencyById( props, currencyId );
+	const account = getAccountById( props, accountId );
+	const toAccount = getAccountById( props, toAccountId );
+
 	/**
 	 * EXPENSE/INCOME:
 	 * When recordCurrency is different from accountCurrency
@@ -22,18 +30,36 @@ const AmountListItem = ( { amount, amountInAccountCurrency, typeId, account, toA
 	 * recordCurrency/accountCurrency is different from toAccountCurrency
 	 */
 
-	let inputComponent = <AmountBox
-		amount={ amountInAccountCurrency }
-		amountSign={ getAmountSign( typeId ) }
-		onAmountChange={ onAmountChange }
+	/**
+	 *
+	 * TODO: Instead of showing conversion in the single ListItem, add a new one with converted value
+	 */
 
-	/>;
+	 console.log( record );
+	let inputComponent =
+		<AmountBox
+			amount={ amount }
+			amountSign={ getAmountSign( typeId ) }
+			onAmountChange={ onAmountChange }
+		/>;
 
-	if (
-		( ( typeId === EXPENSE || typeId === INCOME ) && ( currency.id !== account.currencyId ) ) ||
-		( ( typeId === TRANSFER ) && ( currency.id !== toAccount.currencyId ) )
-	) {
-		inputComponent = <InputBoxWithConversion amount={ amount } onAmountChange={ onAmountChange } typeId={ typeId } amountInAccountCurrency={ amountInAccountCurrency } />;
+	// const isShowConversionRatesForExpenseIncome = ( typeId === EXPENSE || typeId === INCOME ) && ( currency.id !== account.currencyId );
+	const isShowConversionRates = currency.id !== account.currencyId;
+
+	const isShowConversionRatesForTransfers = ( typeId === TRANSFER ) && ( toAccountId !== -99 ) && ( currency.id !== toAccount.currencyId );
+
+	if ( isShowConversionRates || isShowConversionRatesForTransfers ) {
+		const toCurrencyId = isShowConversionRates ? account.currencyId : toAccount.currencyId;
+		const toCurrency = getCurrencyById( props, toCurrencyId );
+
+		inputComponent = <InputBoxWithConversion
+			amount={ amount }
+			onAmountChange={ onAmountChange }
+			typeId={ typeId }
+			amountInAccountCurrency={ amountInAccountCurrency }
+			fromCurrency={ currency }
+			toCurrency={ toCurrency }
+		/>;
 	}
 
 	return (
@@ -56,38 +82,36 @@ const AmountListItem = ( { amount, amountInAccountCurrency, typeId, account, toA
 	);
 };
 
-const InputBoxWithConversion = ( { amount, onAmountChange, typeId, amountInAccountCurrency } ) =>
-	<View style={ { flexDirection: 'row' } }>
+const InputBoxWithConversion = ( { amount, onAmountChange, typeId, amountInAccountCurrency, toCurrency, fromCurrency } ) =>
+	<View style={ amountStyles.amountBoxStyle }>
 		<AmountBox
 			isInput
 			amount={ amount }
 			amountSign={ getAmountSign( typeId ) }
 			onAmountChange={ onAmountChange }
+			currencyCode={ fromCurrency.code }
 		/>
-		<View style={ { flex: 1, justifyContent: 'center', alignItems: 'center' } }>
+		<View style={ { width: 30, alignItems: 'center' } } >
 			<Text style={ amountStyles.textStyle }>{ '>' }</Text>
 		</View>
 		<AmountBox
 			amount={ amountInAccountCurrency }
 			amountSign={ getAmountSign( typeId ) }
 			onAmountChange={ onAmountChange }
+			currencyCode={ toCurrency.code }
 		/>
 	</View>;
 
-const AmountBox = ( { amount, amountSign, onAmountChange, isInput } ) =>
-	<View style={ amountStyles.amountBoxStyle }>
+const AmountBox = ( { amount, amountSign, onAmountChange, isInput, currencyCode } ) =>
+	<View style={ { flexDirection: 'row' } }>
 		<Text style={ amountStyles.textStyle }>{ amountSign }</Text>
 		{
 			isInput ?
 				<AmountInput amount={ amount } onAmountChange={ onAmountChange } /> :
 				<Text style={ amountStyles.textStyle }>{ c( amount ).value }</Text>
 		}
-	</View>;
 
-const InputBox = ( { amount, onAmountChange, typeId } ) =>
-	<View style={ { flexDirection: 'row' } }>
-		<Text style={ amountStyles.textStyle }>{ getAmountSign( typeId ) }</Text>
-		<AmountInput amount={ amount } onAmountChange={ onAmountChange } />
+		{ currencyCode && <Text style={ [ amountStyles.textStyle, { paddingLeft: 5 } ] }>{ currencyCode }</Text> }
 	</View>;
 
 const AmountInput = ( { amount, onAmountChange } ) =>
@@ -102,20 +126,37 @@ const AmountInput = ( { amount, onAmountChange } ) =>
 		autoFocus
 	/>;
 
-export default AmountListItem;
-
 const amountStyles = StyleSheet.create( {
 	amountBoxStyle: {
 		flexDirection: 'row',
-		flex: 4,
+		flex: 1,
 		// borderRadius: 12,
 		// borderColor: 'lightgrey',
 		// borderWidth: 1,
 		// backgroundColor: 'lightgrey',
 		// borderLeftWidth: 1,
 		// borderRightWidth: 1,
-		justifyContent: 'center',
+		justifyContent: 'flex-start',
 		alignItems: 'center',
 	},
 	textStyle: Object.assign( {}, styles.amountInput, { fontSize: 20 } ),
 } );
+
+// export AmountListItem;
+
+const mapStateToProps = ( state ) => {
+	const { categories, currencies, accounts, records } = state;
+	return {
+		records,
+		categories,
+		currencies,
+		accounts,
+	};
+};
+
+const mapDispatchToProps = () => ( {} );
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)( AmountListItem );
