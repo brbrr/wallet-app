@@ -7,7 +7,8 @@ import { Text, ScrollView } from 'react-native';
 /**
  * Internal dependencies
  */
-import RecordsItem, { TransferItem } from './RecordItem';
+import RecordsItem from './RecordItem';
+import TransferItem from './TransferItem';
 import { getRecordAmountWithCurrency } from '../../utils';
 import DayHeader from './DayHeader';
 
