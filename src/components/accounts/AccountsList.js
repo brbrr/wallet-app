@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 /**
  * Internal dependencies
  */
-import { ChangeOrderButton } from '../ChangeOrderButton';
+import ChangeOrderButton from '../ChangeOrderButton';
 import AccountListRow from './AccountListRow';
 
 const AccountsList = ( { accounts, accountOrder, onChangeOrder, onReorderToggle, isReorderEnabled, onListRowPress, enableReorder } ) => {
@@ -39,11 +39,6 @@ const AccountsList = ( { accounts, accountOrder, onChangeOrder, onReorderToggle,
 };
 
 export default AccountsList;
-
-ChangeOrderButton.propTypes = {
-	onReorderToggle: PropTypes.func.isRequired,
-	isReorderEnabled: PropTypes.bool.isRequired,
-};
 
 AccountsList.propTypes = {
 	onChangeOrder: PropTypes.func.isRequired,

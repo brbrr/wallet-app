@@ -12,7 +12,7 @@ import draftRecord from './draftRecord';
 import currencies from './currencies';
 import accounts from './accounts';
 
-const walletApp = combineReducers( {
+const appReducer = combineReducers( {
 	records,
 	categories,
 	draftRecord,
@@ -20,4 +20,12 @@ const walletApp = combineReducers( {
 	accounts,
 } );
 
-export default walletApp;
+const rootReducer = ( state, action ) => {
+	if ( action.type === 'PURGE_DATA' ) {
+		state = undefined;
+	}
+
+	return appReducer( state, action );
+};
+
+export default rootReducer;

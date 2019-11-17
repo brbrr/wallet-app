@@ -10,13 +10,17 @@ import * as Icon from '@expo/vector-icons';
 import { Provider } from 'react-redux';
 // Before rendering any navigation stack
 import { useScreens } from 'react-native-screens';
+import { PersistGate } from 'redux-persist/integration/react';
+
 /**
  * Internal dependencies
  */
 import AppNavigator from './src/navigation/AppNavigator';
-import store from './src/utils/create-store';
+import getStore from './src/utils/create-store';
 
 useScreens();
+
+const { persistor, store } = getStore();
 
 export default class App extends React.Component {
 	state = {
@@ -35,10 +39,12 @@ export default class App extends React.Component {
 		}
 		return (
 			<Provider store={ store }>
-				<View style={ styles.container }>
-					{ Platform.OS === 'ios' && <StatusBar barStyle="default" /> }
-					<AppNavigator />
-				</View>
+				<PersistGate loading={ null } persistor={ persistor }>
+					<View style={ styles.container }>
+						{ Platform.OS === 'ios' && <StatusBar barStyle="default" /> }
+						<AppNavigator />
+					</View>
+				</PersistGate>
 			</Provider>
 		);
 	}
