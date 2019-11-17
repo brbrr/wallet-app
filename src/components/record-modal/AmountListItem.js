@@ -85,7 +85,6 @@ const AmountListItem = ( props ) => {
 const InputBoxWithConversion = ( { amount, onAmountChange, typeId, amountInAccountCurrency, toCurrency, fromCurrency } ) =>
 	<View style={ amountStyles.amountBoxStyle }>
 		<AmountBox
-			isInput
 			amount={ amount }
 			amountSign={ getAmountSign( typeId ) }
 			onAmountChange={ onAmountChange }
@@ -95,6 +94,7 @@ const InputBoxWithConversion = ( { amount, onAmountChange, typeId, amountInAccou
 			<Text style={ amountStyles.textStyle }>{ '>' }</Text>
 		</View>
 		<AmountBox
+			isIntupt={ false }
 			amount={ amountInAccountCurrency }
 			amountSign={ getAmountSign( typeId ) }
 			onAmountChange={ onAmountChange }
@@ -102,7 +102,7 @@ const InputBoxWithConversion = ( { amount, onAmountChange, typeId, amountInAccou
 		/>
 	</View>;
 
-const AmountBox = ( { amount, amountSign, onAmountChange, isInput, currencyCode } ) =>
+const AmountBox = ( { amount, amountSign, onAmountChange, isInput = true, currencyCode } ) =>
 	<View style={ { flexDirection: 'row' } }>
 		<Text style={ amountStyles.textStyle }>{ amountSign }</Text>
 		{
