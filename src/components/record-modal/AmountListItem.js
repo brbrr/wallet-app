@@ -12,7 +12,7 @@ import { connect } from 'react-redux';
  */
 import { getAmountSign } from '../../utils';
 import styles from './styles';
-import { TRANSFER, INCOME, EXPENSE } from '../../constants/Records';
+import { TRANSFER } from '../../constants/Records';
 import { getCurrencyById, getAccountById } from '../../selectors';
 
 const AmountListItem = ( props ) => {

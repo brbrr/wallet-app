@@ -9,9 +9,11 @@ import _ from 'lodash';
  * Internal dependencies
  */
 import data from './conversion-rates.js';
-import store from './create-store';
+import getStore from './create-store';
 import { getAccountById, getCurrencyById, getRecordById, getDefaultAccount } from '../selectors/index.js';
 import { EXPENSE, INCOME, TRANSFER } from '../constants/Records.js';
+
+const { store } = getStore();
 
 export function getAmountAsString( { amountInAccountCurrency, typeId } ) {
 	return getAmountSign( typeId ) + amountInAccountCurrency.toString();
