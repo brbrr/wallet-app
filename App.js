@@ -28,10 +28,13 @@ export default class App extends React.Component {
 	};
 
 	render() {
-		if ( ! this.state.isLoadingComplete && ! this.props.skipLoadingScreen ) {
+		if ( ! this.state.isLoadingComplete ) {
 			return (
 				<AppLoading
-					startAsync={ this._loadResourcesAsync }
+					startAsync={ () => new Promise( ( resolve ) => setTimeout( () => {
+						console.log( 'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ' );
+						resolve( 'Promise A win!' );
+					}, 2000 ) ) }
 					onError={ this._handleLoadingError }
 					onFinish={ this._handleFinishLoading }
 				/>
@@ -39,7 +42,10 @@ export default class App extends React.Component {
 		}
 		return (
 			<Provider store={ store }>
-				<PersistGate loading={ null } persistor={ persistor }>
+				<PersistGate
+					loading={ null }
+					persistor={ persistor }
+				>
 					<View style={ styles.container }>
 						{ Platform.OS === 'ios' && <StatusBar barStyle="default" /> }
 						<AppNavigator />
