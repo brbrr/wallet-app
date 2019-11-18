@@ -1,10 +1,27 @@
 /**
  * Internal dependencies
  */
-import { ADD_NEW_ACCOUNT, UPDATE_ACCOUNTS_ORDER, UPDATE_ACCOUNT, UPDATE_ACCOUNT_BALANCE } from '../actions';
+import { ADD_NEW_ACCOUNT, UPDATE_ACCOUNTS_ORDER, UPDATE_ACCOUNT, UPDATE_ACCOUNT_BALANCE } from '../actions/accounts';
 import { addNewItem } from '../utils/reducerHelper';
 
 const initialState = {
+	byId: {
+		'-99': {
+			balance: 0,
+			name: 'Out of wallet',
+			id: -99,
+			currencyId: 2,
+			colorCode: 'pink',
+			iconName: 'bank',
+			hidden: true,
+			isServiceAccount: true,
+		},
+	},
+	allIds: [],
+	serviceAccountId: -99,
+
+};
+const initialState2 = {
 	byId: {
 		1: {
 			balance: -343.32,
@@ -53,7 +70,6 @@ export default function accounts( state = initialState, action ) {
 			return {
 				...state,
 				byId: { ...state.byId, [ account.id ]: account },
-				allIds: [ ...state.allIds ],
 			};
 		case UPDATE_ACCOUNT_BALANCE:
 			const acc = { ...account, balance: action.newBalance };

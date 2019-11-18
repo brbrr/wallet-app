@@ -4,7 +4,7 @@
 import { ADD_NEW_CURRENCY } from '../actions';
 import { addNewItem } from '../utils/reducerHelper';
 
-const initialState = {
+const initialState2 = {
 	byId: {
 		1: {
 			code: 'USD',
@@ -23,6 +23,11 @@ const initialState = {
 		},
 	},
 	allIds: [ 1, 2, 3 ],
+};
+
+const initialState = {
+	byId: {},
+	allIds: [],
 };
 
 export default function currencies( state = initialState, action ) {
