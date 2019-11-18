@@ -19,37 +19,31 @@ const Overview = ( props ) => {
 	const { account, accounts } = props;
 	let backgroundColor = account ? account.colorCode : '#8B9FBB';
 
-	let content = '';
+	let title = '';
+	let accountBalance = '';
 	if ( account ) {
 		const currency = getCurrencyById( props, account.currencyId );
-
-		content = <>
-			<Text style={ styles.subTitle }>
-				{ account.name }
-			</Text>
-			<Text style={ styles.title }>
-				{ account.balance } { currency.code }
-			</Text>
-		</>;
+		title = account.name;
+		accountBalance = `${ account.balance } ${ currency.code }`;
+	} else if ( accounts.allIds < 1 ) {
+		title = 'No accounts';
+		accountBalance = `Add new account!`;
 	} else {
 		const acc = getDefaultAccount( props );
 		const currency = getCurrencyById( props, acc.currencyId );
 		backgroundColor = acc.colorCode;
-
-		content =
-			<>
-				<Text style={ styles.subTitle }>
-					All wallets
-				</Text>
-				<Text style={ styles.title }>
-					{ getAccountsTotalsInCurrency( accounts.byId ) } { currency.code }
-				</Text>
-			</>;
+		title = 'All wallets';
+		accountBalance = `${ getAccountsTotalsInCurrency( props, accounts.byId ) } ${ currency.code }`;
 	}
 
 	return (
 		<View style={ { flex: 1, backgroundColor } }>
-			{ content }
+			<Text style={ styles.subTitle }>
+				{ title }
+			</Text>
+			<Text style={ styles.title }>
+				{ accountBalance }
+			</Text>
 		</View>
 
 	);
@@ -58,10 +52,8 @@ const Overview = ( props ) => {
 // export default Overview;
 
 const mapStateToProps = ( state ) => {
-	const { categories, currencies, accounts, records } = state;
+	const { currencies, accounts } = state;
 	return {
-		records,
-		categories,
 		currencies,
 		accounts,
 	};
