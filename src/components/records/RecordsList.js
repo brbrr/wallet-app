@@ -12,6 +12,19 @@ import TransferItem from './TransferItem';
 import { getRecordAmountWithCurrency } from '../../utils';
 import DayHeader from './DayHeader';
 
+const splitRecordsByDate = ( recordsArray ) => recordsArray.reduce( ( acc, record ) => {
+	const date = new Date( record.createdAt );
+	const recordDate = date.toISOString().split( 'T' )[ 0 ];
+
+	if ( ! acc[ recordDate ] ) {
+		acc[ recordDate ] = [];
+	}
+
+	acc[ recordDate ].push( record );
+
+	return acc;
+}, {} );
+
 // TODO: separate in two components: RecordsList & FullList(?) components
 export const RecordsList = ( { recordsArray, accounts, categories, currencies, navigateEditRecordScreen } ) => {
 	if ( recordsArray.length === 0 ) {
@@ -22,17 +35,7 @@ export const RecordsList = ( { recordsArray, accounts, categories, currencies, n
 
 	recordsArray.sort( ( a, b ) => a.createdAt < b.createdAt );
 
-	const list = recordsArray.reduce( ( acc, record ) => {
-		const date = new Date( record.createdAt );
-		const recordDate = date.toISOString().split( 'T' )[ 0 ];
-
-		if ( ! acc[ recordDate ] ) {
-			acc[ recordDate ] = [ record ];
-		} else {
-			acc[ recordDate ].push( record );
-		}
-		return acc;
-	}, {} );
+	const list = splitRecordsByDate( recordsArray );
 
 	const listRecords = Object.values( list ).sort( ( a, b ) => a[ 0 ].createdAt < b[ 0 ].createdAt );
 

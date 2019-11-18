@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { addNewAccount, updateAccount } from '../actions';
+import { addNewAccount, updateAccount } from '../actions/accounts';
 import AccountInfo from '../components/accounts/AccountInfo';
 import { getCurrencyById, getAccountById } from '../selectors';
 

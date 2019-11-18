@@ -3,10 +3,9 @@
  */
 import React from 'react';
 import { StyleSheet, ScrollView, Platform } from 'react-native';
-import { ListItem, Button } from 'react-native-elements';
-import { connect } from 'react-redux';
+import { ListItem } from 'react-native-elements';
 
-class SettingsScreen extends React.Component {
+export default class SettingsScreen extends React.Component {
 	static navigationOptions = {
 		title: 'Settings',
 	};
@@ -71,10 +70,6 @@ class SettingsScreen extends React.Component {
 					onPress={ () => this.props.navigation.navigate( 'SettingsCategories', { isEdit: true } ) }
 				/>
 
-				<Button
-					containerStyle={ { flexDirection: 'row', alignSelf: 'flex-end' } }
-					title="Purge DB"
-					onPress={ () => this.restState } />
 			</ScrollView>
 		);
 	}
@@ -117,13 +112,3 @@ const styles = StyleSheet.create( {
 		margin: 3,
 	} ),
 } );
-
-const mapStateToProps = () => ( {} );
-
-const mapDispatchToProps = ( dispatch ) => ( { restState: dispatch( { type: 'PURGE_DATA' } ) } );
-
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps
-)( SettingsScreen );
-

@@ -13,7 +13,7 @@ import _ from 'lodash';
  */
 import { createNewRecord, updateRecord, deleteRecord } from '../actions/records';
 import { getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
-import { updateAccountBalance } from '../actions';
+import { updateAccountBalance } from '../actions/accounts';
 import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord, getTxUpdateDirective } from '../utils';
 import { logComponentUpdates } from '../utils/debug-utils';
 import { TRANSFER } from '../constants/Records';
@@ -129,7 +129,7 @@ class NewRecordModal extends React.Component {
 		const record = this.getRecordFromState();
 
 		// Sanitize record object! e.g. amount value
-		// this should be called _before_ updating the account and after record got assigned an id
+		// WHY???? this should be called _before_ updating the account and after record got assigned an id
 		const updateDirective = getAccountsUpdateDirective( this.props, record );
 		const newUpdateDirective = getTxUpdateDirective( this.props, record );
 		console.log( record, account, updateDirective, newUpdateDirective, _.isEqual( updateDirective, newUpdateDirective ) );

@@ -8,7 +8,7 @@ import { omit } from 'lodash';
 /**
  * Internal dependencies
  */
-import { selectRecordAccount, updateAccountsOrder } from '../actions';
+import { selectRecordAccount, updateAccountsOrder } from '../actions/accounts';
 import { getAccountsById, getAccountOrder } from '../selectors';
 import AccountsList from '../components/accounts/AccountsList';
 import { logComponentUpdates } from '../utils/debug-utils';
