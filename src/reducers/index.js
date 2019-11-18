@@ -8,14 +8,14 @@ import { combineReducers } from 'redux';
  */
 import records from './records';
 import categories from './categories';
-import draftRecord from './draftRecord';
+// import draftRecord from './draftRecord';
 import currencies from './currencies';
 import accounts from './accounts';
 
 const appReducer = combineReducers( {
 	records,
 	categories,
-	draftRecord,
+	// draftRecord,
 	currencies,
 	accounts,
 } );
