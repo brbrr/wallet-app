@@ -10,12 +10,15 @@ import records from './records';
 import categories from './categories';
 import currencies from './currencies';
 import accounts from './accounts';
+import stats, { balanceTrend } from './stats';
 
 const appReducer = combineReducers( {
 	records,
 	categories,
 	currencies,
 	accounts,
+	// stats,
+	balanceTrend,
 } );
 
 const rootReducer = ( state, action ) => {

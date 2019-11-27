@@ -2,16 +2,18 @@
  * External dependencies
  */
 import React, { Component } from 'react';
-import { Dimensions, View, Text } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
-import {
-	LineChart,
-	BarChart,
-	PieChart,
-	ProgressChart,
-	ContributionGraph,
-	StackedBarChart,
-} from 'react-native-chart-kit';
+import { VictoryChart, VictoryAxis, VictoryArea, VictoryVoronoiContainer, VictoryTooltip } from 'victory-native';
+import moment from 'moment';
+
+// import process from 'process';
+
+/**
+ * Internal dependencies
+ */
+import ChartDataProvider from '../../utils/chart-data-provider';
+import chartTheme from './chartTheme';
 
 class StatsScreen extends Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -20,69 +22,126 @@ class StatsScreen extends Component {
 		};
 	};
 
-	render() {
+	constructor( props ) {
+		super( props );
+
+		console.log( '!!!! StatsScreen' );
+
+		this.dataProvider = new ChartDataProvider( props.stats, props );
+	}
+
+	renderChart1( data, domain ) {
 		return (
-			<View>
-				<Text>
-        Balance Stats!
-				</Text>
-				<View>
-					<Text>Bezier Line Chart</Text>
-					<LineChart
-						data={ {
-							labels: [ 'January', 'February', 'March', 'April', 'May', 'June' ],
-							datasets: [
-								{
-									data: [
-										Math.random() * 100,
-										Math.random() * 100,
-										Math.random() * 100,
-										Math.random() * 100,
-										Math.random() * 100,
-										Math.random() * 100,
-									],
-								},
-							],
-						} }
-						width={ Dimensions.get( 'window' ).width } // from react-native
-						height={ 220 }
-						yAxisLabel={ '$' }
-						yAxisSuffix={ 'k' }
-						chartConfig={ {
-							backgroundColor: '#e26a00',
-							backgroundGradientFrom: '#fb8c00',
-							backgroundGradientTo: '#ffa726',
-							decimalPlaces: 2, // optional, defaults to 2dp
-							color: ( opacity = 1 ) => `rgba(255, 255, 255, ${ opacity })`,
-							labelColor: ( opacity = 1 ) => `rgba(255, 255, 255, ${ opacity })`,
-							style: {
-								borderRadius: 16,
+			<VictoryChart
+				// width={ 350 }
+				height={ 200 }
+				theme={ chartTheme }
+				// scale={ { x: 'linear', y: 'log' } }
+				containerComponent={ <VictoryVoronoiContainer /> }
+
+			>
+				<VictoryAxis tickCount={ 8 }
+					style={ {
+						ticks: { size: 0 },
+						tickLabels: { fontSize: 10, padding: 5 },
+					} }
+				/>
+				<VictoryAxis
+					dependentAxis
+					style={ {
+						ticks: { size: 0 },
+						tickLabels: { fontSize: 10, padding: 5 },
+						axis: { stroke: null },
+					} }
+				/>
+				<VictoryArea
+					interpolation="basis"
+					data={ data }
+					domain={ domain }
+					labelComponent={
+						<VictoryTooltip
+							style={ { fontSize: 10 } }
+						/>
+					}
+					labels={ ( { datum } ) => {
+						return `x: ${ datum.x }, y: ${ datum.y }`;
+					} }
+					style={
+						{
+							data: {
+								stroke: '#00a78f',
+								fill: '#8ee9d4',
+								opacity: 0.5,
 							},
-							propsForDots: {
-								r: '6',
-								strokeWidth: '2',
-								stroke: '#ffa726',
-							},
-						} }
-						bezier
-						style={ {
-							marginVertical: 8,
-							borderRadius: 16,
-						} }
-					/>
+							labels: { fontSize: 10 },
+						}
+					}
+				/>
+			</VictoryChart> );
+	}
+
+	getDomain( data ) {
+		let min = data[ 0 ].y;
+		let max = data[ 0 ].y;
+		data.forEach( ( entry ) => {
+			const balance = entry.y;
+			min = balance < min ? balance : min;
+			max = balance > max ? balance : max;
+		} );
+
+		let domain = { y: [ 0, max + ( 0.1 * max ) ] };
+		if ( min < 0 ) {
+			domain = { y: [ min - ( 0.1 * max ), max + ( 0.1 * max ) ] };
+		}
+
+		return domain;
+	}
+
+	render() {
+		console.log( '##### 1 ', new Date() );
+
+		// const dailyData = this.dataProvider.getDailyChartData( this.props.balanceTrend );
+		const monthlyData = this.dataProvider.getMonthlyChartData( this.props.balanceTrend );
+
+		console.log( '##### 1-1 ', new Date() );
+
+		// const monthlyData = dailyData.filter( ( entry, idx ) => {
+		// 	const isFits = moment( entry._date ).isSame( moment( entry._date ).endOf( 'month' ), 'day' ) ||
+		// 	idx === ( dailyData.length - 1 );
+		// 	return isFits;
+		// } );
+
+		// console.log( '##### 2 ', new Date() );
+
+		// const domain = this.getDomain( dailyData );
+		const monthlyDomain = this.getDomain( monthlyData );
+		// console.log( '##### 3 ', new Date() );
+
+		return (
+			<ScrollView>
+				<View style={ { flex: 1 } }>
+					<Text>
+						Balance Stats!
+					</Text>
+					{ /* { this.renderChart1( dailyData, domain ) } */ }
 				</View>
-			</View>
+				<View>
+					{ this.renderChart1( monthlyData, monthlyDomain ) }
+				</View>
+			</ScrollView>
 		);
 	}
 }
 
 export const mapStateToProps = ( state ) => {
-	const { records, accounts, categories, currencies } = state;
+	const { records, accounts, categories, currencies, stats, balanceTrend } = state;
 	return {
 		records,
 		accounts,
 		categories,
 		currencies,
+		stats,
+		balanceTrend,
 	};
 };
 

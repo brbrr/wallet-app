@@ -72,11 +72,10 @@ export default function accounts( state = initialState, action ) {
 				byId: { ...state.byId, [ account.id ]: account },
 			};
 		case UPDATE_ACCOUNT_BALANCE:
-			const acc = { ...account, balance: action.newBalance };
+			const acc = Object.assign( {}, account, { balance: action.newBalance } );
 			return {
 				...state,
 				byId: { ...state.byId, [ acc.id ]: acc },
-				allIds: [ ...state.allIds ],
 			};
 		case UPDATE_ACCOUNTS_ORDER:
 			return {

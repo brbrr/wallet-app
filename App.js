@@ -31,10 +31,7 @@ export default class App extends React.Component {
 		if ( ! this.state.isLoadingComplete ) {
 			return (
 				<AppLoading
-					startAsync={ () => new Promise( ( resolve ) => setTimeout( () => {
-						console.log( 'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ' );
-						resolve( 'Promise A win!' );
-					}, 2000 ) ) }
+					startAsync={ this._loadResourcesAsync }
 					onError={ this._handleLoadingError }
 					onFinish={ this._handleFinishLoading }
 				/>
@@ -43,7 +40,7 @@ export default class App extends React.Component {
 		return (
 			<Provider store={ store }>
 				<PersistGate
-					loading={ null }
+					// loading={ null }
 					persistor={ persistor }
 				>
 					<View style={ styles.container }>
@@ -67,6 +64,7 @@ export default class App extends React.Component {
 				// We include SpaceMono because we use it in HomeScreen.js. Feel free
 				// to remove this if you are not using it in your app
 				'space-mono': require( './assets/fonts/SpaceMono-Regular.ttf' ),
+				roboto: require( './assets/fonts/Roboto-Regular.ttf' ),
 			} ),
 		] );
 	};

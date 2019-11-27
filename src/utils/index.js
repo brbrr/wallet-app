@@ -41,8 +41,6 @@ export function getRecordAmount( record ) {
 // TODO: Set a expected currency, e.g. in which to convert
 // Now it's just a sum of all `amountInAccountCurrency`, instead we should convert them into some base currency
 export function getTotalSpent( records ) {
-	// console.log( 'getTotalSpent' );
-
 	return records.reduce( ( acc, record ) => {
 		const amount = getRecordAmount( record );
 		return acc.add( amount );
@@ -90,7 +88,7 @@ export function getAccountsTotalsInCurrency( state, accounts ) {
 	}, c( 0 ) ).value;
 }
 
-function convertAmount( amount, { from = 'USD', to = 'EUR' } = {} ) {
+export function convertAmount( amount, { from = 'USD', to = 'EUR' } = {} ) {
 	fx.base = data.base;
 	fx.rates = data.rates;
 
@@ -191,8 +189,6 @@ function getAccountBalanceDirectiveForTransfer( state, record ) {
 
 	// It's an "Out of Wallet" id, which means we should just deduct the amount from the "from" account
 	if ( toAccount.id === state.accounts.serviceAccountId ) {
-		console.log( 'XXXX', getAccountsUpdateDirectiveForNewRecord( state, record ) );
-
 		return getAccountsUpdateDirectiveForNewRecord( state, record );
 	}
 

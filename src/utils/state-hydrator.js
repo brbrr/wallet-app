@@ -2,30 +2,36 @@
  * Internal dependencies
  */
 import { addNewCurrency } from '../actions';
-import { createNewRecordAndUpdateAccounts } from '../actions/records';
+import { insertRecordAndUpdateAccounts, addNewRecord } from '../actions/records';
 import { addNewAccount } from '../actions/accounts';
 
 const accounts = {
 	1: {
-		balance: 0,
+		balance: 3000,
 		name: 'USD Cash',
 		currencyId: 1,
 		colorCode: 'green',
 		iconName: 'google-wallet',
+		createdAt: 1546300800000,
+		updatedAt: 1546300800000,
 	},
 	2: {
-		balance: 0,
+		balance: 3000,
 		name: 'UAH Bank',
 		currencyId: 2,
 		colorCode: 'blue',
 		iconName: 'bank',
+		createdAt: 1546300800000,
+		updatedAt: 1546300800000,
 	},
 	3: {
-		balance: 0,
+		balance: 3000,
 		name: 'UAH ZZZ',
 		currencyId: 2,
 		colorCode: 'red',
 		iconName: 'bank',
+		createdAt: 1546300800000,
+		updatedAt: 1546300800000,
 	},
 };
 
@@ -68,10 +74,46 @@ const currencies = {
 	},
 };
 
+const records2 = {
+	1: {
+		amount: 1452,
+		amountInAccountCurrency: 1452,
+		createdAt: 1555534119211,
+		description: 'Ice cream',
+		accountId: 1,
+		categoryId: 1,
+		currencyId: 1,
+		typeId: 0,
+	},
+
+	3: {
+		amount: 321.32,
+		amountInAccountCurrency: 321.32,
+		createdAt: 1557224819211,
+		description: 'Random transaction',
+		accountId: 1,
+		categoryId: 3,
+		currencyId: 1,
+		typeId: 0,
+	},
+
+	10: {
+		amount: 1323,
+		amountInAccountCurrency: 1323,
+		createdAt: 1572869837211,
+		description: 'Whatever',
+		accountId: 1,
+		categoryId: 1,
+		currencyId: 1,
+		typeId: 1,
+	},
+
+};
+
 const records = {
 	1: {
-		amount: 22,
-		amountInAccountCurrency: 22,
+		amount: 1452,
+		amountInAccountCurrency: 1452,
 		createdAt: 1555534119211,
 		description: 'Ice cream',
 		accountId: 1,
@@ -92,7 +134,7 @@ const records = {
 	3: {
 		amount: 321.32,
 		amountInAccountCurrency: 321.32,
-		createdAt: 1555554819211,
+		createdAt: 1557224819211,
 		description: 'Random transaction',
 		accountId: 1,
 		categoryId: 3,
@@ -102,7 +144,7 @@ const records = {
 	4: {
 		amount: 243.6,
 		amountInAccountCurrency: 243.6,
-		createdAt: 1555597817211,
+		createdAt: 1558724817211,
 		description: 'Whatever',
 		accountId: 2,
 		categoryId: 1,
@@ -112,7 +154,7 @@ const records = {
 	5: {
 		amount: 32.6,
 		amountInAccountCurrency: 884.927,
-		createdAt: 1555697817211,
+		createdAt: 1558824817211,
 		description: 'Whatever',
 		accountId: 2,
 		categoryId: 1,
@@ -122,7 +164,7 @@ const records = {
 	6: {
 		amount: 765.1,
 		amountInAccountCurrency: 765.1,
-		createdAt: 1552597817211,
+		createdAt: 1559224817211,
 		description: 'Whatever',
 		accountId: 2,
 		categoryId: 2,
@@ -132,7 +174,7 @@ const records = {
 	7: {
 		amount: 1600,
 		amountInAccountCurrency: 1600,
-		createdAt: 1555397817211,
+		createdAt: 1559478172111,
 		description: 'Whatever',
 		accountId: 2,
 		categoryId: 3,
@@ -140,9 +182,9 @@ const records = {
 		typeId: 0,
 	},
 	8: {
-		amount: 123,
-		amountInAccountCurrency: 123,
-		createdAt: 1555567817211,
+		amount: 157423,
+		amountInAccountCurrency: 157423,
+		createdAt: 1568867817211,
 		description: 'Whatever',
 		accountId: 2,
 		categoryId: 1,
@@ -150,9 +192,9 @@ const records = {
 		typeId: 0,
 	},
 	9: {
-		amount: 532,
-		amountInAccountCurrency: 532,
-		createdAt: 1555591817211,
+		amount: 6242,
+		amountInAccountCurrency: 6242,
+		createdAt: 1569891817211,
 		description: 'Whatever',
 		accountId: 2,
 		categoryId: 2,
@@ -160,19 +202,19 @@ const records = {
 		typeId: 0,
 	},
 	10: {
-		amount: 123,
-		amountInAccountCurrency: 123,
-		createdAt: 1555869837211,
+		amount: 1323,
+		amountInAccountCurrency: 1323,
+		createdAt: 1572869837211,
 		description: 'Whatever',
-		accountId: 2,
+		accountId: 1,
 		categoryId: 1,
-		currencyId: 2,
+		currencyId: 1,
 		typeId: 1,
 	},
 	11: {
 		amount: 532,
 		amountInAccountCurrency: 532,
-		createdAt: 1555891867211,
+		createdAt: 1568891867211,
 		description: 'Whatever',
 		accountId: 2,
 		currencyId: 2,
@@ -185,6 +227,9 @@ export function hydrateAccounts( dispatch ) {
 	Object.values( accounts ).forEach( ( account ) => {
 		dispatch( addNewAccount( account ) );
 	} );
+
+	// const account = Object.values( accounts );
+	// dispatch( addNewAccount( account[ 0 ] ) );
 }
 
 export function hydrateCurrencies( dispatch ) {
@@ -194,5 +239,8 @@ export function hydrateCurrencies( dispatch ) {
 }
 
 export function hydrateRecords( dispatch ) {
-	Object.values( records ).forEach( ( record ) => dispatch( createNewRecordAndUpdateAccounts( record ) ) );
+	Object.values( records ).forEach( ( record ) => dispatch( insertRecordAndUpdateAccounts( addNewRecord, record ) ) );
+
+	// const record = Object.values( records );
+	// dispatch( insertRecordAndUpdateAccounts( addNewRecord, record[ 0 ] ) );
 }
