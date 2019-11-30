@@ -33,7 +33,7 @@ export const RecordsList = ( { recordsArray, accounts, categories, currencies, n
 		);
 	}
 
-	recordsArray.sort( ( a, b ) => a.createdAt < b.createdAt );
+	recordsArray.sort( ( a, b ) => a.createdAt - b.createdAt );
 
 	const list = splitRecordsByDate( recordsArray );
 

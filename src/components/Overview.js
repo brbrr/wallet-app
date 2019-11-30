@@ -37,7 +37,7 @@ const Overview = ( props ) => {
 	}
 
 	return (
-		<View style={ { flex: 1, backgroundColor } }>
+		<View style={ { flex: 1, backgroundColor, height: 150 } }>
 			<Text style={ styles.subTitle }>
 				{ title }
 			</Text>
