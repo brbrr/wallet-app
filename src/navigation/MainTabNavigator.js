@@ -11,6 +11,7 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import SettingsStack from './SettingsNavigator';
+import StatisticsStack from './StatisticsNavigator';
 
 const HomeStack = createStackNavigator( {
 	Home: HomeScreen,
@@ -46,5 +47,6 @@ export default createBottomTabNavigator( {
 			tabBarOnPress: () => navigation.navigate( 'NewRecord' ),
 		} ),
 	},
+	StatisticsStack,
 	SettingsStack,
 } );

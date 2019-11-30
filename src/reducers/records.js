@@ -5,6 +5,11 @@ import { ADD_NEW_RECORD, UPDATE_RECORD, DELETE_RECORD } from '../actions/records
 import { addNewItem } from '../utils/reducerHelper';
 
 const initialState = {
+	byId: {},
+	allIds: [],
+};
+
+const initialState2 = {
 	byId: {
 		1: {
 			amount: 22,

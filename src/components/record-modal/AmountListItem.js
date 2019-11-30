@@ -35,7 +35,6 @@ const AmountListItem = ( props ) => {
 	 * TODO: Instead of showing conversion in the single ListItem, add a new one with converted value
 	 */
 
-	 console.log( record );
 	let inputComponent =
 		<AmountBox
 			amount={ amount }

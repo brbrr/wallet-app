@@ -47,6 +47,9 @@ class HomeScreen extends React.Component {
 		const recordsLists = [ this.recordList( 0, recordsArray ) ];
 
 		Object.values( accounts.byId ).forEach( ( account, id ) => {
+			if ( account.id === -99 ) {
+				return;
+			}
 			const accountRecords = recordsArray.filter( ( record ) => record.accountId === account.id );
 			recordsLists.push( this.recordList( id + 1, accountRecords, account ) );
 		} );
@@ -63,11 +66,10 @@ class HomeScreen extends React.Component {
 				style={ {
 					flex: 1,
 					flexDirection: 'column',
-					justifyContent: 'space-between',
 					backgroundColor: '#e3eef2',
 				} }
 			>
-				<Overview account={ account } accounts={ accounts } />
+				<Overview account={ account } />
 				<View
 					style={ {
 						flex: 0.3,

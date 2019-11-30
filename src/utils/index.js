@@ -9,11 +9,8 @@ import _ from 'lodash';
  * Internal dependencies
  */
 import data from './conversion-rates.js';
-import getStore from './create-store';
 import { getAccountById, getCurrencyById, getRecordById, getDefaultAccount } from '../selectors/index.js';
 import { EXPENSE, INCOME, TRANSFER } from '../constants/Records.js';
-
-const { store } = getStore();
 
 export function getAmountAsString( { amountInAccountCurrency, typeId } ) {
 	return getAmountSign( typeId ) + amountInAccountCurrency.toString();
@@ -44,8 +41,6 @@ export function getRecordAmount( record ) {
 // TODO: Set a expected currency, e.g. in which to convert
 // Now it's just a sum of all `amountInAccountCurrency`, instead we should convert them into some base currency
 export function getTotalSpent( records ) {
-	// console.log( 'getTotalSpent' );
-
 	return records.reduce( ( acc, record ) => {
 		const amount = getRecordAmount( record );
 		return acc.add( amount );
@@ -56,12 +51,12 @@ export function getTotalSpent( records ) {
  * Calculates the total sum of of records in specified currency
  * Useful when need to figure out intermediate sum, e.g. for daily expense.
  *
+ * @param {Object} state redux state
  * @param {Array} records Records array
  * @param {number} currencyId currency id
  * @return {number} sum of provided records balances in specified currency
  */
-export function getTotalSpentInCurrency( records, currencyId ) {
-	const state = store.getState();
+export function getTotalSpentInCurrency( state, records, currencyId ) {
 	const toCurrency = getCurrencyById( state, currencyId );
 
 	return records.reduce( ( acc, record ) => {
@@ -74,11 +69,13 @@ export function getTotalSpentInCurrency( records, currencyId ) {
 
 /**
  * Calculates the total sum of accounts in default account currency
+ *
+ * @param {Object} state redux state
  * @param {Object} accounts object of accounts indexed by their id
+ *
  * @return {number} total sum of accounts in default currency
  */
-export function getAccountsTotalsInCurrency( accounts ) {
-	const state = store.getState();
+export function getAccountsTotalsInCurrency( state, accounts ) {
 	const defaultAccount = getDefaultAccount( state );
 	const defaultCurrency = getCurrencyById( state, defaultAccount.currencyId );
 
@@ -91,7 +88,7 @@ export function getAccountsTotalsInCurrency( accounts ) {
 	}, c( 0 ) ).value;
 }
 
-function convertAmount( amount, { from = 'USD', to = 'EUR' } = {} ) {
+export function convertAmount( amount, { from = 'USD', to = 'EUR' } = {} ) {
 	fx.base = data.base;
 	fx.rates = data.rates;
 
@@ -192,8 +189,6 @@ function getAccountBalanceDirectiveForTransfer( state, record ) {
 
 	// It's an "Out of Wallet" id, which means we should just deduct the amount from the "from" account
 	if ( toAccount.id === state.accounts.serviceAccountId ) {
-		console.log( 'XXXX', getAccountsUpdateDirectiveForNewRecord( state, record ) );
-
 		return getAccountsUpdateDirectiveForNewRecord( state, record );
 	}
 

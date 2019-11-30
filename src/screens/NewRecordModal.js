@@ -5,16 +5,14 @@ import React from 'react';
 import { ScrollView, Button, Alert, View } from 'react-native';
 import { ButtonGroup } from 'react-native-elements';
 import { connect } from 'react-redux';
-import c from 'currency.js';
-import _ from 'lodash';
 
 /**
  * Internal dependencies
  */
-import { createNewRecord, updateRecord, deleteRecord } from '../actions/records';
+import { addNewRecord, updateRecord, deleteRecord, insertRecordAndUpdateAccounts } from '../actions/records';
 import { getAccountById, getDefaultAccount, getCategoryById, getDefaultCategory, getRecordById } from '../selectors';
-import { updateAccountBalance } from '../actions';
-import { getAccountsUpdateDirective, convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord, getTxUpdateDirective } from '../utils';
+import { updateAccountBalance } from '../actions/accounts';
+import { convertRecordAmountToAccountCurrency, getUpdatedAccountBalanceAfterDeletedRecord } from '../utils';
 import { logComponentUpdates } from '../utils/debug-utils';
 import { TRANSFER } from '../constants/Records';
 import AccountListItem from '../components/record-modal/AccountListItem';
@@ -110,7 +108,7 @@ class NewRecordModal extends React.Component {
 			record.id = id;
 		}
 
-		if ( typeId === TRANSFER ) { // if ( toAccountId ) {
+		if ( typeId === TRANSFER ) {
 			record.toAccountId = toAccountId;
 			//FIXME: This is a hacky way to force `convertRecordAmountToAccountCurrency` to use `toAccountId` for amount calculations.
 			const hackyRecord = Object.assign( {}, record, { accountId: toAccountId } );
@@ -123,39 +121,19 @@ class NewRecordModal extends React.Component {
 	}
 
 	saveRecordAndGoBack() {
-		const { accountId, isEdit } = this.state;
-		const { _createNewRecord, _updateRecord, _updateAccountBalance, navigation } = this.props;
-		const account = getAccountById( this.props, accountId );
+		const { isEdit } = this.state;
+		const { _insertRecordAndUpdateAccounts, navigation } = this.props;
 		const record = this.getRecordFromState();
 
 		// Sanitize record object! e.g. amount value
-		// this should be called _before_ updating the account and after record got assigned an id
-		const updateDirective = getAccountsUpdateDirective( this.props, record );
-		const newUpdateDirective = getTxUpdateDirective( this.props, record );
-		console.log( record, account, updateDirective, newUpdateDirective, _.isEqual( updateDirective, newUpdateDirective ) );
-
-		Object.entries( updateDirective ).forEach( ( [ accId, newBalance ] ) => {
-			const acc = getAccountById( this.props, accId );
-			const newAccBalance = c( acc.balance ).add( newUpdateDirective[ accId ] ).value;
-
-			if ( newAccBalance !== newBalance ) {
-				console.error(
-					`old: ${ newBalance }, new: ${ newAccBalance };
-isEqual: ${ _.isEqual( updateDirective, newUpdateDirective ) };
-oldDirective: ${ JSON.stringify( updateDirective ) };
-newDirective: ${ JSON.stringify( newUpdateDirective ) }`
-				);
-
-				throw new Error( `OUCH: old updateDirective is different from new one. check logs` );
-			}
-
-			_updateAccountBalance( acc, newAccBalance );
-		} );
-		if ( ! isEdit ) {
-			_createNewRecord( record );
+		let recordAction;
+		if ( isEdit ) {
+			recordAction = updateRecord;
 		} else {
-			_updateRecord( record );
+			recordAction = addNewRecord;
 		}
+
+		_insertRecordAndUpdateAccounts( recordAction, record );
 
 		navigation.navigate( 'Main' );
 	}
@@ -310,10 +288,9 @@ const mapStateToProps = ( state ) => {
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {
-		_createNewRecord: ( record ) => dispatch( createNewRecord( record ) ),
-		_updateRecord: ( record ) => dispatch( updateRecord( record ) ),
 		_updateAccountBalance: ( account, newBalance ) => dispatch( updateAccountBalance( account, newBalance ) ),
 		_deleteRecord: ( record ) => dispatch( deleteRecord( record ) ),
+		_insertRecordAndUpdateAccounts: ( recordAction, record ) => dispatch( insertRecordAndUpdateAccounts( recordAction, record ) ),
 	};
 };
 
