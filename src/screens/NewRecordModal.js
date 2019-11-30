@@ -108,7 +108,7 @@ class NewRecordModal extends React.Component {
 			record.id = id;
 		}
 
-		if ( typeId === TRANSFER ) { // if ( toAccountId ) {
+		if ( typeId === TRANSFER ) {
 			record.toAccountId = toAccountId;
 			//FIXME: This is a hacky way to force `convertRecordAmountToAccountCurrency` to use `toAccountId` for amount calculations.
 			const hackyRecord = Object.assign( {}, record, { accountId: toAccountId } );
@@ -123,33 +123,9 @@ class NewRecordModal extends React.Component {
 	saveRecordAndGoBack() {
 		const { isEdit } = this.state;
 		const { _insertRecordAndUpdateAccounts, navigation } = this.props;
-		// const account = getAccountById( this.props, accountId );
 		const record = this.getRecordFromState();
 
 		// Sanitize record object! e.g. amount value
-
-		// 		const updateDirective = getAccountsUpdateDirective( this.props, record );
-		// 		const newUpdateDirective = getTxUpdateDirective( this.props, record );
-		// 		console.log( record, account, updateDirective, newUpdateDirective, _.isEqual( updateDirective, newUpdateDirective ) );
-
-		// 		Object.entries( updateDirective ).forEach( ( [ accId, newBalance ] ) => {
-		// 			const acc = getAccountById( this.props, accId );
-		// 			const newAccBalance = c( acc.balance ).add( newUpdateDirective[ accId ] ).value;
-
-		// 			if ( newAccBalance !== newBalance ) {
-		// 				console.error(
-		// 					`old: ${ newBalance }, new: ${ newAccBalance };
-		// isEqual: ${ _.isEqual( updateDirective, newUpdateDirective ) };
-		// oldDirective: ${ JSON.stringify( updateDirective ) };
-		// newDirective: ${ JSON.stringify( newUpdateDirective ) }`
-		// 				);
-
-		// 				throw new Error( `OUCH: old updateDirective is different from new one. check logs` );
-		// 			}
-
-		// 			_updateAccountBalance( acc, newAccBalance );
-		// 		} );
-
 		let recordAction;
 		if ( isEdit ) {
 			recordAction = updateRecord;
@@ -312,8 +288,6 @@ const mapStateToProps = ( state ) => {
 
 const mapDispatchToProps = ( dispatch ) => {
 	return {
-		// _createNewRecord: ( record ) => dispatch( addNewRecord( record ) ),
-		// _updateRecord: ( record ) => dispatch( updateRecord( record ) ),
 		_updateAccountBalance: ( account, newBalance ) => dispatch( updateAccountBalance( account, newBalance ) ),
 		_deleteRecord: ( record ) => dispatch( deleteRecord( record ) ),
 		_insertRecordAndUpdateAccounts: ( recordAction, record ) => dispatch( insertRecordAndUpdateAccounts( recordAction, record ) ),
