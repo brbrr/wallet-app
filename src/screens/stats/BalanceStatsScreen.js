@@ -25,35 +25,39 @@ class StatsScreen extends Component {
 	constructor( props ) {
 		super( props );
 
-		console.log( '!!!! StatsScreen' );
-
 		this.dataProvider = new ChartDataProvider( props.stats, props );
 	}
 
-	renderChart1( data, domain ) {
+	renderChart1( data, domain, tickFormat = ( t ) => moment( t ).format( 'MMM' ), tickCount = 8, tickValues = null ) {
 		return (
 			<VictoryChart
 				// width={ 350 }
 				height={ 200 }
 				theme={ chartTheme }
-				// scale={ { x: 'linear', y: 'log' } }
 				containerComponent={ <VictoryVoronoiContainer /> }
 
 			>
-				<VictoryAxis tickCount={ 8 }
+				<VictoryAxis
+					scale={ { x: 'time' } }
+					// tickCount={ tickCount }
+					tickFormat={ tickFormat }
+					tickValues={ tickValues }
 					style={ {
 						ticks: { size: 0 },
-						tickLabels: { fontSize: 10, padding: 5 },
+						tickLabels: { fontSize: 8, padding: 5 },
 					} }
 				/>
+
 				<VictoryAxis
 					dependentAxis
+					tickFormat={ ( t ) => `${ Math.round( t / 1000 ) }k` }
 					style={ {
 						ticks: { size: 0 },
 						tickLabels: { fontSize: 10, padding: 5 },
 						axis: { stroke: null },
 					} }
 				/>
+
 				<VictoryArea
 					interpolation="basis"
 					data={ data }
@@ -63,9 +67,6 @@ class StatsScreen extends Component {
 							style={ { fontSize: 10 } }
 						/>
 					}
-					labels={ ( { datum } ) => {
-						return `x: ${ datum.x }, y: ${ datum.y }`;
-					} }
 					style={
 						{
 							data: {
@@ -81,16 +82,14 @@ class StatsScreen extends Component {
 	}
 
 	getDomain( data ) {
-		let min = data[ 0 ].y;
-		let max = data[ 0 ].y;
-		data.forEach( ( entry ) => {
-			const balance = entry.y;
-			min = balance < min ? balance : min;
-			max = balance > max ? balance : max;
-		} );
+		const values = data.map( ( e ) => e.y );
+		const min = Math.min( ...values );
+		const max = Math.max( ...values );
 
 		let domain = { y: [ 0, max + ( 0.1 * max ) ] };
-		if ( min < 0 ) {
+		if ( max < 0 ) {
+			domain = { y: [ min - ( 0.1 * max ), 0 ] };
+		} else if ( min < 0 ) {
 			domain = { y: [ min - ( 0.1 * max ), max + ( 0.1 * max ) ] };
 		}
 
@@ -98,24 +97,11 @@ class StatsScreen extends Component {
 	}
 
 	render() {
-		console.log( '##### 1 ', new Date() );
-
-		// const dailyData = this.dataProvider.getDailyChartData( this.props.balanceTrend );
+		const dailyData = this.dataProvider.getDailyChartData( this.props.balanceTrend, moment().startOf( 'month' ) );
 		const monthlyData = this.dataProvider.getMonthlyChartData( this.props.balanceTrend );
 
-		console.log( '##### 1-1 ', new Date() );
-
-		// const monthlyData = dailyData.filter( ( entry, idx ) => {
-		// 	const isFits = moment( entry._date ).isSame( moment( entry._date ).endOf( 'month' ), 'day' ) ||
-		// 	idx === ( dailyData.length - 1 );
-		// 	return isFits;
-		// } );
-
-		// console.log( '##### 2 ', new Date() );
-
-		// const domain = this.getDomain( dailyData );
+		const domain = this.getDomain( dailyData );
 		const monthlyDomain = this.getDomain( monthlyData );
-		// console.log( '##### 3 ', new Date() );
 
 		return (
 			<ScrollView>
@@ -123,7 +109,7 @@ class StatsScreen extends Component {
 					<Text>
 						Balance Stats!
 					</Text>
-					{ /* { this.renderChart1( dailyData, domain ) } */ }
+					{ this.renderChart1( dailyData, domain, ( t ) => moment( t ).format( 'DD.MM' ), 8, dailyData.map( ( e ) => e.x ).filter( ( d, i ) => i % 4 === 0 ) ) }
 				</View>
 				<View>
 					{ this.renderChart1( monthlyData, monthlyDomain ) }
