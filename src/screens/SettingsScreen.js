@@ -70,6 +70,25 @@ export default class SettingsScreen extends React.Component {
 					onPress={ () => this.props.navigation.navigate( 'SettingsCategories', { isEdit: true } ) }
 				/>
 
+				<ListItem
+					containerStyle={ styles.itemContainer }
+					contentContainerStyle={ { flex: 2 } }
+					rightContentContainerStyle={ { flex: 1 } }
+					title="Debug"
+					bottomDivider={ true }
+					topDivider={ true }
+					leftIcon={ {
+						name: 'circle',
+						type: 'font-awesome',
+						color: 'blue',
+						size: 42,
+						containerStyle: { margin: -2 },
+					} }
+					chevron
+					rightTitle={ 'Select' }
+					onPress={ () => this.props.navigation.navigate( 'SettingsDebug' ) }
+				/>
+
 			</ScrollView>
 		);
 	}

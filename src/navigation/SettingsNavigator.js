@@ -17,6 +17,7 @@ import { SettingsCurrenciesScreen } from '../screens/CurrenciesScreen';
 import CurrencyScreen from '../screens/CurrencyScreen';
 import { NewCurrencyStack } from './CurrenciesNavigator';
 import { SettingsAccountsScreen } from '../screens/settings/SettingsAccountsScreen';
+import { SettingsDebugScreen } from '../screens/settings/Debug';
 
 const SettingsAccountsStack = createStackNavigator( {
 	SettingsAccountsList: { screen: SettingsAccountsScreen },
@@ -34,11 +35,16 @@ const SettingsCurrenciesStack = createStackNavigator( {
 	Currency: CurrencyScreen,
 } );
 
+const SettingsDebugStack = createStackNavigator( {
+	SettingsDebug: { screen: SettingsDebugScreen },
+} );
+
 const SettingsStack = createStackNavigator( {
 	Settings: SettingsScreen,
 	SettingsAccounts: { screen: SettingsAccountsStack, navigationOptions: { header: null } },
 	SettingsCurrencies: { screen: SettingsCurrenciesStack, navigationOptions: { header: null } },
 	SettingsCategories: { screen: SettingsCategoriesStack, navigationOptions: { header: null } },
+	SettingsDebugStack,
 } );
 
 SettingsStack.navigationOptions = {
