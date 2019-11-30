@@ -25,7 +25,7 @@ const persistedReducer = persistReducer( persistConfig, rootReducer );
 export default () => {
 	const store = createStore(
 		persistedReducer,
-		composeWithDevTools( applyMiddleware( thunk, statsEntriesBackfiller ) )
+		composeWithDevTools( applyMiddleware( thunk ) )
 		// composeWithDevTools( applyMiddleware( thunk, dateUpdater, statsEntriesBackfiller ) )
 	);
 	// const persistor = persistStore( store, { manualPersist: true } );

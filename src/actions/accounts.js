@@ -23,7 +23,7 @@ export function addNewAccount( account ) {
 			updatedAt: account.updatedAt || moment().valueOf(),
 		} );
 		dispatch( { type: ADD_NEW_ACCOUNT, account: acc } );
-		dispatch( updateAccountBalance( acc, acc.balance ) );
+		dispatch( updateAccountBalance( acc, acc.balance, acc.createdAt ) );
 	};
 }
 
@@ -33,7 +33,7 @@ export function updateAccount( account ) {
 		const acc = Object.assign( {}, account, { updatedAt: moment().valueOf() } );
 
 		dispatch( { type: UPDATE_ACCOUNT, acc } );
-		dispatch( updateAccountBalance( acc, acc.balance ) );
+		dispatch( updateAccountBalance( acc, acc.balance, acc.updatedAt ) );
 	};
 }
 
@@ -61,16 +61,4 @@ export function updateAccountBalance( account, newBalance, date ) {
 
 export function updateAccountsOrder( newOrder ) {
 	return { type: UPDATE_ACCOUNTS_ORDER, newOrder };
-}
-
-function addNewAccount2( account ) {
-	return { type: ADD_NEW_ACCOUNT, account };
-}
-
-function updateAccount2( account ) {
-	return { type: UPDATE_ACCOUNT, account };
-}
-
-function getMeta() {
-	return { createdAt: Date.now() };
 }

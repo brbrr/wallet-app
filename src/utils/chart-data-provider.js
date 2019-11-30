@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import { convertAmount } from '.';
-import { getCurrencyById, getDefaultAccountCurrency } from '../selectors';
+import { getCurrencyById, getDefaultAccountCurrency, getAccountOrder, getAccountById } from '../selectors';
 /**
  * External dependencies
  */
 import moment from 'moment';
 import 'react-native-console-time-polyfill';
+import _ from 'lodash';
 
 export default class ChartDataProvider {
 	constructor( stats, state ) {
@@ -16,193 +17,124 @@ export default class ChartDataProvider {
 	}
 
 	do( stats = this.stats ) {
-		// const data = this.backfillAllMissingRecords( stats );
-		// console.log( 'backfillAllMissingRecords end ', new Date() );
+		const balanceTrend = _.cloneDeep( stats );
 
-		return this.prepareDataForCharts( stats, this.calcFunction );
+		const trends = this.fillInMissingEntries( balanceTrend );
+		return this.prepareDataForCharts( trends, this.calcFunction );
 	}
 
 	getMonthlyChartData( balanceTrend ) {
-		const data = this.do( balanceTrend );
-		const entries = Object.entries( data );
+		const trend = this.do( balanceTrend );
+		const fullTrend = this.backfillChartData( trend, 'month' );
+		const entries = Object.entries( fullTrend );
 
-		console.time( 'reduce' );
-
-		const r = entries.reduce( ( accumulator, [ date, entry ], idx ) => {
+		return entries.reduce( ( accumulator, [ date, entry ], idx ) => {
 			const isEOMEntry = moment( date ).isSame( moment( date ).endOf( 'month' ), 'day' ) ||
 			idx === ( entries.length - 1 );
 			if ( isEOMEntry ) {
-				accumulator.push( { x: moment( date ).format( 'MMM' ), y: entry.balance, _date: date } );
+				accumulator.push( {
+					x: moment( date ).valueOf(),
+					y: entry.balance,
+					_date: date,
+					label: moment( date ).format( 'MMM' ),
+				} );
 			}
 
 			return accumulator;
 		}, [] )
 			.sort( ( a, b ) => Date.parse( a._date ) - Date.parse( b._date ) );
-
-		console.timeEnd( 'reduce' );
-
-		return r;
-
-		// console.time( 'forEach' );
-
-		// let accumulator = [];
-		// entries.forEach( ( [ date, entry ], idx ) => {
-		// 	const isEOMEntry = moment( date ).isSame( moment( date ).endOf( 'month' ), 'day' ) ||
-		// 	idx === ( entries.length - 1 );
-		// 	if ( isEOMEntry ) {
-		// 		accumulator.push( { x: moment( date ).format( 'MMM' ), y: entry.balance, _date: date } );
-		// 	}
-		// } );
-		// accumulator.sort( ( a, b ) => Date.parse( a._date ) - Date.parse( b._date ) );
-
-		// console.timeEnd( 'forEach' );
-
-		// console.time( 'loop' );
-
-		// accumulator = [];
-
-		// for ( let i = 0; i < entries.length; i++ ) {
-		// 	const [ date, entry ] = entries[ i ];
-		// 	const isEOMEntry = moment( date ).isSame( moment( date ).endOf( 'month' ), 'day' ) ||
-		// 	i === ( entries.length - 1 );
-		// 	if ( isEOMEntry ) {
-		// 		accumulator.push( { x: moment( date ).format( 'MMM' ), y: entry.balance, _date: date } );
-		// 	}
-		// }
-
-		// accumulator.sort( ( a, b ) => Date.parse( a._date ) - Date.parse( b._date ) );
-
-		// console.timeEnd( 'loop' );
-
-		// return accumulator;
 	}
 
-	getDailyChartData( balanceTrend ) {
-		const data = this.do( balanceTrend );
+	getDailyChartData( balanceTrend, fromDate ) {
+		const trend = this.do( balanceTrend );
+		const fullTrend = this.backfillChartData( trend, 'day', fromDate );
 
-		const chartData = Object.entries( data )
-			.sort( ( a, b ) => Date.parse( a[ 0 ].date ) - Date.parse( b[ 0 ].date ) )
-			.map( ( [ date, entry ] ) => ( { x: moment( date ).format( 'DD.MM' ), y: entry.balance, _date: date } ) );
-
-		return chartData;
+		return Object.entries( fullTrend )
+			.sort( ( a, b ) => Date.parse( a[ 0 ] ) - Date.parse( b[ 0 ] ) )
+			.map( ( [ date, entry ] ) => ( {
+				x: moment( date ).valueOf(),
+				y: entry.balance,
+				_date: date,
+				label: moment( date ).format( 'DD.MM' ),
+			} ) );
 	}
 
 	/**
 	 * Sums up all the daily balances across all accounts
 	 * Return array of entries such as:
 	 *	{ '2019-11-16': { balance: 0, ids: [ 2, 3 ] }
-	 * @param {Array} data
+	 * @param {Object} trend date and accountId indexed entries i.e. { '2019-11-16': { 2: { ... }}
 	 * @param {Function} calcFunction
 	 *
 	 * @return {Array} list of entries such as: { '2019-11-16': { balance: 0, ids: [ 2, 3 ] }
 	 */
-	prepareDataForCharts( data, calcFunction ) {
-		// Convert stats object into flat array with elements such as: [ date, entry]
-		const arr = Object.entries( data ).reduce( ( acc, [ id, entries ] ) => {
-			Object.entries( entries ).forEach( ( entry ) => acc.push( entry ) );
-			return acc;
-		}, [] );
+	prepareDataForCharts( trend, calcFunction ) {
+		const dates = Object.keys( trend ).sort( ( a, b ) => Date.parse( a ) - Date.parse( b ) );
+		const result = {};
+		const prevEntries = {};
+		dates.forEach( ( date ) => {
+			const dayTrend = trend[ date ];
+			const dayBalance = Object.values( dayTrend ).reduce( ( acc, entry ) => {
+				const balance = this.getBalance( entry, prevEntries[ entry.id ], calcFunction );
+				prevEntries[ entry.id ] = Object.assign( {}, entry, { convertedBalance: balance } );
+				return acc += balance;
+			}, 0 );
+			result[ date ] = { balance: dayBalance };
+		} );
 
-		// Process flatten array into an object with summed account balances
-		let prevEntry = null;
-		return arr.reduce( ( acc, [ date, entry ] ) => {
-			if ( ! acc[ date ] ) {
-				acc[ date ] = { balance: 0, ids: [] };
-			}
-
-			// TODO: FIXME: As an idea, we can do the calculations when adding new record in reducer/action
-			let balance;
-			if ( this.isEntriesEqual( entry, prevEntry ) ) {
-				// When prevEntry and entry are the same
-				balance = prevEntry.convertedBalance;
-			} else if ( calcFunction ) {
-				balance = calcFunction( entry, this.state );
-			} else {
-				balance = entry.balance;
-			}
-
-			acc[ date ].balance += balance;
-
-			// Add account ID to the list of IDs
-			if ( ! acc[ date ].ids.includes( entry.id ) ) {
-				acc[ date ].ids.push( entry.id );
-			}
-			prevEntry = Object.assign( {}, entry, { convertedBalance: balance } );
-			return acc;
-		}, {} );
+		return result;
 	}
 
 	/**
-	 * Fills in all the missing daily entries by using previous actual records.
-	 * { 1: {'2019-01-14': { ...balance, id } } }
+	 * Adds all the missing account snapshots to all existing trend dates
+	 * @param {Object} trends frop redux state
 	 *
-	 * @param {Object} stats Map of all the actual account entries
-	 * @param {Date} toDate toDate date
-	 *
-	 * @return {Object} Map of all the account entries + backfilled missing dates
+	 * @return {Object} balance trend with all the filled day entries
 	 */
-	_backfillAllMissingRecords( stats, toDate = new Date() ) {
-		console.log( 'backfillAllMissingRecords 1 ', new Date() );
+	fillInMissingEntries( trends ) {
+		// TODO: Add test to check that all account IDs are present for every date
+		const dates = Object.keys( trends ).sort( ( a, b ) => Date.parse( a ) - Date.parse( b ) );
+		const expectedAccountIds = getAccountOrder( this.state ); //[ 1, 2, 3 ];
+		const prevEntries = {};
 
-		return Object.entries( stats ).reduce( ( acc, [ accountId, entries ] ) => {
-			console.log( 'backfillAllMissingRecords 2 ', accountId, new Date() );
+		dates.forEach( ( date ) => {
+			const dayTrends = trends[ date ];
+			const missingEntries = expectedAccountIds.filter( ( id ) => ! dayTrends[ id ] );
+			// console.log( 'MISSING entries ', missingEntries, date );
 
-			const result = this.backfillMissingRecordsForAccount( entries, toDate );
-			acc[ accountId ] = result;
-			return acc;
-		}, {} );
-	}
+			// Fill in all missing entries
+			// To make sure our charts are correct, every date should have entry for every account
+			missingEntries.forEach( ( id ) => {
+				if ( prevEntries[ id ] ) {
+					const entry = prevEntries[ id ];
+					// console.log( 'Adding ', entry, date );
 
-	_backfillMissingRecordsForAccount( entries, toDate ) {
-		const result = {};
-		const dates = Object.keys( entries ).sort( ( a, b ) => Date.parse( a ) - Date.parse( b ) );
-		const fromDate = new Date( dates[ 0 ] );
-		let prevEntry = null;
-		const backfilled = [];
-		while ( fromDate < toDate ) {
-			const date = fromDate.toISOString().split( 'T' )[ 0 ];
-
-			if ( dates.includes( date ) ) {
-				result[ date ] = entries[ date ];
-				prevEntry = entries[ date ];
-			} else {
-				result[ date ] = Object.assign( {}, prevEntry, { backfilled: 'BACKFILLED' } );
-				backfilled.push( Object.assign( {}, prevEntry, { backfilled: 'BACKFILLED' } ) );
-			}
-
-			fromDate.setDate( fromDate.getDate() + 1 );
-		}
-
-		return result;
-	}
-
-	backfillMissingRecordsForAccountBy( dateType, entries, toDate ) {
-		const result = {};
-		const dates = Object.keys( entries ).sort( ( a, b ) => Date.parse( a ) - Date.parse( b ) );
-		const fromDate = new Date( dates[ 0 ] );
-		let prevEntry = null;
-		while ( fromDate < toDate ) {
-			const date = fromDate.toISOString().split( 'T' )[ 0 ];
-
-			if ( entries[ date ] ) {
-				prevEntry = entries[ date ];
-			} else {
-			}
-
-			if ( moment( date ).isSame( moment( date ).startOf( dateType ) ) ) {
-				if ( entries[ date ] ) {
-					result[ date ] = entries[ date ];
-				} else {
-					result[ date ] = Object.assign( {}, prevEntry, { backfilled: 'BACKFILLED', statDate: date } );
+					dayTrends[ entry.id ] = entry;
 				}
-			}
+			} );
 
-			fromDate.setDate( fromDate.getDate() + 1 );
+			expectedAccountIds.forEach( ( id ) => {
+				if ( dayTrends[ id ] ) {
+					prevEntries[ id ] = dayTrends[ id ];
+				}
+			} );
+		} );
+
+		const today = moment().format( 'YYYY-MM-DD' );
+		trends[ today ] = {};
+		expectedAccountIds.forEach( ( accId ) => trends[ today ][ accId ] = getAccountById( this.state, accId ) );
+
+		return trends;
+	}
+
+	getBalance( entry, prevEntry, calcFunction ) {
+		if ( this.isEntriesEqual( entry, prevEntry ) ) {
+			// When prevEntry and entry are the same
+			return prevEntry.convertedBalance;
+		} else if ( calcFunction ) {
+			return calcFunction( entry, this.state );
 		}
-		// Object.entries( result ).map( ( e ) => [ e[ 1 ].statDate, e[ 1 ].balance, e[ 1 ].backfilled ] );
-		// Object.entries( entries ).map( ( e ) => [ e[ 1 ].statDate, e[ 1 ].balance, e[ 1 ].backfilled ] );
-
-		return result;
+		return entry.balance;
 	}
 
 	isEntriesEqual( firstEntry, secondEntry ) {
@@ -223,5 +155,42 @@ export default class ChartDataProvider {
 		const convertedAmount = convertAmount( balance, { from: fromCurrency.code, to: defaultCurrency.code } );
 
 		return convertedAmount;
+	}
+
+	backfillChartData( entries, dateType = 'day', _fromDate = null, toDate = moment() ) {
+		console.log( 'backfillChartData 1', new Date() );
+
+		const result = {};
+		const dates = Object.keys( entries ).sort( ( a, b ) => moment( a ).diff( b ) );
+		const fromDate = _fromDate ? _fromDate : moment( dates[ 0 ] );
+		let date = fromDate.format( 'YYYY-MM-DD' );
+		let prevEntry = null;
+
+		// pre-filling prevEntry when there is no entry for the fromDate
+		if ( ! entries[ date ] ) {
+			const earlierDates = dates.filter( ( d ) => d < date );
+			prevEntry = entries[ _.last( earlierDates ) ];
+		}
+
+		while ( fromDate < toDate ) {
+			date = fromDate.format( 'YYYY-MM-DD' );
+
+			if ( entries[ date ] ) {
+				prevEntry = entries[ date ];
+			}
+
+			if ( moment( date ).isSame( moment( date ).endOf( dateType ).startOf( 'day' ) ) ) {
+				if ( entries[ date ] ) {
+					result[ date ] = entries[ date ];
+				} else {
+					result[ date ] = Object.assign( {}, prevEntry, { backfilled: 'BACKFILLED' } );
+				}
+			}
+
+			fromDate.add( 1, 'days' );
+		}
+		console.log( 'backfillChartData 1', new Date() );
+
+		return result;
 	}
 }
