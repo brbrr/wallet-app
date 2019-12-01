@@ -9,7 +9,7 @@ import _ from 'lodash';
  */
 import { getTxUpdateDirective, getAccountsUpdateDirective } from '../utils';
 import { getAccountById } from '../selectors';
-import { updateAccountBalance } from './accounts';
+import { updateAccountBalance, updateAccountBalanceDirective } from './accounts';
 
 export const ADD_NEW_RECORD = 'ADD_NEW_RECORD';
 export const UPDATE_RECORD = 'UPDATE_RECORD';
@@ -53,6 +53,9 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 			}
 
 			dispatch( updateAccountBalance( account, newAccBalance, record.createdAt ) );
+
+			const directive = { id: account.id, updateValue: modifier.value, createdAt: record.createdAt };
+			dispatch( updateAccountBalanceDirective( directive ) );
 		} );
 	};
 }
