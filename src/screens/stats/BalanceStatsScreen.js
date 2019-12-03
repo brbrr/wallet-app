@@ -25,7 +25,7 @@ class StatsScreen extends Component {
 	constructor( props ) {
 		super( props );
 
-		this.dataProvider = new ChartDataProvider( props.stats, props );
+		this.dataProvider = new ChartDataProvider( props.stats, props.state );
 	}
 
 	renderChart1( data, domain, tickFormat = ( t ) => moment( t ).format( 'MMM' ), tickCount = 8, tickValues = null ) {
@@ -97,8 +97,8 @@ class StatsScreen extends Component {
 	}
 
 	render() {
-		const dailyData = this.dataProvider.getDailyChartData( this.props.balanceTrend, moment().startOf( 'month' ) );
-		const monthlyData = this.dataProvider.getMonthlyChartData( this.props.balanceTrend );
+		const dailyData = this.dataProvider.getDailyChartData( moment().subtract( 1, 'months' ).startOf( 'month' ) );
+		const monthlyData = this.dataProvider.getMonthlyChartData();
 
 		const domain = this.getDomain( dailyData );
 		const monthlyDomain = this.getDomain( monthlyData );
@@ -120,14 +120,8 @@ class StatsScreen extends Component {
 }
 
 export const mapStateToProps = ( state ) => {
-	const { records, accounts, categories, currencies, stats, balanceTrend } = state;
 	return {
-		records,
-		accounts,
-		categories,
-		currencies,
-		stats,
-		balanceTrend,
+		state,
 	};
 };
 

@@ -129,11 +129,9 @@ class NewRecordModal extends React.Component {
 		const record = this.getRecordFromState();
 
 		// Sanitize record object! e.g. amount value
-		let recordAction;
+		let recordAction = addNewRecord;
 		if ( isEdit ) {
 			recordAction = updateRecord;
-		} else {
-			recordAction = addNewRecord;
 		}
 
 		_insertRecordAndUpdateAccounts( recordAction, record );

@@ -54,7 +54,7 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 
 			dispatch( updateAccountBalance( account, newAccBalance, record.createdAt ) );
 
-			const directive = { id: account.id, updateValue: modifier.value, createdAt: record.createdAt };
+			const directive = { accId: account.id, updateValue: modifier.value, createdAt: record.createdAt };
 			dispatch( updateAccountBalanceDirective( directive ) );
 		} );
 	};

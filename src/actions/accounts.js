@@ -70,7 +70,9 @@ export function updateAccountBalance( account, newBalance, date ) {
 }
 
 export function updateAccountBalanceDirective( directive ) {
-	return { type: UPDATE_ACCOUNT_BALANCE_DIRECTIVE, directive };
+	const statDate = moment( directive.createdAt ).format( 'YYYY-MM-DD' );
+
+	return { type: 'UPDATE_ACCOUNT_BALANCE_DIRECTIVE', directive: { ...directive, statDate } };
 }
 
 export function updateAccountsOrder( newOrder ) {
