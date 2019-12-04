@@ -1,12 +1,12 @@
 /**
- * Internal dependencies
- */
-import { getMaxId, getNewId } from '../utils/reducerHelper';
-import { addBalanceTrendEntry } from '.';
-/**
  * External dependencies
  */
 import moment from 'moment';
+
+/**
+ * Internal dependencies
+ */
+import { getNewId } from '../utils/reducerHelper';
 import { getAccountById } from '../selectors';
 
 export const ADD_NEW_ACCOUNT = 'ADD_NEW_ACCOUNT';
@@ -14,6 +14,7 @@ export const UPDATE_ACCOUNT = 'UPDATE_ACCOUNT';
 export const UPDATE_ACCOUNT_BALANCE = 'UPDATE_ACCOUNT_BALANCE';
 export const UPDATE_ACCOUNT_BALANCE_DIRECTIVE = 'UPDATE_ACCOUNT_BALANCE_DIRECTIVE';
 export const UPDATE_ACCOUNTS_ORDER = 'UPDATE_ACCOUNTS_ORDER';
+export const ADD_ACCOUNT_SNAPSHOTS = 'ADD_ACCOUNT_SNAPSHOTS';
 
 export function addNewAccount( account ) {
 	return ( dispatch, getState ) => {
@@ -26,7 +27,7 @@ export function addNewAccount( account ) {
 		dispatch( { type: ADD_NEW_ACCOUNT, account: acc } );
 		dispatch( updateAccountBalance( acc, acc.balance, acc.createdAt ) );
 
-		const directive = { accId: id, updateValue: parseFloat( acc.balance ), createdAt: acc.createdAt };
+		const directive = { accId: id, updateValue: parseFloat( acc.balance ), createdAt: acc.createdAt, statDate: moment( acc.createdAt ).format( 'YYYY-MM-DD' ) };
 		dispatch( updateAccountBalanceDirective( directive ) );
 	};
 }
@@ -42,7 +43,7 @@ export function updateAccount( account ) {
 		// We could track updateDirectives in redux and link it to account. so every account object will be populated with related directives. not sure if it worth it.
 		const prevAccSnapshot = getAccountById( getState(), acc.id );
 		const updateValue = parseFloat( acc.balance ) - parseFloat( prevAccSnapshot.balance );
-		const directive = { accId: acc.id, updateValue, createdAt: acc.updatedAt };
+		const directive = { accId: acc.id, updateValue, createdAt: acc.updatedAt, statDate: moment( acc.updatedAt ).format( 'YYYY-MM-DD' ) };
 		dispatch( updateAccountBalanceDirective( directive ) );
 	};
 }
@@ -59,22 +60,17 @@ export function updateAccount( account ) {
  * @return { Object} redux action
  */
 export function updateAccountBalance( account, newBalance, date ) {
-	return ( dispatch ) => {
-		dispatch( { type: UPDATE_ACCOUNT_BALANCE, account, newBalance, date } );
-		const entryDate = date ? moment( date ) : moment( account.updatedAt );
-
-		const entry = Object.assign( {}, account, { balance: newBalance, statDate: entryDate.format( 'YYYY-MM-DD' ) } );
-		dispatch( addBalanceTrendEntry( entry ) );
-	};
-	// return { type: UPDATE_ACCOUNT_BALANCE, account, newBalance, date };
+	return { type: UPDATE_ACCOUNT_BALANCE, account, newBalance, date };
 }
 
 export function updateAccountBalanceDirective( directive ) {
-	const statDate = moment( directive.createdAt ).format( 'YYYY-MM-DD' );
-
-	return { type: 'UPDATE_ACCOUNT_BALANCE_DIRECTIVE', directive: { ...directive, statDate } };
+	return { type: UPDATE_ACCOUNT_BALANCE_DIRECTIVE, directive };
 }
 
 export function updateAccountsOrder( newOrder ) {
 	return { type: UPDATE_ACCOUNTS_ORDER, newOrder };
+}
+
+export function addAccountSnapshots( snapshots, id ) {
+	return { type: ADD_ACCOUNT_SNAPSHOTS, snapshots, id };
 }

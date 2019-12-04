@@ -3,6 +3,7 @@
  */
 import c from 'currency.js';
 import _ from 'lodash';
+import moment from 'moment';
 
 /**
  * Internal dependencies
@@ -54,7 +55,7 @@ newDirective: ${ JSON.stringify( newUpdateDirective ) }`
 
 			dispatch( updateAccountBalance( account, newAccBalance, record.createdAt ) );
 
-			const directive = { accId: account.id, updateValue: modifier.value, createdAt: record.createdAt };
+			const directive = { accId: account.id, updateValue: modifier.value, createdAt: record.createdAt, statDate: moment( record.createdAt ).format( 'YYYY-MM-DD' ) };
 			dispatch( updateAccountBalanceDirective( directive ) );
 		} );
 	};
