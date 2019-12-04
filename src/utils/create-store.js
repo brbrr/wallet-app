@@ -12,7 +12,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
  */
 import rootReducer from '../reducers';
 import { hydrateAccounts, hydrateCurrencies, hydrateRecords } from './state-hydrator';
-import { statsEntriesBackfiller, snapshotCalculator } from './stats-middleware';
+import { snapshotCalculator } from './stats-middleware';
 
 const persistConfig = {
 	key: 'root',

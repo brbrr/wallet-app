@@ -97,8 +97,10 @@ class StatsScreen extends Component {
 	}
 
 	render() {
+		console.log( 'before:', new Date() );
 		const dailyData = this.dataProvider.getDailyChartData( moment().subtract( 1, 'months' ).startOf( 'month' ) );
 		const monthlyData = this.dataProvider.getMonthlyChartData();
+		console.log( 'after:', new Date() );
 
 		const domain = this.getDomain( dailyData );
 		const monthlyDomain = this.getDomain( monthlyData );

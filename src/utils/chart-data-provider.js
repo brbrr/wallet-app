@@ -2,7 +2,6 @@
  * External dependencies
  */
 import moment from 'moment';
-import 'react-native-console-time-polyfill';
 
 /**
  * Internal dependencies
@@ -20,7 +19,7 @@ export default class ChartDataProvider {
 		const manipulator = new ChartDataManipulator( this.state );
 
 		const ids = getAccountIds( this.state );
-		const fullTrend = manipulator.doStuff( this.state, ids );
+		const fullTrend = manipulator.doStuff( ids );
 		const entries = Object.entries( fullTrend );
 
 		return entries.reduce( ( accumulator, [ date, entry ], idx ) => {
@@ -44,7 +43,7 @@ export default class ChartDataProvider {
 		const manipulator = new ChartDataManipulator( this.state );
 
 		const ids = getAccountIds( this.state );
-		const fullTrend = manipulator.doStuff( this.state, ids, fromDate );
+		const fullTrend = manipulator.doStuff( ids, fromDate );
 
 		return Object.entries( fullTrend )
 			.sort( ( a, b ) => Date.parse( a[ 0 ] ) - Date.parse( b[ 0 ] ) )

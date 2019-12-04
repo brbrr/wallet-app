@@ -1,123 +1,79 @@
 /**
- * Internal dependencies
- */
-import { UPDATE_ACCOUNT_BALANCE, UPDATE_ACCOUNT, ADD_NEW_ACCOUNT, updateAccountBalance } from '../actions/accounts';
-import { ADD_NEW_RECORD, UPDATE_RECORD, DELETE_RECORD } from '../actions/records';
-import { getAccountById, getLatestBalanceTrendEntryForAccount, getBalanceTrendEntryForAccountByDate } from '../selectors';
-/**
  * External dependencies
  */
 import moment from 'moment';
-import { ADD_BALANCE_TREND_ENTRY, addBalanceTrendEntry, BACKFILL_MISSING_ENTRIES } from '../actions';
 
-export const dateUpdater = ( store ) => ( next ) => ( action ) => {
-	const nowDate = Date.now();
-	switch ( action.type ) {
-		// accounts
-		case ADD_NEW_ACCOUNT:
-			action.account.createdAt = action.account.createdAt ? action.account.createdAt : nowDate;
-			action.account.updatedAt = action.account.updatedAt ? action.account.updatedAt : nowDate;
-			action.date = action.account.createdAt;
-			// falls through
-		case UPDATE_ACCOUNT:
-		case UPDATE_ACCOUNT_BALANCE:
-			action.account.updatedAt = action.account.updatedAt ? action.account.updatedAt : nowDate;
-			// action.account.updatedAt = nowDate;
-			action.date = action.date ? action.date : action.account.createdAt;
-			// action.date = action.account.createdAt ? action.account.createdAt : nowDate;
+/**
+ * Internal dependencies
+ */
+import { UPDATE_ACCOUNT_BALANCE_DIRECTIVE, updateAccountBalanceDirective, addAccountSnapshots } from '../actions/accounts';
+import ChartDataManipulator from './chart-data-manipulator';
 
-			break;
-
-		// records
-		// case ADD_NEW_RECORD:
-		// 	action.record.createdAt = Date.now();
-			// falls through
-		case UPDATE_RECORD:
-		case DELETE_RECORD:
-			action.record.updatedAt = nowDate;
-			action.date = nowDate;
-			break;
-		default:
-			break;
-	}
-	return next( action );
-};
-
-// TODO: think about how we can extract account update action into a middleware, and wether we should do it at all.
-const accountBalanceUpdater = ( store ) => ( next ) => ( action ) => {
-	const nowDate = Date.now();
-	switch ( action.type ) {
-		// accounts
-		case ADD_NEW_ACCOUNT:
-		case UPDATE_ACCOUNT:
-
-		// records
-		case ADD_NEW_RECORD:
-		case UPDATE_RECORD:
-		case DELETE_RECORD:
-			// do stuff
-			break;
-		default:
-			break;
-	}
-	return next( action );
-};
-
-export const statsEntriesBackfiller1 = ( store ) => ( next ) => ( action ) => {
-	if ( action.type === ADD_BALANCE_TREND_ENTRY ) {
-		const state = store.getState();
-		const accountId = action.entry.id;
-		const latestEntry = getLatestBalanceTrendEntryForAccount( state, accountId );
-		const prevDate = moment( action.entry.statDate ).subtract( 1, 'day' );
-
-		// if latestEntry is more than day ago, we should backfill missing days
-		if ( latestEntry && ! action.entry.backfilled && moment( latestEntry.statDate ).isBefore( moment( prevDate ) ) ) {
-			const fromDate = moment( latestEntry.statDate ).add( 1, 'day' );
-			const toDate = moment( prevDate );
-			const result = {};
-			while ( fromDate <= toDate ) {
-				const date1 = fromDate.format( 'YYYY-MM-DD' );
-
-				if ( ! getBalanceTrendEntryForAccountByDate( state, accountId, date1 ) ) {
-					const newEntry = Object.assign( {}, latestEntry, { statDate: date1, _originStatDate: latestEntry.statDate, backfilled: 'BACKFILLED' } );
-
-					result[ date1 ] = newEntry;
-				}
-
-				fromDate.add( 1, 'day' );
-			}
-
-			store.dispatch( { type: BACKFILL_MISSING_ENTRIES, entries: result, id: accountId } );
-		}
-	}
-
-	return next( action );
-};
-
+/**
+ * NOTE: It's not clare what's is most effective approach
+ * runtime backfill
+ * before: 2019-12-04T08:44:28.084Z
+ * backfill count:  334
+ * backfill count:  330
+ * backfill count:  337
+ * after: 2019-12-04T08:44:28.800Z
+ *
+ * with: middleware
+ * before: 2019-12-04T08:58:09.827Z
+ * backfill count:  30
+ * backfill count:  64
+ * backfill count:  337
+ * after: 2019-12-04T08:58:10.118Z
+ * @param {Object} store
+ * @return {Object} dispached function
+ */
 export const statsEntriesBackfiller = ( store ) => ( next ) => ( action ) => {
-	if ( action.type === ADD_BALANCE_TREND_ENTRY ) {
-		const { entry } = action;
+	if ( action.type === UPDATE_ACCOUNT_BALANCE_DIRECTIVE ) {
 		const state = store.getState();
-		const accountId = entry.id;
-		const fromDate = moment( entry.statDate );
-		fromDate.add( 1, 'day' );
-		const toDate = moment().startOf( 'day' );
+		const { accId, statDate, backfilled } = action.directive;
+		const latestEntry = getLatestAccountDirective( state, accId );
 
-		const result = {};
-		while ( fromDate <= toDate ) {
-			const date = fromDate.format( 'YYYY-MM-DD' );
-			const newEntry = Object.assign( {}, entry, { statDate: date, _originStatDate: entry.statDate, backfilled: 'BACKFILLED' } );
-			const existingEntry = getBalanceTrendEntryForAccountByDate( state, accountId, date );
-			if ( existingEntry && ! existingEntry.backfilled ) {
-				break;
+		if ( latestEntry && ! backfilled && moment( statDate ).diff( latestEntry.statDate, 'days' ) > 1 ) {
+			const toDate = moment( statDate );
+			let startDate = moment( latestEntry.statDate ).add( 1, 'days' );
+			const directives = [];
+			while ( startDate < toDate ) {
+				const date = startDate.format( 'YYYY-MM-DD' );
+				const backFillDir = Object.assign( {}, latestEntry, { updateValue: 0, statDate: date, backfilled: latestEntry.statDate } );
+				delete backFillDir.id;
+				directives.push( backFillDir );
+				startDate = startDate.add( 1, 'days' );
 			}
-			result[ date ] = newEntry;
-			fromDate.add( 1, 'day' );
+			next( action );
+			return store.dispatch( updateAccountBalanceDirective( directives ) );
 		}
-
-		store.dispatch( { type: BACKFILL_MISSING_ENTRIES, entries: result, id: accountId } );
 	}
 
 	return next( action );
+};
+
+export const snapshotCalculator = ( store ) => ( next ) => ( action ) => {
+	if ( action.type === UPDATE_ACCOUNT_BALANCE_DIRECTIVE ) {
+		const result = next( action );
+		const state = store.getState();
+		const id = action.directive.accId;
+		const directives = getBalanceDirectivesById( state );
+		const dataManipulator = new ChartDataManipulator( state, 'balanceDirectiveTrend' );
+		const accSnapshots = dataManipulator.fillInAndTransform( directives, id );
+
+		store.dispatch( addAccountSnapshots( accSnapshots, id ) );
+		return result;
+	}
+	return next( action );
+};
+
+// TODO: extract into selectors
+const getBalanceDirectives = ( state ) => state.balanceDirectiveTrend;
+const getBalanceDirectivesById = ( state ) => getBalanceDirectives( state ).byId;
+const getBalanceDirectivesByIds = ( state ) => getBalanceDirectives( state ).byIds;
+const getBalanceDirectiveById = ( state, directiveId ) => getBalanceDirectivesById( state )[ directiveId ];
+const getLatestAccountDirective = ( state, accountId ) => {
+	const foundId = getBalanceDirectivesByIds( state ).filter( ( directiveId ) => directiveId.endsWith( accountId ) ).sort( ( a, b ) => moment( b.split( '::' )[ 0 ] ).diff( moment( a.split( '::' )[ 0 ] ) ) )[ 0 ];
+	return getBalanceDirectiveById( state, foundId );
 };
 
