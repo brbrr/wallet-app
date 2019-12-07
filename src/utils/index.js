@@ -9,7 +9,7 @@ import _ from 'lodash';
  * Internal dependencies
  */
 import data from './conversion-rates.js';
-import { getAccountById, getCurrencyById, getRecordById, getDefaultAccount } from '../selectors/index.js';
+import { getAccountById, getCurrencyById, getRecordById, getDefaultAccount, getAccountCurrency } from '../selectors/index.js';
 import { EXPENSE, INCOME, TRANSFER } from '../constants/Records.js';
 
 export function getAmountAsString( { amountInAccountCurrency, typeId } ) {
@@ -51,17 +51,22 @@ export function getTotalSpent( records ) {
  * Calculates the total sum of of records in specified currency
  * Useful when need to figure out intermediate sum, e.g. for daily expense.
  *
- * @param {Object} state redux state
+ * @param {Object} state redux state = {currencies, }
  * @param {Array} records Records array
  * @param {number} currencyId currency id
  * @return {number} sum of provided records balances in specified currency
  */
 export function getTotalSpentInCurrency( state, records, currencyId ) {
 	const toCurrency = getCurrencyById( state, currencyId );
-
+	/**
+		amount: 32.6,
+		amountInAccountCurrency: 884.927,
+		accountId: 1,
+		currencyId: 0,
+	 */
 	return records.reduce( ( acc, record ) => {
 		const amount = record.amountInAccountCurrency;
-		const fromCurrency = getCurrencyById( state, record.currencyId );
+		const fromCurrency = getAccountCurrency( state, record.accountId );
 		const convertedAmount = convertAmount( amount, { from: fromCurrency.code, to: toCurrency.code } );
 		return acc.add( convertedAmount );
 	}, c( 0 ) ).value;

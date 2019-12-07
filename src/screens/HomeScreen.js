@@ -27,7 +27,7 @@ class HomeScreen extends React.Component {
 		super( props );
 
 		this.state = {
-			view: 0,
+			viewCenter: 0,
 		};
 	}
 
@@ -36,7 +36,11 @@ class HomeScreen extends React.Component {
 	}
 
 	// Find dots dimensions
-	findDimensions( { y, height } ) {
+	findDimensions( layout, id ) {
+		if ( id !== 0 ) {
+			return;
+		}
+		const { y, height } = layout;
 		const dotElementCenter = ( 8 / 2 ) + 3; // 8px height & 3 px marginTop from default DotElement: https://github.com/leecade/react-native-swiper
 		this.setState( { viewCenter: y + ( height / 2 ) - dotElementCenter } );
 	}
@@ -75,11 +79,12 @@ class HomeScreen extends React.Component {
 						flex: 0.3,
 						backgroundColor: '#b6b1b8',
 					} }
-					onLayout={ ( event ) => this.findDimensions( event.nativeEvent.layout ) }
+					onLayout={ ( event ) => this.findDimensions( event.nativeEvent.layout, id ) }
 				/>
 				<View style={ { flex: 3 } }>
 					<RecordsList
 						recordsArray={ recordsArray }
+						account={ account }
 						accounts={ accounts }
 						categories={ categories }
 						currencies={ currencies }
