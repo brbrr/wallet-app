@@ -26,7 +26,7 @@ const splitRecordsByDate = ( recordsArray ) => recordsArray.reduce( ( acc, recor
 }, {} );
 
 // TODO: separate in two components: RecordsList & FullList(?) components
-export const RecordsList = ( { recordsArray, accounts, categories, currencies, navigateEditRecordScreen } ) => {
+export const RecordsList = ( { recordsArray, account, accounts, categories, currencies, navigateEditRecordScreen } ) => {
 	if ( recordsArray.length === 0 ) {
 		return (
 			<Text style={ styles.getStartedText }>{ 'No records yet.' }</Text>
@@ -48,7 +48,10 @@ export const RecordsList = ( { recordsArray, accounts, categories, currencies, n
 		result.push(
 			<DayHeader
 				key={ `${ idx }-header` }
+				account={ account }
 				records={ itemsList }
+				accounts={ accounts }
+				currencies={ currencies }
 			/>
 		);
 

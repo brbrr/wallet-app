@@ -57,6 +57,7 @@ class NewRecordModal extends React.Component {
 			currencyId: account.currencyId,
 			categoryId: category.id,
 			createdAt: Date.now(),
+			updatedAt: Date.now(),
 			typeId: 0,
 			isEdit,
 			toAccountId: -99, // Out of wallet
@@ -88,7 +89,7 @@ class NewRecordModal extends React.Component {
 	}
 
 	getRecordFromState() {
-		const { amount, description, accountId, currencyId, categoryId, createdAt, typeId, isEdit, id, toAccountId } = this.state;
+		const { amount, description, accountId, currencyId, categoryId, createdAt, updatedAt, typeId, isEdit, id, toAccountId } = this.state;
 
 		const record = {
 			amount,
@@ -98,6 +99,7 @@ class NewRecordModal extends React.Component {
 			accountId,
 			categoryId,
 			createdAt,
+			updatedAt,
 			typeId,
 		};
 
@@ -106,6 +108,7 @@ class NewRecordModal extends React.Component {
 
 		if ( isEdit ) {
 			record.id = id;
+			record.updatedAt = Date.now();
 		}
 
 		if ( typeId === TRANSFER ) {
@@ -126,11 +129,9 @@ class NewRecordModal extends React.Component {
 		const record = this.getRecordFromState();
 
 		// Sanitize record object! e.g. amount value
-		let recordAction;
+		let recordAction = addNewRecord;
 		if ( isEdit ) {
 			recordAction = updateRecord;
-		} else {
-			recordAction = addNewRecord;
 		}
 
 		_insertRecordAndUpdateAccounts( recordAction, record );
