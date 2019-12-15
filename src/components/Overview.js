@@ -8,7 +8,6 @@ import {
 	StyleSheet,
 } from 'react-native';
 import { connect } from 'react-redux';
-import { Divider } from 'react-native-elements';
 
 /**
  * Internal dependencies
