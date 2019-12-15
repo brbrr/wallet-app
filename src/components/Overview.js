@@ -8,6 +8,7 @@ import {
 	StyleSheet,
 } from 'react-native';
 import { connect } from 'react-redux';
+import { Divider } from 'react-native-elements';
 
 /**
  * Internal dependencies
@@ -37,19 +38,36 @@ const Overview = ( props ) => {
 	}
 
 	return (
-		<View style={ { flex: 1, backgroundColor, height: 150 } }>
-			<Text style={ styles.subTitle }>
-				{ title }
-			</Text>
-			<Text style={ styles.title }>
-				{ accountBalance }
-			</Text>
-		</View>
+		<View style={ styles.container( backgroundColor ) }>
+			<View style={ styles.rect }>
+				<View style={ { flex: 10 } }>
+					<Text style={ styles.subTitle }>
+						{ title }
+					</Text>
+					<Text style={ styles.title }>
+						{ accountBalance }
+					</Text>
+				</View>
+				<View
+					style={ {
+						flex: 0.1,
+						backgroundColor: 'black',
+						width: 0.1,
 
+					} }
+				/>
+				<View style={ { flex: 10 } }>
+					<Text style={ styles.subTitle }>
+						{ 'total spent' }
+					</Text>
+					<Text style={ styles.title }>
+						{ 'totalSpend' }
+					</Text>
+				</View>
+			</View>
+		</View>
 	);
 };
-
-// export default Overview;
 
 const mapStateToProps = ( state ) => {
 	const { currencies, accounts } = state;
@@ -67,7 +85,17 @@ export default connect(
 )( Overview );
 
 const styles = StyleSheet.create( {
-	container: {},
+	container: ( backgroundColor ) => ( { flex: 1, backgroundColor, justifyContent: 'center', alignItems: 'center' } ),
 	title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
 	subTitle: { fontSize: 16, fontWeight: 'bold', left: 30, paddingTop: 10 },
+	rect: {
+		height: 100,
+		marginLeft: 15,
+		marginRight: 15,
+		backgroundColor: 'rgba(230, 230, 230,1)',
+		borderRadius: 18,
+		borderColor: '#000000',
+		borderWidth: 0,
+		flexDirection: 'row',
+	},
 } );
