@@ -16,7 +16,7 @@ import { getAccountsTotalsInCurrency } from '../utils';
 import { getDefaultAccount, getCurrencyById } from '../selectors';
 
 const Overview = ( props ) => {
-	const { account, accounts } = props;
+	const { account, accounts, isMulti } = props;
 	let backgroundColor = account ? account.colorCode : '#8B9FBB';
 
 	let title = '';
@@ -39,34 +39,32 @@ const Overview = ( props ) => {
 	return (
 		<View style={ styles.container( backgroundColor ) }>
 			<View style={ styles.rect }>
-				<View style={ { flex: 10 } }>
-					<Text style={ styles.subTitle }>
-						{ title }
-					</Text>
-					<Text style={ styles.title }>
-						{ accountBalance }
-					</Text>
-				</View>
-				<View
-					style={ {
-						flex: 0.1,
-						backgroundColor: 'black',
-						width: 0.1,
-
-					} }
-				/>
-				<View style={ { flex: 10 } }>
-					<Text style={ styles.subTitle }>
-						{ 'total spent' }
-					</Text>
-					<Text style={ styles.title }>
-						{ 'totalSpend' }
-					</Text>
-				</View>
+				{ isMulti ?
+					[ titleView( title, accountBalance ), dividerView(), titleView( 'total spent', 'totalSpent' ) ] :
+					titleView( title, accountBalance ) }
 			</View>
 		</View>
 	);
 };
+
+const titleView = ( subTitle, title ) =>
+	<View style={ { flex: 10 } }>
+		<Text style={ styles.subTitle }>
+			{ subTitle }
+		</Text>
+		<Text style={ styles.title }>
+			{ title }
+		</Text>
+	</View>;
+
+const dividerView = () =>
+	<View
+		style={ {
+			flex: 0.1,
+			backgroundColor: 'black',
+			width: 0.1,
+		} }
+	/>;
 
 const mapStateToProps = ( state ) => {
 	const { currencies, accounts } = state;
