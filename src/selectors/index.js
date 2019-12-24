@@ -26,6 +26,8 @@ export const getCategories = ( state ) => state.categories;
 export const getCategoriesById = ( state ) => getCategories( state ).byId;
 export const getCategoryById = ( state, categoryId ) => getCategoriesById( state )[ categoryId ];
 export const getDefaultCategory = ( state ) => getCategoryById( state, 1 );
+export const getCategoriesByParentId = ( state, parentId ) => Object.values( getCategoriesById( state ) ).filter( ( c ) => c.parentId === parentId );
+export const getParentCategories = ( state ) => getCategoriesByParentId( state, null );
 
 export const getRecords = ( state ) => state.records;
 export const getRecordsById = ( state ) => getRecords( state ).byId;

@@ -28,15 +28,15 @@ export default class App extends React.Component {
 	};
 
 	render() {
-		if ( ! this.state.isLoadingComplete && ! this.props.skipLoadingScreen ) {
-			return (
-				<AppLoading
-					startAsync={ this._loadResourcesAsync }
-					onError={ this._handleLoadingError }
-					onFinish={ this._handleFinishLoading }
-				/>
-			);
-		}
+		// if ( ! this.state.isLoadingComplete && ! this.props.skipLoadingScreen ) {
+		// 	return (
+		// 		<AppLoading
+		// 			startAsync={ this._loadResourcesAsync }
+		// 			onError={ this._handleLoadingError }
+		// 			onFinish={ this._handleFinishLoading }
+		// 		/>
+		// 	);
+		// }
 		return (
 			<Provider store={ store }>
 				<PersistGate loading={ null } persistor={ persistor }>

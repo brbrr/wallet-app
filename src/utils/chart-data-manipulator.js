@@ -7,7 +7,6 @@ import { getDefaultAccountCurrency, getAccountCurrency } from '../selectors';
  * External dependencies
  */
 import moment from 'moment';
-import 'react-native-console-time-polyfill';
 import _ from 'lodash';
 
 export default class ChartDataManipulator {

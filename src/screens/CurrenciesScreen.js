@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import RecordOptionSelector from '../components/records/RecordOptionSelector';
+import OptionSelector from '../components/OptionSelector';
 
 class CurrenciesScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
@@ -39,7 +39,7 @@ class CurrenciesScreen extends React.Component {
 		const { currencies, navigation } = this.props;
 
 		return (
-			<RecordOptionSelector
+			<OptionSelector
 				items={ Object.values( currencies.byId ) }
 				selectItem={ ( currencyId ) => this.selectItem( currencyId ) }
 				navigation={ navigation }
