@@ -17,6 +17,7 @@ import { PersistGate } from 'redux-persist/integration/react';
  */
 import AppNavigator from './src/navigation/AppNavigator';
 import getStore from './src/utils/create-store';
+import { hydrateState } from './src/utils/state-hydrator';
 
 useScreens();
 
@@ -28,15 +29,15 @@ export default class App extends React.Component {
 	};
 
 	render() {
-		// if ( ! this.state.isLoadingComplete && ! this.props.skipLoadingScreen ) {
-		// 	return (
-		// 		<AppLoading
-		// 			startAsync={ this._loadResourcesAsync }
-		// 			onError={ this._handleLoadingError }
-		// 			onFinish={ this._handleFinishLoading }
-		// 		/>
-		// 	);
-		// }
+		if ( ! this.state.isLoadingComplete && ! this.props.skipLoadingScreen ) {
+			return (
+				<AppLoading
+					startAsync={ this._loadResourcesAsync }
+					onError={ this._handleLoadingError }
+					onFinish={ this._handleFinishLoading }
+				/>
+			);
+		}
 		return (
 			<Provider store={ store }>
 				<PersistGate loading={ null } persistor={ persistor }>
@@ -50,6 +51,8 @@ export default class App extends React.Component {
 	}
 
 	_loadResourcesAsync = async () => {
+		hydrateState( store.dispatch );
+
 		return Promise.all( [
 			Asset.loadAsync( [
 				require( './assets/images/robot-dev.png' ),

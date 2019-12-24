@@ -11,7 +11,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
  * Internal dependencies
  */
 import rootReducer from '../reducers';
-import { hydrateAccounts, hydrateCurrencies, hydrateRecords } from './state-hydrator';
+import { hydrateAccounts, hydrateCurrencies, hydrateRecords, hydrateState } from './state-hydrator';
 import { snapshotCalculator } from './stats-middleware';
 
 const persistConfig = {
@@ -25,19 +25,19 @@ const persistedReducer = persistReducer( persistConfig, rootReducer );
 export default () => {
 	const store = createStore(
 		persistedReducer,
+		// rootReducer,
 		composeWithDevTools( applyMiddleware( thunk, snapshotCalculator ) )
 		// composeWithDevTools( applyMiddleware( thunk, dateUpdater, statsEntriesBackfiller ) )
 	);
-	// const persistor = persistStore( store, { manualPersist: true } );
 	const persistor = persistStore( store );
 
+	// const persistor = persistStore( store, { manualPersist: true } );
+	// hydrateState( store.dispatch );
+
 	// persistor.persist();
+	// const persistor = persistStore( store );
 
-	hydrateAccounts( store.dispatch );
-	hydrateCurrencies( store.dispatch );
-	hydrateRecords( store.dispatch );
-
-	persistor.flush();
+	// persistor.flush();
 	persistor.purge();
 	return { store, persistor };
 };
