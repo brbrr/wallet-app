@@ -136,8 +136,6 @@ class DatePicker extends Component {
 		getDateObj = () => {
 			const { date } = this.state;
 
-			console.log( '###### QQQQQ', date );
-
 			return {
 				date,
 				year: date ? date.getFullYear() : '',
