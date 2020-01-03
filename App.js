@@ -51,7 +51,7 @@ export default class App extends React.Component {
 	}
 
 	_loadResourcesAsync = async () => {
-		hydrateState( store.dispatch );
+		// hydrateState( store.dispatch );
 
 		return Promise.all( [
 			Asset.loadAsync( [
