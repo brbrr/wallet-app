@@ -7,30 +7,17 @@ import { createStackNavigator } from 'react-navigation';
  * Internal dependencies
  */
 import NewRecordModal from '../screens/NewRecordModal';
-import CategoriesScreen, { EditCategoriesScreen } from '../screens/CategoriesScreen';
 import CurrenciesScreen from '../screens/CurrenciesScreen';
 import AccountsScreen from '../screens/AccountsScreen';
 import { NewAccountStack } from './AccountsNavigator';
 import { NewCurrencyStack } from './CurrenciesNavigator';
-import { NewCategoryStack } from './CategoriesStack';
-import SubCategoriesScreen, { EditSubCategoriesScreen } from '../screens/SubCategoriesScreen';
-
-export const EditCategoriesStack = createStackNavigator( {
-	EditCategories: { screen: EditCategoriesScreen },
-	EditSubCategories: { screen: EditSubCategoriesScreen },
-	NewCategory: NewCategoryStack,
-} );
-
-export const ViewCategoriesStack = createStackNavigator( {
-	Categories: { screen: CategoriesScreen },
-	SubCategories: { screen: SubCategoriesScreen },
-} );
+import { EditCategoriesStack, ViewCategoriesStack, EditSubCategoriesStack } from './CategoriesStack';
 
 export const CategoriesListStack = createStackNavigator( {
 	ViewCategories: ViewCategoriesStack,
-	EditCategories: { screen: EditCategoriesStack, navigationOptions: { header: null } },
-},
-{
+	EditCategories: { screen: EditCategoriesStack, navigationOptions: { header: null, navMode: 'modal' } },
+	EditSubCategories: { screen: EditSubCategoriesStack, navigationOptions: { header: null, navMode: 'modal' } },
+}, {
 	mode: 'modal',
 	headerMode: 'none',
 } );
@@ -49,5 +36,5 @@ export default createStackNavigator( {
 	New: { screen: NewRecordModal },
 	Currencies: { screen: CurrenciesStack, navigationOptions: { header: null } },
 	Accounts: { screen: AccountsStack, navigationOptions: { header: null } },
-	Categories: { screen: CategoriesListStack, navigationOptions: { header: null } },
+	CategoriesStack: { screen: CategoriesListStack, navigationOptions: { header: null } },
 } );
