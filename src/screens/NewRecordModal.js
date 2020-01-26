@@ -127,16 +127,20 @@ class NewRecordModal extends React.Component {
 		const { isEdit } = this.state;
 		const { _insertRecordAndUpdateAccounts, navigation } = this.props;
 		const record = this.getRecordFromState();
+		console.log( 'saveRecordAndGoBack 1', Date.now() );
 
 		// Sanitize record object! e.g. amount value
 		let recordAction = addNewRecord;
 		if ( isEdit ) {
 			recordAction = updateRecord;
 		}
+		console.log( 'saveRecordAndGoBack 2', Date.now() );
 
 		_insertRecordAndUpdateAccounts( recordAction, record );
+		console.log( 'saveRecordAndGoBack 3', Date.now() );
 
 		navigation.navigate( 'Main' );
+		console.log( 'saveRecordAndGoBack 4', Date.now() );
 	}
 
 	/**
@@ -233,7 +237,7 @@ class NewRecordModal extends React.Component {
 	}
 
 	render() {
-		console.log( '!!!!!!!! NewRecordModal screen render' );
+		console.log( '!!!!!!!! NewRecordModal screen render', this.onStateChange );
 
 		const { description, categoryId, typeId, isEdit, createdAt } = this.state;
 		const { navigation } = this.props;

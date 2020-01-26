@@ -9,14 +9,13 @@ import { ScrollView } from 'react-native-gesture-handler';
 /**
  * Internal dependencies
  */
-import { addNewCategory, updateCategory } from '../actions/categories';
-import { getCategoryById } from '../selectors';
-import NewCategory from '../components/NewCategory';
-
-export class NewCategoryScreen extends React.Component {
+import { addNewCategory, updateCategory } from '../../actions/categories';
+import { getCategoryById } from '../../selectors';
+import NewCategory from '../../components/NewCategory';
+class NewCategoryScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
 		const isEdit = navigation.getParam( 'isEdit' );
-		const createNewCategoryAndGoBack = navigation.getParam( 'createNewCategoryAndGoBack' );
+		const saveAndGoBack = navigation.getParam( 'saveAndGoBack' );
 		const rightButtonTitle = isEdit ? 'Save' : 'Add';
 		const title = isEdit ? 'Edit Category' : 'New Category';
 
@@ -24,7 +23,7 @@ export class NewCategoryScreen extends React.Component {
 			title,
 			headerRight: (
 				<Button
-					onPress={ createNewCategoryAndGoBack }
+					onPress={ saveAndGoBack }
 					title={ rightButtonTitle }
 				/>
 			),
@@ -56,7 +55,7 @@ export class NewCategoryScreen extends React.Component {
 		}
 
 		props.navigation.setParams(
-			{ createNewCategoryAndGoBack: this.createNewCategoryAndGoBack }
+			{ saveAndGoBack: this.saveAndGoBack }
 		);
 	}
 
@@ -79,7 +78,7 @@ export class NewCategoryScreen extends React.Component {
 		return category;
 	}
 
-	createNewCategoryAndGoBack = () => {
+	saveAndGoBack = () => {
 		const { navigation } = this.props;
 		this.save();
 		navigation.goBack( null );
@@ -116,12 +115,10 @@ export class NewCategoryScreen extends React.Component {
 
 const mapStateToProps = ( { categories } ) => ( { categories } );
 
-const mapDispatchToProps = ( dispatch ) => {
-	return {
-		_addNewCategory: ( category ) => dispatch( addNewCategory( category ) ),
-		_updateCategory: ( category ) => dispatch( updateCategory( category ) ),
-	};
-};
+const mapDispatchToProps = ( dispatch ) => ( {
+	_addNewCategory: ( category ) => dispatch( addNewCategory( category ) ),
+	_updateCategory: ( category ) => dispatch( updateCategory( category ) ),
+} );
 
 export default connect(
 	mapStateToProps,

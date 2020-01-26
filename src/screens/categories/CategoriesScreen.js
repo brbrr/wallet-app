@@ -2,20 +2,21 @@
  * External dependencies
  */
 import React from 'react';
-import { Button } from 'react-native';
+import { Button, View } from 'react-native';
 import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { getParentCategories, getCategoryById } from '../selectors';
-import ItemsList from '../components/ItemsList';
+import { getParentCategories, getCategoryById } from '../../selectors';
+import ItemsList from '../../components/ItemsList';
+import Card from '../../components/Card';
 
 class CategoriesScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
 		title: 'Categories',
 		headerRight: (
 			<Button
-				onPress={ () => navigation.navigate( 'EditCategories' ) }
+				onPress={ () => navigation.navigate( 'EditCategories', { navMode: 'modal' } ) }
 				title="Edit"
 			/>
 		),
@@ -37,7 +38,14 @@ class CategoriesScreen extends React.Component {
 
 	render() {
 		const parentCategories = getParentCategories( this.props );
-		return <ItemsList items={ parentCategories } selectItem={ this.selectItem } />;
+
+		return (
+			<View style={ { flex: 1, backgroundColor: '#f9f9f9' } }>
+				<Card title="ALL CATEGORIES" containerStyle={ { marginTop: 20 } }>
+					<ItemsList items={ parentCategories } selectItem={ this.selectItem } />
+				</Card>
+			</View>
+		);
 	}
 }
 
@@ -50,33 +58,23 @@ export default connect(
 	mapDispatchToProps
 )( CategoriesScreen );
 
-class SCategoriesScreen extends CategoriesScreen {
-	// selectItem = ( categoryId ) => {
-	// 	this.props.navigation.navigate( 'NewCategory', { categoryId, isEdit: true } );
-	// }
-}
-
-export const SettingsCategoriesScreen = connect(
-	mapStateToProps,
-	mapDispatchToProps
-)( SCategoriesScreen );
-
 class ECategoriesScreen extends CategoriesScreen {
 	static navigationOptions = ( { navigation } ) => {
-		const showSearch = navigation.getParam( 'showSearch' );
-		const changeTitle = navigation.getParam( 'changeTitle' );
+		const navMode = navigation.getParam( 'navMode' );
+		const backButtonName = navMode === 'modal' ? 'Close' : 'Back';
+
 		return ( {
-			title: showSearch ? 'New Title' : 'Alternate Title',
+			title: 'Edit Categories',
 			headerRight: (
 				<Button
-					onPress={ changeTitle }
-					title="changeTitle"
+					onPress={ () => navigation.navigate( 'NewCategory', { parentId: null } ) }
+					title="Add"
 				/>
 			),
 			headerLeft: (
 				<Button
 					onPress={ () => navigation.goBack( null ) }
-					title="Close"
+					title={ backButtonName }
 				/>
 			),
 		} );
@@ -88,16 +86,6 @@ class ECategoriesScreen extends CategoriesScreen {
 		this.props.navigation.setParams(
 			{ changeTitle: this.changeTitle, showSearch: this.state.showSearch }
 		);
-	}
-
-	changeTitle = () => {
-		const { showSearch } = this.state;
-		const newValue = ! showSearch;
-		this.setState( { showSearch: newValue } );
-		// Assuming you have access to the navigation props
-		this.props.navigation.setParams( {
-			showSearch: newValue,
-		} );
 	}
 
 	selectItem = ( categoryId ) => {
