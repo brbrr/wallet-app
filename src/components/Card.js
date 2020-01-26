@@ -2,31 +2,43 @@
  * External dependencies
  */
 import React from 'react';
-import { View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { Card as _Card } from 'react-native-elements';
 
-const Card = ( props ) => {
-	return (
-		<View style={ styles.containerStyle }>
-			{ props.children }
-		</View>
-	);
-};
+const Card = ( { title, containerStyle, titleStyle, dividerStyle, children } ) => (
+	<_Card
+		title={ title }
+		containerStyle={ Object.assign( {}, styles.containerStyle, containerStyle ) }
+		titleStyle={ Object.assign( {}, styles.titleStyle, titleStyle ) }
+		dividerStyle={ Object.assign( {}, styles.dividerStyle, dividerStyle ) }
+	>
+		{ children }
+	</_Card>
+);
 
-const styles = {
+const styles = StyleSheet.create( {
 	containerStyle: {
-		borderWidth: 1,
-		borderRadius: 2,
-		borderColor: '#ddd',
-		borderBottomWidth: 0,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
-		elevation: 1,
-		marginLeft: 5,
-		marginRight: 5,
-		marginTop: 10,
-	},
-};
+		borderWidth: 0,
+		shadowOpacity: 0,
+		padding: 0,
+		margin: 0,
+		marginTop: 40,
+		backgroundColor: 'transparent',
 
-export { Card };
+	},
+	titleStyle: {
+		borderWidth: 0,
+		marginBottom: 10,
+		margin: 1,
+		fontSize: 12,
+		textAlign: 'left',
+		marginLeft: 18,
+	},
+	dividerStyle: {
+		flex: 1,
+		marginBottom: 0,
+		borderWidth: 0,
+	},
+} );
+
+export default Card;
