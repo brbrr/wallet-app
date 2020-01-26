@@ -12,7 +12,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { addNewCategory, updateCategory } from '../../actions/categories';
 import { getCategoryById } from '../../selectors';
 import NewCategory from '../../components/NewCategory';
-class NewCategoryScreen extends React.Component {
+
+export class NewCategoryScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
 		const isEdit = navigation.getParam( 'isEdit' );
 		const saveAndGoBack = navigation.getParam( 'saveAndGoBack' );
