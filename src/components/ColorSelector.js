@@ -26,7 +26,7 @@ const ColorSelector = ( { navigation } ) => {
 	const onStateChange = navigation.getParam( 'onStateChange' );
 	const updateAndGoBack = ( colorCode ) => {
 		onStateChange( { colorCode } );
-		navigation.goBack();
+		navigation.pop();
 	};
 
 	let allColors = colors.reduce( ( resultArray, colorCode, index ) => {

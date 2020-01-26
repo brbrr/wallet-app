@@ -64,7 +64,7 @@ const NewCategory = ( { navigate, onStateChange, name, colorCode, iconName } ) =
 export default NewCategory;
 
 const styles = StyleSheet.create( {
-	container: { backgroundColor: '#f9f9f9', flex: 1 },
+	container: { backgroundColor: '#f9f9f9' },
 	iconContainer: {
 		marginTop: 20,
 		marginBottom: 20,

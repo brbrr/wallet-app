@@ -16,15 +16,14 @@ export default class ItemsList extends React.Component {
 
 	renderItem = ( { item } ) => {
 		const { selectItem, nameValue } = this.props;
+		const icon = getIconConfiguration( item, { size: 20 } );
 
 		return (
-			<ListItem
-				containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55, marginTop: item.id === 0 ? 20 : 0 } }
+			<Item
 				title={ item[ nameValue ] }
-				bottomDivider={ true }
-				topDivider={ true }
-				leftIcon={ getIconConfiguration( item, { size: 20 } ) }
-				onPress={ () => selectItem( item.id ) }
+				selectItem={ selectItem }
+				icon={ icon }
+				id={ item.id }
 			/>
 		);
 	}
@@ -35,7 +34,7 @@ export default class ItemsList extends React.Component {
 		const { items } = this.props;
 
 		return (
-			<View style={ { backgroundColor: '#f9f9f9', flex: 1, paddingTop: 20 } }>
+			<View>
 				<FlatList
 					keyExtractor={ this.keyExtractor }
 					data={ items }
@@ -45,3 +44,16 @@ export default class ItemsList extends React.Component {
 		);
 	}
 }
+
+export const Item = ( { id, icon, title, selectItem } ) => {
+	return (
+		<ListItem
+			containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55 } }
+			title={ title }
+			bottomDivider={ true }
+			topDivider={ true }
+			leftIcon={ icon }
+			onPress={ () => selectItem( id ) }
+		/>
+	);
+};
