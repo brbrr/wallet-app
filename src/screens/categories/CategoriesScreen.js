@@ -42,7 +42,7 @@ class CategoriesScreen extends React.Component {
 		return (
 			<View style={ { flex: 1, backgroundColor: '#f9f9f9' } }>
 				<Card title="ALL CATEGORIES" containerStyle={ { marginTop: 20 } }>
-					<ItemsList items={ parentCategories } selectItem={ this.selectItem } />
+					<ItemsList items={ parentCategories } selectItem={ this.selectItem } itemProps={ { chevron: true } } />
 				</Card>
 			</View>
 		);

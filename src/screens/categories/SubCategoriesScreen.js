@@ -57,7 +57,7 @@ class SubCategoriesScreen extends React.Component {
 					<Item id={ parentCategory.id } title={ 'General - ' + parentCategory.name } icon={ icon } selectItem={ this.selectItem } />
 				</Card>
 				<Card title="SUBCATEGORIES" >
-					<ItemsList items={ categories } selectItem={ this.selectItem } />
+					<ItemsList items={ categories } selectItem={ this.selectItem } itemProps={ { chevron: true } } />
 				</Card>
 			</View>
 		);

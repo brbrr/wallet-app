@@ -15,7 +15,7 @@ export default class ItemsList extends React.Component {
 	}
 
 	renderItem = ( { item } ) => {
-		const { selectItem, nameValue } = this.props;
+		const { selectItem, nameValue, itemProps } = this.props;
 		const icon = getIconConfiguration( item, { size: 20 } );
 
 		return (
@@ -24,6 +24,7 @@ export default class ItemsList extends React.Component {
 				selectItem={ selectItem }
 				icon={ icon }
 				id={ item.id }
+				{ ...itemProps }
 			/>
 		);
 	}
@@ -45,7 +46,7 @@ export default class ItemsList extends React.Component {
 	}
 }
 
-export const Item = ( { id, icon, title, selectItem } ) => {
+export const Item = ( { id, icon, title, selectItem, ...props } ) => {
 	return (
 		<ListItem
 			containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55 } }
@@ -54,6 +55,7 @@ export const Item = ( { id, icon, title, selectItem } ) => {
 			topDivider={ true }
 			leftIcon={ icon }
 			onPress={ () => selectItem( id ) }
+			{ ...props }
 		/>
 	);
 };
