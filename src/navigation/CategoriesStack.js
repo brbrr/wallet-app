@@ -29,7 +29,7 @@ export const EditSubCategoriesStack = createStackNavigator( {
 
 export const EditCategoriesStack = createStackNavigator( {
 	EditCategories: { screen: EditCategoriesScreen },
-	EditSubCategories: { screen: EditSubCategoriesStack },
+	EditSubCategoriesStack: { screen: EditSubCategoriesStack },
 } );
 
 export const ViewCategoriesStack = createStackNavigator( {

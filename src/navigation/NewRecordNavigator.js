@@ -15,8 +15,8 @@ import { EditCategoriesStack, ViewCategoriesStack, EditSubCategoriesStack } from
 
 export const CategoriesListStack = createStackNavigator( {
 	ViewCategories: ViewCategoriesStack,
-	EditCategories: { screen: EditCategoriesStack, navigationOptions: { header: null, navMode: 'modal' } },
-	EditSubCategories: { screen: EditSubCategoriesStack, navigationOptions: { header: null, navMode: 'modal' } },
+	EditCategoriesStack: { screen: EditCategoriesStack, navigationOptions: { header: null, navMode: 'modal' } },
+	EditSubCategoriesStack: { screen: EditSubCategoriesStack, navigationOptions: { header: null, navMode: 'modal' } },
 }, {
 	mode: 'modal',
 	headerMode: 'none',

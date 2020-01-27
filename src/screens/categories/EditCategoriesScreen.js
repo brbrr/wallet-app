@@ -2,19 +2,20 @@
  * External dependencies
  */
 import React from 'react';
-import { Button } from 'react-native';
+import { Button, View } from 'react-native';
 import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { getCategoryById } from '../../selectors';
-import CategoriesScreen from './CategoriesScreen';
+import { getParentCategories, getCategoryById } from '../../selectors';
+import ItemsList from '../../components/ItemsList';
+import Card from '../../components/Card';
 
 const mapStateToProps = ( { categories } ) => ( { categories } );
 
 const mapDispatchToProps = () => ( {} );
 
-class ECategoriesScreen extends CategoriesScreen {
+class EditCategoriesScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => {
 		const navMode = navigation.getParam( 'navMode' );
 		const backButtonName = navMode === 'modal' ? 'Close' : 'Back';
@@ -51,9 +52,21 @@ class ECategoriesScreen extends CategoriesScreen {
 
 		navigation.navigate( 'EditSubCategories', { categoryId, category, onStateChange } );
 	}
+
+	render() {
+		const parentCategories = getParentCategories( this.props );
+
+		return (
+			<View style={ { flex: 1, backgroundColor: '#f9f9f9' } }>
+				<Card title="ALL CATEGORIES" containerStyle={ { marginTop: 20 } }>
+					<ItemsList items={ parentCategories } selectItem={ this.selectItem } itemProps={ { chevron: true } } />
+				</Card>
+			</View>
+		);
+	}
 }
 
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)( ECategoriesScreen );
+)( EditCategoriesScreen );

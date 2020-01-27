@@ -50,6 +50,7 @@ class EditSubCategoriesScreen extends React.Component {
 		this.state = Object.assign( {}, this.state, category );
 	}
 	onStateChange = ( state ) => this.setState( state );
+
 	getCategoryFromState() {
 		const { name, colorCode, iconName, id, parentId } = this.state;
 		const category = {
@@ -66,6 +67,7 @@ class EditSubCategoriesScreen extends React.Component {
 		const category = this.getCategoryFromState();
 		_updateCategory( category );
 	};
+
 	render() {
 		const { navigation } = this.props;
 		const categoryId = navigation.getParam( 'categoryId' );
