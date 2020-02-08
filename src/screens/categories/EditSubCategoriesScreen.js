@@ -70,9 +70,9 @@ class EditSubCategoriesScreen extends React.Component {
 
 	render() {
 		const { navigation } = this.props;
-		const categoryId = navigation.getParam( 'categoryId' );
+		// const categoryId = navigation.getParam( 'categoryId' );
 		const { name, colorCode, iconName } = this.state;
-		const categories = getCategoriesByParentId( this.props, categoryId );
+		const categories = getCategoriesByParentId( this.props, this.props );
 		return ( <View style={ { flex: 1, backgroundColor: '#f9f9f9' } }>
 			<Card containerStyle={ { marginTop: 20 } }>
 				<NewCategory navigate={ navigation.navigate } name={ name } colorCode={ colorCode } iconName={ iconName } onStateChange={ this.onStateChange } />

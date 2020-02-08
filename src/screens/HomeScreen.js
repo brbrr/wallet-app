@@ -12,6 +12,7 @@ import { RecordsList } from '../components/records/RecordsList';
 import Overview from '../components/Overview';
 import Swiper from 'react-native-swiper';
 import { logComponentUpdates } from '../utils/debug-utils';
+import { getAccountsListById, getRecordsListById } from '../selectors';
 
 class HomeScreen extends React.Component {
 	static navigationOptions = {
@@ -46,11 +47,11 @@ class HomeScreen extends React.Component {
 	}
 
 	renderRecordsLists() {
-		const { records, accounts } = this.props;
-		const recordsArray = Object.values( records.byId );
+		const recordsArray = getRecordsListById( this.props );
 		const recordsLists = [ this.recordList( 0, recordsArray ) ];
 
-		Object.values( accounts.byId ).forEach( ( account, id ) => {
+		// Object.values( accounts.byId );
+		getAccountsListById( this.props ).forEach( ( account, id ) => {
 			if ( account.id === -99 ) {
 				return;
 			}

@@ -71,7 +71,7 @@ class NewRecordModal extends React.Component {
 
 		props.navigation.setParams(
 			{
-				saveRecordAndGoBack: this.saveRecordAndGoBack.bind( this ),
+				saveRecordAndGoBack: this.saveRecordAndGoBack,
 				isEdit,
 			}
 		);
@@ -123,7 +123,7 @@ class NewRecordModal extends React.Component {
 		return record;
 	}
 
-	saveRecordAndGoBack() {
+	saveRecordAndGoBack = () => {
 		const { isEdit } = this.state;
 		const { _insertRecordAndUpdateAccounts, navigation } = this.props;
 		const record = this.getRecordFromState();
@@ -237,7 +237,7 @@ class NewRecordModal extends React.Component {
 	}
 
 	render() {
-		console.log( '!!!!!!!! NewRecordModal screen render', this.onStateChange );
+		console.log( '!!!!!!!! NewRecordModal screen render' );
 
 		const { description, categoryId, typeId, isEdit, createdAt } = this.state;
 		const { navigation } = this.props;

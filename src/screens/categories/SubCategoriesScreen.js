@@ -46,7 +46,7 @@ class SubCategoriesScreen extends React.Component {
 
 	render() {
 		const categoryId = this.props.navigation.getParam( 'categoryId' );
-		const categories = getCategoriesByParentId( this.props, categoryId );
+		const categories = getCategoriesByParentId( this.props, this.props );
 		const parentCategory = getCategoryById( this.props, categoryId );
 
 		const icon = getIconConfiguration( parentCategory, { size: 20 } );

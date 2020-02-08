@@ -32,6 +32,7 @@ export default class ChartDataManipulator {
 		const accDirectives = this.getAccountDirectives( directives, id );
 		const allAccDirectives = this.fillInMissingDirectives( id, accDirectives, 'day' );
 		// this should be done in runtime, can't be stored in redux
+		// why?
 		return this.transformAccountDirectives( allAccDirectives );
 	}
 
@@ -50,7 +51,16 @@ export default class ChartDataManipulator {
 		} );
 	};
 
-	// This could be stored in Redux
+	/**
+	 * Generate a list of directives with backfilled entries
+	 * This could be stored in Redux
+	 *
+	 * @param {number} id account Id
+	 * @param {Array} directives list of actual directives
+	 * @param {string} dateType date type: day, month, year
+	 * @param {Moment} toDate until what date list needs to be backfilled
+	 * @return {Array} list of directives
+	 */
 	fillInMissingDirectives = ( id, directives, dateType, toDate = moment() ) => {
 		const firstSnapshot = directives[ 0 ];
 
@@ -84,7 +94,8 @@ export default class ChartDataManipulator {
 				if ( snapshot ) {
 					result.push( snapshot );
 				} else {
-					result.push( Object.assign( {}, prevEntry, { statDate: date, updateValue: 0, backfilled: prevEntry.statDate } ) );
+					const record = Object.assign( {}, prevEntry, { statDate: date, updateValue: 0, backfilled: prevEntry.statDate } );
+					result.push( record );
 					count += 1;
 				}
 			}
