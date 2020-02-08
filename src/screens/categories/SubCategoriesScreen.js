@@ -23,7 +23,7 @@ class SubCategoriesScreen extends React.Component {
 			title,
 			headerRight: (
 				<Button
-					onPress={ () => navigation.navigate( 'EditSubCategories', { categoryId: category.id, category, onStateChange, navMode: 'modal' } ) }
+					onPress={ () => navigation.navigate( 'EditSubCategoriesStack', { categoryId: category.id, category, onStateChange, navMode: 'modal' } ) }
 					title="Edit"
 				/>
 			),
