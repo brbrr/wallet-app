@@ -255,3 +255,9 @@ export function hydrateRecords( dispatch ) {
 	// const record = Object.values( records );
 	// dispatch( insertRecordAndUpdateAccounts( addNewRecord, record[ 0 ] ) );
 }
+
+export function hydrateState( dispatch ) {
+	hydrateAccounts( dispatch );
+	hydrateCurrencies( dispatch );
+	hydrateRecords( dispatch );
+}

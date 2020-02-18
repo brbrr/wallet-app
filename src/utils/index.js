@@ -97,6 +97,13 @@ export function convertAmount( amount, { from = 'USD', to = 'EUR' } = {} ) {
 	fx.base = data.base;
 	fx.rates = data.rates;
 
+	// Hacky way to save some computation cycles
+	// Ideally, this function should be a private API, and its usage should be replaced with something like:
+	// getAmountInCurrency( amnt, originCurr, destCurr )
+	if ( from === to ) {
+		return amount;
+	}
+
 	const convertedAmount = fx.convert( amount, { from, to } );
 	console.log( `Converting ${ amount } ${ from }, to: ${ to }: ${ convertedAmount }` );
 	return convertedAmount;

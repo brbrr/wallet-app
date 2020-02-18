@@ -46,12 +46,12 @@ export default class AccountListRow extends Component {
 		};
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( this.props.active !== nextProps.active ) {
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.active !== this.props.active ) {
 			Animated.timing( this._active, {
 				duration: 100,
 				easing: Easing.bounce,
-				toValue: Number( nextProps.active ),
+				toValue: Number( this.props.active ),
 			} ).start();
 		}
 	}

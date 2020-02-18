@@ -6,9 +6,11 @@
  * External dependencies
  */
 import React, { Component } from 'react';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 import {
-	DatePickerAndroid,
-	DatePickerIOS,
+	// DatePickerAndroid,
+	// DatePickerIOS,
 	Platform,
 	Text,
 	TouchableOpacity,
@@ -113,12 +115,13 @@ class DatePicker extends Component {
 
 			if ( isAndroid ) {
 				try {
-					const { action, year, month, day } = await DatePickerAndroid.open( {
+					const { action, year, month, day } = await DateTimePicker.open( {
 						date: date || startDate,
+						value: date || startDate,
 					} );
 
 					const newDate = new Date( year, month, day );
-					if ( action !== DatePickerAndroid.dismissedAction ) {
+					if ( action !== DateTimePicker.dismissedAction ) {
 						this.setState( () => ( { newDate, startDate: date } ) );
 						this.props.onDateChanged( this.getDateObj() );
 					}
@@ -151,7 +154,7 @@ class DatePicker extends Component {
 			);
 		}
 
-		handleDateChange = ( date ) => this.setState( { date, startDate: date } )
+		handleDateChange = ( event, date ) => this.setState( { date, startDate: date } )
 
 		render() {
 			const { showIOSModal, date } = this.state;
@@ -187,10 +190,11 @@ class DatePicker extends Component {
 										onPress={ this.handleModalClose }
 									/>
 								</View>
-								<DatePickerIOS
+								<DateTimePicker
 									mode="date"
 									date={ date || startDate }
-									onDateChange={ this.handleDateChange }
+									value={ date || startDate }
+									onChange={ this.handleDateChange }
 									maximumDate={ maxDate }
 									minimumDate={ minDate }
 									{ ...props }
