@@ -71,7 +71,7 @@ class NewRecordModal extends React.Component {
 
 		props.navigation.setParams(
 			{
-				saveRecordAndGoBack: this.saveRecordAndGoBack.bind( this ),
+				saveRecordAndGoBack: this.saveRecordAndGoBack,
 				isEdit,
 			}
 		);
@@ -123,20 +123,24 @@ class NewRecordModal extends React.Component {
 		return record;
 	}
 
-	saveRecordAndGoBack() {
+	saveRecordAndGoBack = () => {
 		const { isEdit } = this.state;
 		const { _insertRecordAndUpdateAccounts, navigation } = this.props;
 		const record = this.getRecordFromState();
+		console.log( 'saveRecordAndGoBack 1', Date.now() );
 
 		// Sanitize record object! e.g. amount value
 		let recordAction = addNewRecord;
 		if ( isEdit ) {
 			recordAction = updateRecord;
 		}
+		console.log( 'saveRecordAndGoBack 2', Date.now() );
 
 		_insertRecordAndUpdateAccounts( recordAction, record );
+		console.log( 'saveRecordAndGoBack 3', Date.now() );
 
 		navigation.navigate( 'Main' );
+		console.log( 'saveRecordAndGoBack 4', Date.now() );
 	}
 
 	/**

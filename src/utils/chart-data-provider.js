@@ -45,6 +45,7 @@ export default class ChartDataProvider {
 		const ids = getAccountIds( this.state );
 		const fullTrend = manipulator.doStuff( ids, fromDate );
 
+		// Prepare data for chart visualization
 		return Object.entries( fullTrend )
 			.sort( ( a, b ) => Date.parse( a[ 0 ] ) - Date.parse( b[ 0 ] ) )
 			.map( ( [ date, entry ] ) => ( {
