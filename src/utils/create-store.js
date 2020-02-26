@@ -13,7 +13,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import rootReducer from '../reducers';
 import { hydrateAccounts, hydrateCurrencies, hydrateRecords, hydrateState } from './state-hydrator';
 import { snapshotCalculator } from './stats-middleware';
-import state from './dummy-state';
+// import state from './dummy-state';
 
 const persistConfig = {
 	key: 'root',
@@ -27,10 +27,12 @@ export default () => {
 	const store = createStore(
 		persistedReducer,
 		// rootReducer,
-		state,
+		// state,
 		composeWithDevTools( applyMiddleware( thunk, snapshotCalculator ) )
 		// composeWithDevTools( applyMiddleware( thunk, dateUpdater, statsEntriesBackfiller ) )
 	);
+	// store.dispatch( { type: 'PURGE_DATA' } );
+
 	const persistor = persistStore( store );
 
 	// const persistor = persistStore( store, { manualPersist: true } );
