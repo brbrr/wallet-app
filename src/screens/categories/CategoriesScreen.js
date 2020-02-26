@@ -4,12 +4,11 @@
 import React from 'react';
 import { Button, View } from 'react-native';
 import { connect } from 'react-redux';
-import { Icon } from 'react-native-elements';
 /**
  * Internal dependencies
  */
-import { getParentCategories, getCategoryById, getRecordsListById, getCategoriesStats } from '../../selectors';
-import ItemsList, { Item } from '../../components/ItemsList';
+import { getParentCategories, getCategoryById } from '../../selectors';
+import ItemsList from '../../components/ItemsList';
 import Card from '../../components/Card';
 import LatestCategories from '../../components/categories/LatestCategories';
 
