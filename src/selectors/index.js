@@ -39,3 +39,19 @@ export const getRecordsById = createSelector( getRecords, ( r ) => r.byId );
 export const getRecordsListById = createSelector( getRecordsById, ( r ) => Object.values( r ) );
 export const getRecordById = ( state, recordId ) => getRecordsById( state )[ recordId ];
 export const getRecordsByAccount = ( state, recordId ) => getRecordsById( state ).filter( ( r ) => r.id === recordId );
+
+export const getCategoriesStats = createSelector( getRecordsListById, ( recordsList ) => (
+	recordsList.reduce( ( acc, rec ) => {
+		const catId = rec.categoryId;
+
+		if ( ! catId ) {
+			return acc;
+		}
+
+		if ( ! acc[ catId ] ) {
+			acc[ catId ] = { id: catId, count: 0 };
+		}
+		acc[ catId ] = { ...acc[ catId ], count: acc[ catId ].count + 1 };
+		return acc;
+	}, {} )
+) );
