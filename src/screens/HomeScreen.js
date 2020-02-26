@@ -4,13 +4,13 @@
 import React from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
+import Swiper from 'react-native-swiper';
 
 /**
  * Internal dependencies
  */
 import { RecordsList } from '../components/records/RecordsList';
 import Overview from '../components/Overview';
-import Swiper from 'react-native-swiper';
 import { logComponentUpdates } from '../utils/debug-utils';
 import { getAccountsListById, getRecordsListById } from '../selectors';
 

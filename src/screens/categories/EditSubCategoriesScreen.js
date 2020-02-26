@@ -29,8 +29,9 @@ class EditSubCategoriesScreen extends React.Component {
 	selectItem = ( categoryId ) => {
 		const { navigation } = this.props;
 		const parentId = navigation.getParam( 'categoryId' );
-		const onStateChange = navigation.getParam( 'onStateChange' );
-		navigation.navigate( 'NewCategory', { categoryId, parentId, onStateChange, isEdit: true } );
+		// const onStateChange = navigation.getParam( 'onStateChange' );
+		// navigation.navigate( 'NewCategory', { categoryId, parentId, onStateChange, isEdit: true } );
+		navigation.navigate( 'NewCategory', { categoryId, parentId, isEdit: true } );
 	};
 	// TODO: Same methods as in NewCategoryScreen.
 	// We need these to be able to trigger save from within screen header as well via button on the screen
