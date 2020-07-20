@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { createAppContainer, createStackNavigator } from 'react-navigation';
+import { createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
 
 /**
  * Internal dependencies

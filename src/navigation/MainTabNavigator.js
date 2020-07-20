@@ -3,7 +3,8 @@
  */
 import React from 'react';
 import { Platform, View } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { createStackNavigator } from 'react-navigation-stack';
 
 /**
  * Internal dependencies
