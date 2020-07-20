@@ -148,7 +148,7 @@ export const recordsInitialState = {
 
 };
 
-export default function records( state = recordsInitialState, action ) {
+export default function records( state = initialState2, action ) {
 	switch ( action.type ) {
 		case ADD_NEW_RECORD:
 			return addNewItem( action.record, state );

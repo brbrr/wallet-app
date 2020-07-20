@@ -11,7 +11,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
  * Internal dependencies
  */
 import rootReducer from '../reducers';
-import { hydrateAccounts, hydrateCurrencies, hydrateRecords, hydrateState } from './state-hydrator';
+import { hydrateState } from './state-hydrator';
 import { snapshotCalculator } from './stats-middleware';
 // import state from './dummy-state';
 
@@ -33,15 +33,22 @@ export default () => {
 	);
 	// store.dispatch( { type: 'PURGE_DATA' } );
 
-	const persistor = persistStore( store );
+	// const persistor = persistStore( store );
+	// persistor.purge();
+	// persistor.flush();
 
-	// const persistor = persistStore( store, { manualPersist: true } );
+	const persistor = persistStore( store, { manualPersist: true } );
+	// persistor.purge();
+	// persistor.flush();
 	// hydrateState( store.dispatch );
 
-	// persistor.persist();
+	persistor.persist();
+	// persistor.purge();
+	// persistor.flush();
+
 	// const persistor = persistStore( store );
 
 	// persistor.flush();
-	persistor.purge();
+	// persistor.purge();
 	return { store, persistor };
 };

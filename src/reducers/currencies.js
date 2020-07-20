@@ -25,7 +25,12 @@ export const currenciesInitialState = {
 	allIds: [ 0, 1, 2 ],
 };
 
-export default function currencies( state = currenciesInitialState, action ) {
+const initState = {
+	byId: {},
+	allIds: [],
+};
+
+export default function currencies( state = initState, action ) {
 	switch ( action.type ) {
 		case ADD_NEW_CURRENCY:
 			return addNewItem( action.currency, state );

@@ -36,6 +36,23 @@ export const accountsInitialState = {
 			createdAt: 1546300800000,
 			updatedAt: 1546300800000,
 		},
+		// '-99': {
+		// 	id: -99,
+		// 	balance: 0,
+		// 	name: 'Out of wallet',
+		// 	currencyId: 2,
+		// 	colorCode: 'pink',
+		// 	iconName: 'bank',
+		// 	hidden: true,
+		// 	isServiceAccount: true,
+		// },
+	},
+	allIds: [ 0, 1, 2 ],
+	serviceAccountId: -99,
+};
+
+const initState = {
+	byId: {
 		'-99': {
 			id: -99,
 			balance: 0,
@@ -47,11 +64,11 @@ export const accountsInitialState = {
 			isServiceAccount: true,
 		},
 	},
-	allIds: [ 0, 1, 2 ],
+	allIds: [],
 	serviceAccountId: -99,
 };
 
-export default function accounts( state = accountsInitialState, action ) {
+export default function accounts( state = initState, action ) {
 	const { account, type } = action;
 	switch ( type ) {
 		case ADD_NEW_ACCOUNT:
