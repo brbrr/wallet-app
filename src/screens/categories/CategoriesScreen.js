@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import { getParentCategories, getCategoryById } from '../../selectors';
 import ItemsList from '../../components/ItemsList';
 import Card from '../../components/Card';
-import LatestCategories from '../../components/categories/LatestCategories';
+import LatestCategoriesCard from '../../components/categories/LatestCategoriesCard';
 
 class CategoriesScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
@@ -51,7 +51,7 @@ class CategoriesScreen extends React.Component {
 
 		return (
 			<View style={ { backgroundColor: '#f9f9f9' } }>
-				<LatestCategories
+				<LatestCategoriesCard
 					selectItem={ this.selectCategory }
 					categories={ this.props.categories }
 					records={ this.props.records }

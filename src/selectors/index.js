@@ -35,11 +35,14 @@ export const getCategoriesByParentId = createSelector( [ getCategoriesById, getC
 export const getParentCategories = ( state ) => getCategoriesByParentId( state, null );
 
 export const getRecords = ( state ) => state.records;
+export const getRecordById = ( state, recordId ) => getRecordsById( state )[ recordId ];
 export const getRecordsById = createSelector( getRecords, ( r ) => r.byId );
 export const getRecordsListById = createSelector( getRecordsById, ( r ) => Object.values( r ) );
-export const getRecordById = ( state, recordId ) => getRecordsById( state )[ recordId ];
 export const getRecordsByAccount = ( state, recordId ) => getRecordsById( state ).filter( ( r ) => r.id === recordId );
 
+/**
+ * generates a map indexed by categoryId with records count with specific category
+ */
 export const getCategoriesStats = createSelector( getRecordsListById, ( recordsList ) => (
 	recordsList.reduce( ( acc, rec ) => {
 		const catId = rec.categoryId;

@@ -2,8 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { View } from 'react-native';
 import Swiper from 'react-native-swiper';
 
 /**
@@ -11,36 +10,9 @@ import Swiper from 'react-native-swiper';
  */
 import Card from '../Card';
 import { getCategoriesStats, getCategoryById } from '../../selectors';
+import LatestCategoryIcon from './LatestCategoryIcon';
 
-const IconBox = ( category, selectItem, id = null ) =>
-	<TouchableOpacity
-		key={ id }
-		onPress={ () => selectItem( category.id ) }
-		style={
-			{ width: 60, height: 60, flex: 1, flexDirection: 'column', alignItems: 'center' }
-		}
-	>
-		<View>
-			<Icon
-				name={ category.iconName }
-				type={ 'font-awesome' }
-				size={ 16 }
-				reverse
-				reverseColor={ 'white' }
-				color={ category.colorCode }
-				containerStyle={ { margin: -2 } }
-			/>
-			<Text
-				style={ { fontSize: 13, textAlign: 'center' } }
-				numberOfLines={ 1 }
-				ellipsizeMode="tail"
-			>
-				{ category.name }
-			</Text>
-		</View>
-	</TouchableOpacity>;
-
-const LatestCategories = ( props ) => {
+export default ( props ) => {
 	const { selectItem } = props;
 
 	const catStats = getCategoriesStats( props );
@@ -55,10 +27,11 @@ const LatestCategories = ( props ) => {
 		// take first 8 elements
 		.slice( 0, 8 )
 		// split into arrays of four elements
+		// TODO: extract into a method
 		.reduce( ( acc, cat, id ) => {
 			const latestGroup = acc[ acc.length - 1 ];
 			const category = getCategoryById( props, cat.id );
-			const item = IconBox( category, selectItem, id );
+			const item = LatestCategoryIcon( category, selectItem, id );
 
 			if ( latestGroup.length < 4 ) {
 				acc[ acc.length - 1 ].push( item );
@@ -68,7 +41,7 @@ const LatestCategories = ( props ) => {
 
 			return acc;
 		}, [ [] ] )
-		// wrap in styled View
+		// wrapping in styled View
 		.map( ( icons, id ) => (
 			<View
 				style={ { flex: 1, flexDirection: 'row', marginHorizontal: 40, marginTop: 10 } }
@@ -95,5 +68,3 @@ const LatestCategories = ( props ) => {
 		</Card>
 	);
 };
-
-export default LatestCategories;
