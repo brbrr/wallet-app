@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList } from 'react-native';
 import { ListItem } from 'react-native-elements';
 /**
  * Internal dependencies
@@ -32,16 +32,15 @@ export default class ItemsList extends React.Component {
 	keyExtractor = ( item ) => item.id.toString()
 
 	render() {
-		const { items } = this.props;
+		const { items, style } = this.props;
 
 		return (
-			<View>
-				<FlatList
-					keyExtractor={ this.keyExtractor }
-					data={ items }
-					renderItem={ this.renderItem }
-				/>
-			</View>
+			<FlatList
+				keyExtractor={ this.keyExtractor }
+				data={ items }
+				renderItem={ this.renderItem }
+				style={ style }
+			/>
 		);
 	}
 }

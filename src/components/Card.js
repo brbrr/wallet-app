@@ -24,7 +24,6 @@ const styles = StyleSheet.create( {
 		margin: 0,
 		marginTop: 40,
 		backgroundColor: 'transparent',
-
 	},
 	titleStyle: {
 		borderWidth: 0,

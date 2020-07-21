@@ -4,33 +4,33 @@
 import { ADD_NEW_CURRENCY } from '../actions';
 import { addNewItem } from '../utils/reducerHelper';
 
-const initialState2 = {
+export const currenciesInitialState = {
 	byId: {
-		1: {
+		0: {
+			id: 0,
 			code: 'USD',
 			name: 'United States Dollar',
-			id: 1,
 		},
-		2: {
+		1: {
+			id: 1,
 			code: 'UAH',
 			name: 'Ukrainian Hryvnia',
-			id: 2,
 		},
-		3: {
+		2: {
+			id: 2,
 			code: 'EUR',
 			name: 'Euro',
-			id: 3,
 		},
 	},
-	allIds: [ 1, 2, 3 ],
+	allIds: [ 0, 1, 2 ],
 };
 
-const initialState = {
+const initState = {
 	byId: {},
 	allIds: [],
 };
 
-export default function currencies( state = initialState, action ) {
+export default function currencies( state = initState, action ) {
 	switch ( action.type ) {
 		case ADD_NEW_CURRENCY:
 			return addNewItem( action.currency, state );

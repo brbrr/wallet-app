@@ -9,7 +9,7 @@ import * as Font from 'expo-font';
 import * as Icon from '@expo/vector-icons';
 import { Provider } from 'react-redux';
 // Before rendering any navigation stack
-import { useScreens } from 'react-native-screens';
+// import { useScreens } from 'react-native-screens';
 import { PersistGate } from 'redux-persist/integration/react';
 
 /**
@@ -19,7 +19,7 @@ import AppNavigator from './src/navigation/AppNavigator';
 import getStore from './src/utils/create-store';
 import { hydrateState } from './src/utils/state-hydrator';
 
-useScreens();
+// useScreens();
 
 const { persistor, store } = getStore();
 
