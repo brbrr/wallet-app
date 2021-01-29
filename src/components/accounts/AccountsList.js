@@ -13,9 +13,12 @@ import AccountListRow from './AccountListRow';
 
 const AccountsList = ( { accounts, accountOrder, onChangeOrder, onReorderToggle, isReorderEnabled, onListRowPress, enableReorder } ) => {
 	console.log( '!!!! AccountsList screen' );
-	if ( Object.keys( accounts ).length === 0 ) {
+	// default service account is already there.
+	if ( Object.keys( accounts ).length === 1 ) {
 		return (
-			<Text>{ 'No accounts yet.' }</Text>
+			<View style={ styles.container }>
+				<Text>{ 'No accounts yet.' }</Text>
+			</View>
 		);
 	}
 	return (

@@ -17,10 +17,21 @@ import CurrencyScreen from '../screens/CurrencyScreen';
 import { NewCurrencyStack } from './CurrenciesNavigator';
 import { SettingsAccountsScreen } from '../screens/settings/SettingsAccountsScreen';
 import { SettingsDebugScreen } from '../screens/settings/Debug';
+import { SettingsNewAccountsScreen } from '../screens/NewAccountScreen';
+import IconSelector from '../components/IconSelector';
+import ColorSelector from '../components/ColorSelector';
+
+const SettingsNewAccountStack = createStackNavigator( {
+	SettingsNewAccount: { screen: SettingsNewAccountsScreen },
+	IconSelector: { screen: IconSelector },
+	ColorSelector: { screen: ColorSelector },
+}, {
+	navigationOptions: { header: null },
+} );
 
 const SettingsAccountsStack = createStackNavigator( {
 	SettingsAccountsList: { screen: SettingsAccountsScreen },
-	NewAccount: NewAccountStack,
+	SettingsNewAccountStack,
 } );
 
 const SettingsCurrenciesStack = createStackNavigator( {

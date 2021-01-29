@@ -2,27 +2,15 @@
  * External dependencies
  */
 import React from 'react';
-import { Button, StyleSheet, ScrollView, Platform } from 'react-native';
+import { StyleSheet, ScrollView, Platform, View, Text } from 'react-native';
 import { connect } from 'react-redux';
-// import { ListItem, SearchBar } from 'react-native-elements';
-
 /**
  * Internal dependencies
  */
-import { addNewCurrency } from '../actions';
-import CurrencyList from '../components/currencies/CurrenciesList';
+import { addNewCurrency } from '../../actions';
+import CurrencyList from '../../components/currencies/CurrenciesList';
 
-class NewCurrencyScreen extends React.Component {
-	static navigationOptions = ( { navigation } ) => ( {
-		title: 'New Currency',
-		headerLeft: (
-			<Button
-				onPress={ () => navigation.goBack( null ) }
-				title="Back"
-			/>
-		),
-	} );
-
+class SelectCurrencyScreen extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.state = {
@@ -39,17 +27,22 @@ class NewCurrencyScreen extends React.Component {
 	addNewCurrencyAndGoBack = ( code, name ) => {
 		const { navigation, _addNewCurrency } = this.props;
 		_addNewCurrency( { code, name } );
-		navigation.goBack( null );
+		navigation.navigate( 'AddAccount' );
 	}
 
 	render() {
 		return (
-			<CurrencyList
-				searchTerm={ this.state.searchTerm }
-				currencies={ this.props.currencies }
-				updateSearch={ this.updateSearch }
-				noCurrencyPress={ this.addNewCurrencyAndGoBack }
-			/>
+			<View style={ { flex: 1 } }>
+				<View style={ { height: 60, marginTop: 20 } }>
+					<Text>Select your default currency</Text>
+				</View>
+				<CurrencyList
+					searchTerm={ this.state.searchTerm }
+					currencies={ this.props.currencies }
+					updateSearch={ this.updateSearch }
+					noCurrencyPress={ this.addNewCurrencyAndGoBack }
+				/>
+			</View>
 		);
 	}
 }
@@ -64,4 +57,4 @@ const mapDispatchToProps = ( dispatch ) => {
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)( NewCurrencyScreen );
+)( SelectCurrencyScreen );

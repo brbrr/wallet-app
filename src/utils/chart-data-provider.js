@@ -22,21 +22,22 @@ export default class ChartDataProvider {
 		const fullTrend = manipulator.doStuff( ids );
 		const entries = Object.entries( fullTrend );
 
-		return entries.reduce( ( accumulator, [ date, entry ], idx ) => {
-			const isEOMEntry = moment( date ).isSame( moment( date ).endOf( 'month' ), 'day' ) ||
+		return entries.sort( ( a, b ) => Date.parse( a[ 0 ] ) - Date.parse( b[ 0 ] ) )
+			.reduce( ( accumulator, [ date, entry ], idx ) => {
+				const isEndOfMonthEntry = moment( date ).isSame( moment( date ).endOf( 'month' ), 'day' ) ||
 			idx === ( entries.length - 1 );
-			if ( isEOMEntry ) {
-				accumulator.push( {
-					x: moment( date ).valueOf(),
-					y: entry.balance,
-					_date: date,
-					label: moment( date ).format( 'MMM' ),
-				} );
-			}
+				if ( isEndOfMonthEntry ) {
+					accumulator.push( {
+						x: moment( date ).valueOf(),
+						y: entry.balance,
+						_date: date,
+						label: moment( date ).format( 'MMM' ),
+					} );
+				}
 
-			return accumulator;
-		}, [] )
-			.sort( ( a, b ) => Date.parse( a._date ) - Date.parse( b._date ) );
+				return accumulator;
+			}, [] );
+		// .sort( ( a, b ) => Date.parse( a._date ) - Date.parse( b._date ) );
 	}
 
 	getDailyChartData( fromDate ) {
@@ -44,10 +45,10 @@ export default class ChartDataProvider {
 
 		const ids = getAccountIds( this.state );
 		const fullTrend = manipulator.doStuff( ids, fromDate );
+		const entries = Object.entries( fullTrend );
 
 		// Prepare data for chart visualization
-		return Object.entries( fullTrend )
-			.sort( ( a, b ) => Date.parse( a[ 0 ] ) - Date.parse( b[ 0 ] ) )
+		return entries.sort( ( a, b ) => Date.parse( a[ 0 ] ) - Date.parse( b[ 0 ] ) )
 			.map( ( [ date, entry ] ) => ( {
 				x: moment( date ).valueOf(),
 				y: entry.balance,

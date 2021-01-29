@@ -33,11 +33,11 @@ export default () => {
 	);
 	// store.dispatch( { type: 'PURGE_DATA' } );
 
-	// const persistor = persistStore( store );
-	// persistor.purge();
-	// persistor.flush();
+	const persistor = persistStore( store );
+	persistor.purge();
+	persistor.flush();
 
-	const persistor = persistStore( store, { manualPersist: true } );
+	// const persistor = persistStore( store, { manualPersist: true } );
 	// persistor.purge();
 	// persistor.flush();
 	// hydrateState( store.dispatch );

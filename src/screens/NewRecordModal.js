@@ -53,15 +53,20 @@ class NewRecordModal extends React.Component {
 			amount: Math.round( 12 * ( 1 + Math.random( 10 ) ) ), // TODO: REMOVE RANDOM,
 			amountInAccountCurrency: '0',
 			description: '',
-			accountId: account.id,
-			currencyId: account.currencyId,
-			categoryId: category.id,
 			createdAt: Date.now(),
 			updatedAt: Date.now(),
 			typeId: 0,
 			isEdit,
 			toAccountId: -99, // Out of wallet
 		};
+
+		if ( account ) {
+			this.state = Object.assign( {}, this.state, { accountId: account.id, currencyId: account.currencyId } );
+		}
+
+		if ( category ) {
+			this.state = Object.assign( {}, this.state, { categoryId: category.id } );
+		}
 
 		if ( isEdit ) {
 			const recordId = props.navigation.getParam( 'recordId', null );

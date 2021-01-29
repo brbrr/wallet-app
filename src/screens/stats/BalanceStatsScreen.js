@@ -65,6 +65,7 @@ class StatsScreen extends Component {
 					labelComponent={
 						<VictoryTooltip
 							style={ { fontSize: 10 } }
+							renderInPortal={ false }
 						/>
 					}
 					style={
@@ -82,6 +83,7 @@ class StatsScreen extends Component {
 	}
 
 	getDomain( data ) {
+		console.log( data );
 		const values = data.map( ( e ) => e.y );
 		const min = Math.min( ...values );
 		const max = Math.max( ...values );
@@ -93,6 +95,12 @@ class StatsScreen extends Component {
 			domain = { y: [ min - ( 0.1 * max ), max + ( 0.1 * max ) ] };
 		}
 
+		// let domain = [ 0, max + ( 0.1 * max ) ];
+		// if ( max < 0 ) {
+		// 	domain = [ min - ( 0.1 * max ), 0 ];
+		// } else if ( min < 0 ) {
+		// 	domain = [ min - ( 0.1 * max ), max + ( 0.1 * max ) ];
+		// }
 		return domain;
 	}
 
@@ -104,6 +112,9 @@ class StatsScreen extends Component {
 
 		const domain = this.getDomain( dailyData );
 		const monthlyDomain = this.getDomain( monthlyData );
+
+		console.log( 'monthlyData', monthlyData );
+		console.log( 'domain', domain );
 
 		return (
 			<ScrollView>

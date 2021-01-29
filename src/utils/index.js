@@ -85,6 +85,9 @@ export function getAccountsTotalsInCurrency( state, accounts ) {
 	const defaultCurrency = getCurrencyById( state, defaultAccount.currencyId );
 
 	return Object.values( accounts ).reduce( ( acc, account ) => {
+		if ( account.id === -99 ) {
+			return acc;
+		}
 		const balance = account.balance;
 		const fromCurrency = getCurrencyById( state, account.currencyId );
 		const convertedAmount = convertAmount( balance, { from: fromCurrency.code, to: defaultCurrency.code } );

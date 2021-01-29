@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createAppContainer } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
 /**
@@ -9,10 +9,13 @@ import { createStackNavigator } from 'react-navigation-stack';
  */
 import MainTabNavigator from './MainTabNavigator';
 import NewRecordNavigator from './NewRecordNavigator';
+import AppLoadingScreen from '../screens/AppLoadingScreen';
+import WelcomeScreen from '../screens/welcome/WelcomeScreen';
+import SelectCurrencyScreen from '../screens/welcome/SelectCurrencyScreen';
+import AddAccountScreen from '../screens/welcome/AddAccountScreen';
+import NewAccountScreen from '../screens/NewAccountScreen';
 
-export default createAppContainer( createStackNavigator( {
-	// You could add another route here for authentication.
-	// Read more at https://reactnavigation.org/docs/en/auth-flow.html
+const MainStack = createStackNavigator( {
 	Main: MainTabNavigator,
 	NewRecord: NewRecordNavigator,
 },
@@ -20,4 +23,31 @@ export default createAppContainer( createStackNavigator( {
 	mode: 'modal',
 	headerMode: 'none',
 }
-) );
+);
+
+const WelcomeStack = createStackNavigator( {
+	Welcome: WelcomeScreen,
+	SelectCurrency: SelectCurrencyScreen,
+	AddAccount: AddAccountScreen,
+	// AddAccount: NewAccountScreen,
+
+	// NewRecord: NewRecordNavigator,
+},
+{
+	// mode: 'modal',
+	// headerMode: 'none',
+}
+);
+
+export default createAppContainer(
+	createSwitchNavigator(
+		{
+			AppLoading: AppLoadingScreen,
+			App: MainStack,
+			Welcome: WelcomeStack,
+		},
+		{
+			initialRouteName: 'AppLoading',
+		}
+	)
+);
