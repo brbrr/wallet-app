@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { Icon } from '@rneui/themed';
 
 export default ( category, selectItem, id = null ) =>
 	<TouchableOpacity

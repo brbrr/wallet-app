@@ -3,10 +3,10 @@
  */
 import React from 'react';
 import { StyleSheet, ScrollView, Platform } from 'react-native';
-import { ListItem, Input } from 'react-native-elements';
+import { ListItem, Input } from '@rneui/themed';
 import PropTypes from 'prop-types';
 
-const AccountInfo = ( { navigate, onStateChange, name, balance, colorCode, iconName, currencyCode, onPressCurrency } ) =>
+const AccountInfo = ( { navigate, onStateChange, name, balance, colorCode, iconName, currencyCode, currencyScreen } ) =>
 	<ScrollView style={ styles.container } keyboardShouldPersistTaps="always" >
 		<ListItem
 			title="Name"
@@ -50,7 +50,7 @@ const AccountInfo = ( { navigate, onStateChange, name, balance, colorCode, iconN
 			rightTitle={ currencyCode }
 			bottomDivider={ true }
 			topDivider={ true }
-			onPress={ onPressCurrency }
+			onPress={ () => navigate( currencyScreen ) }
 
 			containerStyle={ StyleSheet.flatten( [ styles.itemContainer ] ) }
 			contentContainerStyle={ { flex: 2 } }

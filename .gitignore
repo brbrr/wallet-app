@@ -9,3 +9,4 @@ npm-debug.*
 node_modules
 .vscode
 .expo
+yarn.lock

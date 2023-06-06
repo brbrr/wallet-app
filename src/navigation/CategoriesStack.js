@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createStackNavigator } from 'react-navigation-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 /**
  * Internal dependencies

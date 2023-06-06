@@ -4,13 +4,13 @@
 import React from 'react';
 import { Button, StyleSheet, ScrollView, Platform } from 'react-native';
 import { connect } from 'react-redux';
-import { ListItem, SearchBar } from 'react-native-elements';
+// import { ListItem, SearchBar } from '@rneui/themed';
 
 /**
  * Internal dependencies
  */
 import { addNewCurrency } from '../actions';
-import currenciesList from '../utils/currenciesList';
+import CurrencyList from '../components/currencies/CurrenciesList';
 
 class NewCurrencyScreen extends React.Component {
 	static navigationOptions = ( { navigation } ) => ( {
@@ -28,56 +28,28 @@ class NewCurrencyScreen extends React.Component {
 		this.state = {
 			name: null,
 			balance: null,
-			search: '',
+			searchTerm: '',
 		};
 	}
 
-	updateSearch = ( search ) => {
-		this.setState( { search } );
+	updateSearch = ( searchTerm ) => {
+		this.setState( { searchTerm } );
 	};
 
 	addNewCurrencyAndGoBack = ( code, name ) => {
 		const { navigation, _addNewCurrency } = this.props;
 		_addNewCurrency( { code, name } );
 		navigation.goBack( null );
-	}
+	};
 
 	render() {
-		const { search } = this.state;
-
-		const addedCurrenciesList = Object.values( this.props.currencies.byId );
-		const currencies = Object.entries( currenciesList )
-			.filter( ( [ code ] ) => ! addedCurrenciesList.find( ( c ) => c.code === code ) )
-			.filter( ( [ code, name ] ) => {
-				if ( search.length > 1 ) {
-					return code.toLowerCase().includes( search.toLowerCase() ) || name.toLowerCase().includes( search.toLowerCase() );
-				}
-				return true;
-			} )
-			.map( ( [ code, name ], id ) => (
-				<ListItem
-					key={ id }
-					containerStyle={ { paddingTop: 3, paddingBottom: 3, height: 55 } }
-					contentContainerStyle={ { flex: 2 } }
-					rightContentContainerStyle={ { flex: 1 } }
-					title={ name }
-					rightTitle={ code }
-					bottomDivider={ true }
-					topDivider={ true }
-					onPress={ () => this.addNewCurrencyAndGoBack( code, name ) }
-				/>
-			) );
-
 		return (
-			<ScrollView style={ styles.container } keyboardShouldPersistTaps="always" >
-				<SearchBar
-					placeholder="Type Here..."
-					onChangeText={ this.updateSearch }
-					value={ search }
-					platform={ Platform.OS }
-				/>
-				{ currencies }
-			</ScrollView>
+			<CurrencyList
+				searchTerm={ this.state.searchTerm }
+				currencies={ this.props.currencies }
+				updateSearch={ this.updateSearch }
+				onCurrencyPress={ this.addNewCurrencyAndGoBack }
+			/>
 		);
 	}
 }
@@ -91,33 +63,5 @@ const mapDispatchToProps = ( dispatch ) => {
 
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
 )( NewCurrencyScreen );
-
-const styles = StyleSheet.create( {
-	container: { backgroundColor: '#f9f9f9', flex: 1 },
-	iconContainer: {
-		marginTop: 20,
-		marginBottom: 20,
-		height: 55,
-		flexDirection: 'row',
-	},
-	currencyButton: {
-		color: 'grey',
-		padding: 3,
-		borderWidth: 1,
-		borderColor: 'grey',
-		borderRadius: 3,
-		backgroundColor: '#f9f9f9',
-		marginLeft: 7,
-		marginRight: 9,
-	},
-	amountTitle: { fontSize: 12, marginTop: 2 },
-	amountInput: { color: 'black', textAlign: 'right' },
-	colorBox: ( size, color ) => ( {
-		width: size,
-		height: size,
-		backgroundColor: color,
-		margin: 3,
-	} ),
-} );

@@ -25,7 +25,7 @@ const Overview = ( props ) => {
 		const currency = getCurrencyById( props, account.currencyId );
 		title = account.name;
 		accountBalance = `${ account.balance } ${ currency.code }`;
-	} else if ( accounts.allIds < 1 ) {
+	} else if ( accounts.allIds.length < 1 ) {
 		title = 'No accounts';
 		accountBalance = `Add new account!`;
 	} else {

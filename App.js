@@ -8,18 +8,21 @@ import { Asset } from 'expo-asset';
 import * as Font from 'expo-font';
 import * as Icon from '@expo/vector-icons';
 import { Provider } from 'react-redux';
-// Before rendering any navigation stack
-// import { useScreens } from 'react-native-screens';
+import { NavigationContainer } from '@react-navigation/native';
+
 import { PersistGate } from 'redux-persist/integration/react';
 
 /**
  * Internal dependencies
  */
-import AppNavigator from './src/navigation/AppNavigator';
+// import AppNavigator from './src/navigation/AppNavigator';
+import Navigation from './src/config/navigation';
 import getStore from './src/utils/create-store';
-import { hydrateState } from './src/utils/state-hydrator';
+// import { hydrateState } from './src/utils/state-hydrator';
 
-// useScreens();
+import { enableScreens } from 'react-native-screens';
+
+enableScreens();
 
 const { persistor, store } = getStore();
 
@@ -29,21 +32,22 @@ export default class App extends React.Component {
 	};
 
 	render() {
-		if ( ! this.state.isLoadingComplete && ! this.props.skipLoadingScreen ) {
-			return (
-				<AppLoading
-					startAsync={ this._loadResourcesAsync }
-					onError={ this._handleLoadingError }
-					onFinish={ this._handleFinishLoading }
-				/>
-			);
-		}
+		// if ( ! this.state.isLoadingComplete && ! this.props.skipLoadingScreen ) {
+		// 	return (
+		// 		<AppLoading
+		// 			startAsync={ this._loadResourcesAsync }
+		// 			onError={ this._handleLoadingError }
+		// 			onFinish={ this._handleFinishLoading }
+		// 		/>
+		// 	);
+		// }
 		return (
 			<Provider store={ store }>
 				<PersistGate loading={ null } persistor={ persistor }>
 					<View style={ styles.container }>
 						{ Platform.OS === 'ios' && <StatusBar barStyle="default" /> }
-						<AppNavigator />
+						<Navigation />
+						{ /* <AppNavigator /> */ }
 					</View>
 				</PersistGate>
 			</Provider>

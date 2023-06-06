@@ -4,63 +4,49 @@
 import React from 'react';
 import { Button } from 'react-native';
 import { connect } from 'react-redux';
-
 /**
  * Internal dependencies
  */
 import { addNewAccount, updateAccount } from '../actions/accounts';
+import { getCurrencyById } from '../selectors';
 import AccountInfo from '../components/accounts/AccountInfo';
-import { getCurrencyById, getAccountById } from '../selectors';
-
 class NewAccountScreen extends React.Component {
-	static navigationOptions = ( { navigation } ) => {
-		const rightButtonTitle = navigation.state.params && navigation.state.params.isEdit ? 'Save' : 'Add';
-
-		return {
-			title: 'New Account',
-			headerRight: (
-				<Button
-					onPress={ () => navigation.state.params.persistAccountAndGoBack() }
-					title={ rightButtonTitle }
-				/>
-			),
-			headerLeft: (
-				<Button
-					onPress={ () => navigation.goBack( null ) }
-					title="Back"
-				/>
-			),
-		};
-	};
-
 	constructor( props ) {
 		super( props );
-		const isEdit = props.navigation.getParam( 'isEdit', false );
+		const isEdit = props.route.params?.isEdit;
 		this.state = {
+			isEdit,
 			name: '',
-			balance: '',
+			balance: 0,
 			colorCode: 'blue',
 			iconName: 'car',
-			currencyId: 1,
-			isEdit,
+			currencyId: 0,
 		};
 
-		if ( isEdit ) {
-			const accountId = props.navigation.getParam( 'accountId', null );
-			const account = getAccountById( props, accountId );
-			this.state = Object.assign( {}, this.state, account );
-		}
+		this.currencyScreen = 'Currencies';
+	}
 
-		this.props.navigation.setParams(
-			{ persistAccountAndGoBack: this.persistAccountAndGoBack }
-		);
+	componentDidMount() {
+		this.props.navigation.setOptions( {
+			headerRight: () => (
+				<Button
+					onPress={ () => this.persistAccountAndNavigate() }
+					title={ 'Add' }
+				/>
+			),
+		} );
+	}
+
+	persistAccountAndNavigate = () => {
+		this.persistAccount();
+		this.props.navigation.navigate( 'AppTabsScreen' );
 	}
 
 	onStateChange = ( state ) => this.setState( state )
 
-	persistAccountAndGoBack = () => {
-		const { name, balance, colorCode, iconName, currencyId, isEdit, id } = this.state;
-		const { navigation, _addNewAccount, _updateAccount } = this.props;
+	persistAccount = () => {
+		const { name, balance, colorCode, iconName, currencyId, id } = this.state;
+		const { _addNewAccount, _updateAccount, isEdit } = this.props;
 
 		const account = {
 			name,
@@ -76,20 +62,10 @@ class NewAccountScreen extends React.Component {
 			account.id = id;
 			_updateAccount( account );
 		}
-
-		navigation.goBack( null );
 	}
 
-	onPressCurrency = () => {
-		if ( ! this.state.isEdit ) {
-			this.props.navigation.navigate( 'Currencies', { onStateChange: this.onStateChange } );
-		}
-	}
-
-	render() {
-		const { name, balance, colorCode, iconName, currencyId, isEdit } = this.state;
-		const { navigation } = this.props;
-
+	renderAccountInfo() {
+		const { name, balance, colorCode, iconName, currencyId } = this.state;
 		const currency = getCurrencyById( this.props, currencyId );
 
 		return (
@@ -99,11 +75,27 @@ class NewAccountScreen extends React.Component {
 				colorCode={ colorCode }
 				iconName={ iconName }
 				currencyCode={ currency.code }
-				navigate={ navigation.navigate }
+				navigate={ this.props.navigation.navigate }
 				onStateChange={ this.onStateChange }
-				onPressCurrency={ this.onPressCurrency }
+				currencyScreen={ this.currencyScreen }
 			/>
 		);
+	}
+
+	render() {
+		return (
+			<>
+				{ this.renderAccountInfo() }
+				{ this.props.postAccountInfo && this.props.postAccountInfo( this.persistAccountAndNavigate ) }
+			</>
+		);
+	}
+}
+
+class SNewAccountsScreen extends NewAccountScreen {
+	constructor( props ) {
+		super( props );
+		this.currencyScreen = 'SettingsCurrencies';
 	}
 }
 
@@ -124,19 +116,10 @@ const mapDispatchToProps = ( dispatch ) => {
 
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
 )( NewAccountScreen );
-
-class SNewAccountScreen extends NewAccountScreen {
-	onPressCurrency = () => {
-		if ( ! this.state.isEdit ) {
-			this.props.navigation.navigate( 'SettingsCurrencies', { onStateChange: this.onStateChange } );
-		}
-	}
-}
 
 export const SettingsNewAccountsScreen = connect(
 	mapStateToProps,
-	mapDispatchToProps
-)( SNewAccountScreen );
-
+	mapDispatchToProps,
+)( SNewAccountsScreen );

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { ListItem } from 'react-native-elements';
+import { ListItem } from '@rneui/themed';
 
 /**
  * Internal dependencies

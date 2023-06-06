@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { View } from 'react-native';
-import { Icon, ListItem } from 'react-native-elements';
+import { Icon, ListItem } from '@rneui/themed';
 /**
  * Internal dependencies
  */

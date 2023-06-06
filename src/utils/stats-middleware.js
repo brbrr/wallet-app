@@ -58,7 +58,7 @@ export const snapshotCalculator = ( store ) => ( next ) => ( action ) => {
 		const state = store.getState();
 		const id = action.directive.accId;
 		const directives = getBalanceDirectivesById( state );
-		const dataManipulator = new ChartDataManipulator( state, 'balanceDirectiveTrend' );
+		const dataManipulator = new ChartDataManipulator( state );
 		const accSnapshots = dataManipulator.fillInAndTransform( directives, id );
 
 		store.dispatch( addAccountSnapshots( accSnapshots, id ) );

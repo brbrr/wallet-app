@@ -3,7 +3,7 @@
  */
 import React, { Component } from 'react';
 import { Animated, Easing, Platform } from 'react-native';
-import { ListItem } from 'react-native-elements';
+import { ListItem } from '@rneui/themed';
 /**
  * Internal dependencies
  */
