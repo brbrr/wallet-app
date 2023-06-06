@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { ScrollView, Button, Alert, View } from 'react-native';
-import { ButtonGroup } from 'react-native-elements';
+import { ButtonGroup } from '@rneui/themed';
 import { connect } from 'react-redux';
 
 /**
@@ -21,31 +21,33 @@ import DatePickerListItem from '../components/record-modal/DatePickerListItem';
 import DescriptionListItem from '../components/record-modal/DescriptionListItem';
 import DeleteButtonListItem from '../components/record-modal/DeleteButtonListItem';
 import CategoryListItem from '../components/record-modal/CategoryListItem';
+import { StyleSheet } from 'react-native';
+import { Platform } from 'react-native';
 
 class NewRecordModal extends React.Component {
-	static navigationOptions = ( { navigation } ) => {
-		return {
-			title: 'Add record',
-			headerRight: (
-				<Button
-					onPress={ () => navigation.state.params.saveRecordAndGoBack() }
-					title={ 'Save' }
-				/>
-			),
-			headerLeft: (
-				<Button
-					// FIXME: goBack to the previous route instead of default `Home` route
-					// onPress={ () => this.props.navigation.goBack(null) }
-					onPress={ () => navigation.navigate( 'Main' ) }
-					title="Dismiss"
-				/>
-			),
-		};
-	};
+	// static navigationOptions = ( { navigation } ) => {
+	// 	return {
+	// 		title: 'Add record',
+	// 		headerRight: (
+	// 			<Button
+	// 				onPress={ () => navigation.state.params.saveRecordAndGoBack() }
+	// 				title={ 'Save' }
+	// 			/>
+	// 		),
+	// 		headerLeft: (
+	// 			<Button
+	// 				// FIXME: goBack to the previous route instead of default `Home` route
+	// 				// onPress={ () => this.props.navigation.goBack(null) }
+	// 				onPress={ () => navigation.navigate( 'Main' ) }
+	// 				title="Dismiss"
+	// 			/>
+	// 		),
+	// 	};
+	// };
 
 	constructor( props ) {
 		super( props );
-		const isEdit = props.navigation.getParam( 'isEdit', null );
+		const isEdit = props.route.params?.isEdit;
 
 		const account = getDefaultAccount( props );
 		const category = getDefaultCategory( props );
@@ -69,17 +71,17 @@ class NewRecordModal extends React.Component {
 		}
 
 		if ( isEdit ) {
-			const recordId = props.navigation.getParam( 'recordId', null );
+			const recordId = props.route.params?.recordId;
 			const record = getRecordById( props, recordId );
 			this.state = Object.assign( {}, this.state, record );
 		}
 
-		props.navigation.setParams(
-			{
-				saveRecordAndGoBack: this.saveRecordAndGoBack,
-				isEdit,
-			}
-		);
+		// props.navigation.setParams(
+		// 	{
+		// 		saveRecordAndGoBack: this.saveRecordAndGoBack,
+		// 		isEdit,
+		// 	}
+		// );
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -144,9 +146,9 @@ class NewRecordModal extends React.Component {
 		_insertRecordAndUpdateAccounts( recordAction, record );
 		console.log( 'saveRecordAndGoBack 3', Date.now() );
 
-		navigation.navigate( 'Main' );
+		navigation.navigate( 'Home' );
 		console.log( 'saveRecordAndGoBack 4', Date.now() );
-	}
+	};
 
 	/**
 	 * Removes a record from the redux state. Also updates the account balance.
@@ -186,7 +188,7 @@ class NewRecordModal extends React.Component {
 			],
 			{ cancelable: false },
 		);
-	}
+	};
 
 	onStateChange = ( state ) => {
 		if ( state.currencyId || state.accountId ) {
@@ -197,7 +199,7 @@ class NewRecordModal extends React.Component {
 			this.setState( { amountInAccountCurrency } );
 		}
 		this.setState( state );
-	}
+	};
 
 	// Don't allow multiple periods in amount
 	onAmountChange = ( amount ) => {
@@ -212,7 +214,7 @@ class NewRecordModal extends React.Component {
 
 			this.onStateChange( { amount, amountInAccountCurrency } );
 		}
-	}
+	};
 
 	renderAccountItem() {
 		const { accountId, typeId } = this.state;
@@ -243,45 +245,49 @@ class NewRecordModal extends React.Component {
 
 	render() {
 		console.log( '!!!!!!!! NewRecordModal screen render' );
-
 		const { description, categoryId, typeId, isEdit, createdAt } = this.state;
 		const { navigation } = this.props;
 
 		const category = getCategoryById( this.props, categoryId );
 
 		return (
-			<ScrollView style={ { backgroundColor: '#f9f9f9' } }>
-				<ButtonGroup
-					onPress={ ( id ) => this.setState( { typeId: id } ) }
-					selectedIndex={ typeId }
-					buttons={ [ 'expense', 'income', 'transfer' ] }
-					containerStyle={ { borderRadius: 5, height: 25 } }
-				/>
+			<View style={ styles.container }>
+				<ScrollView style={ { backgroundColor: '#f9f9f9' } }>
 
-				<AmountListItem
-					record={ this.getRecordFromState() }
-					onNavigation={ () => navigation.navigate( 'Currencies', { onStateChange: this.onStateChange } ) }
-					onAmountChange={ this.onAmountChange }
-				/>
+					<ButtonGroup
+						onPress={ ( id ) => this.setState( { typeId: id } ) }
+						selectedIndex={ typeId }
+						buttons={ [ 'expense', 'income', 'transfer' ] }
+						containerStyle={ { borderRadius: 5, height: 25 } }
+					/>
 
-				<CategoryListItem
-					category={ category }
-					typeId={ typeId }
-					onNavigation={ () => navigation.navigate( 'Categories', { onStateChange: this.onStateChange } ) }
-				/>
+					<AmountListItem
+						record={ this.getRecordFromState() }
+						onNavigation={ () => navigation.navigate( 'Currencies', { onStateChange: this.onStateChange } ) }
+						onAmountChange={ this.onAmountChange }
+					/>
 
-				{ this.renderAccountItem() }
+					<CategoryListItem
+						category={ category }
+						typeId={ typeId }
+						onNavigation={ () => navigation.navigate( 'Categories', { onStateChange: this.onStateChange } ) }
+					/>
 
-				<DatePickerListItem
-					createdAt={ createdAt }
-					onStateChange={ this.onStateChange } />
+					{ this.renderAccountItem() }
 
-				<DescriptionListItem
-					description={ description }
-					onStateChange={ this.onStateChange } />
+					<DatePickerListItem
+						createdAt={ createdAt }
+						onStateChange={ this.onStateChange } />
 
-				{ isEdit && <DeleteButtonListItem onPress={ this.deleteRecordAndGoBack } /> }
-			</ScrollView>
+					<DescriptionListItem
+						description={ description }
+						onStateChange={ this.onStateChange } />
+
+					{ isEdit && <DeleteButtonListItem onPress={ this.deleteRecordAndGoBack } /> }
+
+				</ScrollView>
+				<Button title="Save" onPress={ this.saveRecordAndGoBack } />
+			</View>
 		);
 	}
 }
@@ -306,5 +312,17 @@ const mapDispatchToProps = ( dispatch ) => {
 
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
 )( NewRecordModal );
+
+const styles = StyleSheet.create( {
+	container: {
+		flex: 1,
+
+		...Platform.select( {
+			ios: {
+				paddingTop: 20,
+			},
+		} ),
+	},
+} );

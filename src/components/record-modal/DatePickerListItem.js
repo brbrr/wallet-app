@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { ListItem, Button } from 'react-native-elements';
+import { ListItem, Button } from '@rneui/themed';
 import moment from 'moment';
 
 /**

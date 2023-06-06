@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ListItem, Input } from 'react-native-elements';
+import { ListItem, Input } from '@rneui/themed';
 
 const NewCategory = ( { navigate, onStateChange, name, colorCode, iconName } ) =>
 	<View style={ styles.container }>

@@ -2,24 +2,12 @@
  * External dependencies
  */
 import React from 'react';
-import { Platform } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
-
-/**
- * Internal dependencies
- */
-import TabBarIcon from '../components/TabBarIcon';
-import SettingsScreen from '../screens/SettingsScreen';
-import { NewAccountStack } from './AccountsNavigator';
-import { EditCategoriesStack } from './CategoriesStack';
-import { SettingsCurrenciesScreen } from '../screens/CurrenciesScreen';
-import CurrencyScreen from '../screens/CurrencyScreen';
-import { NewCurrencyStack } from './CurrenciesNavigator';
-import { SettingsAccountsScreen } from '../screens/settings/SettingsAccountsScreen';
-import { SettingsDebugScreen } from '../screens/settings/Debug';
-import { SettingsNewAccountsScreen } from '../screens/NewAccountScreen';
-import IconSelector from '../components/IconSelector';
-import ColorSelector from '../components/ColorSelector';
+import { NavigationContainer } from '@react-navigation/native';
+import { CardStyleInterpolators, createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { connect } from 'react-redux';
+import { View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const SettingsNewAccountStack = createStackNavigator( {
 	SettingsNewAccount: { screen: SettingsNewAccountsScreen },

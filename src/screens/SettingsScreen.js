@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { StyleSheet, ScrollView, Platform } from 'react-native';
-import { ListItem } from 'react-native-elements';
+import { ListItem, Icon } from '@rneui/themed';
 
 export default class SettingsScreen extends React.Component {
 	static navigationOptions = {
@@ -11,99 +11,123 @@ export default class SettingsScreen extends React.Component {
 	};
 
 	render() {
+		console.log('SettingsScreen.render()');
 		return (
-			<ScrollView style={ styles.container }>
+			<ScrollView style={styles.container}>
 				<ListItem
-					containerStyle={ styles.itemContainer }
-					contentContainerStyle={ { flex: 2 } }
-					rightContentContainerStyle={ { flex: 1 } }
-					title="Accounts"
-					bottomDivider={ true }
-					topDivider={ true }
-					leftIcon={ {
-						name: 'circle',
-						type: 'font-awesome',
-						color: 'blue',
-						size: 42,
-						containerStyle: { margin: -2 },
-					} }
-					chevron
-					rightTitle={ 'Select' }
-					onPress={ () => this.props.navigation.navigate( 'SettingsAccounts', { enableReorder: true } ) }
-				/>
+					containerStyle={styles.itemContainer}
+					bottomDivider={true}
+					topDivider={true}
+					onPress={() =>
+						this.props.navigation.navigate('SettingsAccounts', {
+							enableReorder: true,
+						})
+					}
+				>
+					<Icon
+						name="circle"
+						type="font-awesome"
+						size={42}
+						color="blue"
+					/>
+					<ListItem.Content>
+						<ListItem.Title>Accounts</ListItem.Title>
+					</ListItem.Content>
+					<ListItem.Content right>
+						<ListItem.Title>Select</ListItem.Title>
+					</ListItem.Content>
+					<ListItem.Chevron />
+				</ListItem>
 
 				<ListItem
-					containerStyle={ styles.itemContainer }
-					contentContainerStyle={ { flex: 2 } }
-					rightContentContainerStyle={ { flex: 1 } }
-					title="Currencies"
-					bottomDivider={ true }
-					topDivider={ true }
-					leftIcon={ {
-						name: 'circle',
-						type: 'font-awesome',
-						color: 'blue',
-						size: 42,
-						containerStyle: { margin: -2 },
-					} }
-					chevron
-					rightTitle={ 'Select' }
-					onPress={ () => this.props.navigation.navigate( 'SettingsCurrencies', { isEdit: true } ) }
-				/>
+					containerStyle={styles.itemContainer}
+					bottomDivider={true}
+					topDivider={true}
+					onPress={() =>
+						this.props.navigation.navigate('SettingsCurrencies', {
+							isEdit: true,
+						})
+					}
+				>
+					<Icon
+						name="circle"
+						type="font-awesome"
+						size={42}
+						color="blue"
+					/>
+					<ListItem.Content>
+						<ListItem.Title>Currencies</ListItem.Title>
+					</ListItem.Content>
+					<ListItem.Content right>
+						<ListItem.Title>Select</ListItem.Title>
+					</ListItem.Content>
+					<ListItem.Chevron />
+				</ListItem>
 
 				<ListItem
-					containerStyle={ styles.itemContainer }
-					contentContainerStyle={ { flex: 2 } }
-					rightContentContainerStyle={ { flex: 1 } }
-					title="Categories"
-					bottomDivider={ true }
-					topDivider={ true }
-					leftIcon={ {
-						name: 'circle',
-						type: 'font-awesome',
-						color: 'blue',
-						size: 42,
-						containerStyle: { margin: -2 },
-					} }
-					chevron
-					rightTitle={ 'Select' }
-					onPress={ () => this.props.navigation.navigate( 'SettingsCategories', { isEdit: true } ) }
-				/>
+					containerStyle={styles.itemContainer}
+					bottomDivider={true}
+					topDivider={true}
+					onPress={() =>
+						this.props.navigation.navigate('SettingsCategories', {
+							isEdit: true,
+						})
+					}
+				>
+					<Icon
+						name="circle"
+						type="font-awesome"
+						size={42}
+						color="blue"
+					/>
+					<ListItem.Content>
+						<ListItem.Title>Categories</ListItem.Title>
+					</ListItem.Content>
+					<ListItem.Content right>
+						<ListItem.Title>Select</ListItem.Title>
+					</ListItem.Content>
+					<ListItem.Chevron />
+				</ListItem>
 
 				<ListItem
-					containerStyle={ styles.itemContainer }
-					contentContainerStyle={ { flex: 2 } }
-					rightContentContainerStyle={ { flex: 1 } }
-					title="Debug"
-					bottomDivider={ true }
-					topDivider={ true }
-					leftIcon={ {
-						name: 'circle',
-						type: 'font-awesome',
-						color: 'blue',
-						size: 42,
-						containerStyle: { margin: -2 },
-					} }
-					chevron
-					rightTitle={ 'Select' }
-					onPress={ () => this.props.navigation.navigate( 'SettingsDebug' ) }
-				/>
-
+					containerStyle={styles.itemContainer}
+					bottomDivider={true}
+					topDivider={true}
+					onPress={() =>
+						this.props.navigation.navigate('SettingsDebug', {
+							isEdit: true,
+						})
+					}
+				>
+					<Icon
+						name="circle"
+						type="font-awesome"
+						size={42}
+						color="blue"
+					/>
+					<ListItem.Content>
+						<ListItem.Title>Debug</ListItem.Title>
+					</ListItem.Content>
+					<ListItem.Content right>
+						<ListItem.Title>Select</ListItem.Title>
+					</ListItem.Content>
+					<ListItem.Chevron />
+				</ListItem>
 			</ScrollView>
 		);
 	}
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
 	container: {
 		backgroundColor: '#f9f9f9',
 		flex: 1,
 
-		...Platform.select( {
+		...Platform.select({
 			ios: {
 				paddingTop: 20,
 			},
-		} ),
+		}),
 	},
 	itemContainer: { paddingTop: 3, paddingBottom: 3, height: 55 },
 	iconContainer: {
@@ -124,10 +148,10 @@ const styles = StyleSheet.create( {
 	},
 	amountTitle: { fontSize: 12, marginTop: 2 },
 	amountInput: { color: 'black', textAlign: 'right' },
-	colorBox: ( size, color ) => ( {
+	colorBox: (size, color) => ({
 		width: size,
 		height: size,
 		backgroundColor: color,
 		margin: 3,
-	} ),
-} );
+	}),
+});

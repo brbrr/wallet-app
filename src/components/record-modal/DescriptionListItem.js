@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { Input, ListItem } from 'react-native-elements';
+import { Input, ListItem } from '@rneui/themed';
 
 /**
  * Internal dependencies

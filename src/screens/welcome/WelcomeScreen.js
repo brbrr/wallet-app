@@ -2,12 +2,11 @@
  * External dependencies
  */
 import React from 'react';
-import {
-	View,
+import { StatusBar, View,
 	Text,
 	StyleSheet,
 } from 'react-native';
-import { Button } from 'react-native-elements';
+import { Button } from '@rneui/themed';
 
 export default class WelcomeScreen extends React.Component {
 	componentDidMount() {
@@ -21,13 +20,20 @@ export default class WelcomeScreen extends React.Component {
 	render() {
 		const { navigation } = this.props;
 		return (
-			<View style={ styles.container }>
-				<Text>O, Hi!</Text>
-				<Text>Welcome to this new fancy app!</Text>
-				<Button
-					title="Solid Button"
-					onPress={ () => navigation.navigate( 'SelectCurrency' ) }
+			<View style={ { flex: 1 } }>
+				<StatusBar
+					backgroundColor="blue"
+					barStyle="dark-content"
 				/>
+				<View style={ styles.container }>
+
+					<Text>O, Hi!</Text>
+					<Text>Welcome to this new fancy app!</Text>
+					<Button
+						title="Solid Button"
+						onPress={ () => navigation.navigate( 'SelectCurrency' ) }
+					/>
+				</View>
 			</View>
 		);
 	}

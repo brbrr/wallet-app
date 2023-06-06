@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { Text, View, StyleSheet, TextInput } from 'react-native';
-import { ListItem } from 'react-native-elements';
+import { ListItem } from '@rneui/themed';
 import c from 'currency.js';
 import { connect } from 'react-redux';
 

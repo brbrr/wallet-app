@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Card as _Card } from 'react-native-elements';
+import { Card as _Card } from '@rneui/themed';
 
 const Card = ( { title, containerStyle, titleStyle, dividerStyle, children } ) => (
 	<_Card

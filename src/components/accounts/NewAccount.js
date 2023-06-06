@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 /**
@@ -11,26 +11,22 @@ import { addNewAccount, updateAccount } from '../../actions/accounts';
 import AccountInfo from './AccountInfo';
 import { getCurrencyById, getAccountById } from '../../selectors';
 
-class NewAccount extends React.Component {
+class NewAccount extends Component {
 	constructor( props ) {
 		super( props );
-		const isEdit = props.isEdit;
 		this.state = {
 			name: '',
 			balance: 0,
 			colorCode: 'blue',
 			iconName: 'car',
 			currencyId: 0,
-			isEdit,
 		};
 
-		if ( isEdit ) {
+		if ( props.isEdit ) {
 			const accountId = props.accountId;
 			const account = getAccountById( props, accountId );
 			this.state = Object.assign( {}, this.state, account );
 		}
-
-		props.bindMethodForHeader( this.persistAccountAndNavigate );
 	}
 
 	onStateChange = ( state ) => this.setState( state )
@@ -44,8 +40,8 @@ class NewAccount extends React.Component {
 	}
 
 	persistAccount = () => {
-		const { name, balance, colorCode, iconName, currencyId, isEdit, id } = this.state;
-		const { _addNewAccount, _updateAccount } = this.props;
+		const { name, balance, colorCode, iconName, currencyId, id } = this.state;
+		const { _addNewAccount, _updateAccount, isEdit } = this.props;
 
 		const account = {
 			name,
@@ -63,14 +59,8 @@ class NewAccount extends React.Component {
 		}
 	}
 
-	persistAccountAndNavigate = () => {
-		this.persistAccount();
-		this.props.navigateAfterPersist();
-	}
-
 	render() {
 		const { name, balance, colorCode, iconName, currencyId } = this.state;
-
 		const currency = getCurrencyById( this.props, currencyId );
 
 		return (
@@ -105,6 +95,8 @@ const mapDispatchToProps = ( dispatch ) => {
 
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
+	null,
+	{ forwardRef: true }
 )( NewAccount );
 

@@ -10,6 +10,7 @@ import records from './records';
 import categories from './categories';
 import currencies from './currencies';
 import accounts from './accounts';
+import config from './config';
 import { balanceDirectiveTrend, accountSnapshots } from './stats';
 
 const appReducer = combineReducers( {
@@ -19,6 +20,7 @@ const appReducer = combineReducers( {
 	accounts,
 	balanceDirectiveTrend,
 	accountSnapshots,
+	config,
 } );
 
 const rootReducer = ( state, action ) => {

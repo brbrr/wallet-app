@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { FlatList } from 'react-native';
-import { ListItem } from 'react-native-elements';
+import { ListItem } from '@rneui/themed';
 /**
  * Internal dependencies
  */
@@ -12,7 +12,7 @@ import { getIconConfiguration } from './helper';
 export default class ItemsList extends React.Component {
 	static defaultProps = {
 		nameValue: 'name',
-	}
+	};
 
 	renderItem = ( { item } ) => {
 		const { selectItem, nameValue, itemProps } = this.props;
@@ -27,9 +27,9 @@ export default class ItemsList extends React.Component {
 				{ ...itemProps }
 			/>
 		);
-	}
+	};
 
-	keyExtractor = ( item ) => item.id.toString()
+	keyExtractor = ( item ) => item.id.toString();
 
 	render() {
 		const { items, style } = this.props;

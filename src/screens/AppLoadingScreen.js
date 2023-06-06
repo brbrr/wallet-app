@@ -2,6 +2,7 @@
  * External dependencies
  */
 import React from 'react';
+import { Text } from 'react-native';
 import {
 	ActivityIndicator,
 	AsyncStorage,
@@ -20,7 +21,7 @@ export default class AppLoadingScreen extends React.Component {
 
 		// This will switch to the App screen or Auth screen and this loading
 		// screen will be unmounted and thrown away.
-		this.props.navigation.navigate( isFirstLoad ? 'App' : 'Welcome' );
+		// this.props.navigation.navigate( isFirstLoad ? 'App' : 'Welcome' );
 	};
 
 	// Render any loading content that you like here
@@ -28,6 +29,7 @@ export default class AppLoadingScreen extends React.Component {
 		return (
 			<View>
 				<ActivityIndicator />
+				<Text> IS LOADING</Text>
 				<StatusBar barStyle="default" />
 			</View>
 		);

@@ -6,7 +6,7 @@ import { createAppContainer } from 'react-navigation';
 import { render, fireEvent } from 'react-native-testing-library';
 import { createStore } from 'redux';
 import { Provider, connect } from 'react-redux';
-import { createStackNavigator } from 'react-navigation-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 /**
  * Internal dependencies

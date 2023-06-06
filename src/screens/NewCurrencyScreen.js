@@ -4,7 +4,7 @@
 import React from 'react';
 import { Button, StyleSheet, ScrollView, Platform } from 'react-native';
 import { connect } from 'react-redux';
-// import { ListItem, SearchBar } from 'react-native-elements';
+// import { ListItem, SearchBar } from '@rneui/themed';
 
 /**
  * Internal dependencies
@@ -40,7 +40,7 @@ class NewCurrencyScreen extends React.Component {
 		const { navigation, _addNewCurrency } = this.props;
 		_addNewCurrency( { code, name } );
 		navigation.goBack( null );
-	}
+	};
 
 	render() {
 		return (
@@ -48,7 +48,7 @@ class NewCurrencyScreen extends React.Component {
 				searchTerm={ this.state.searchTerm }
 				currencies={ this.props.currencies }
 				updateSearch={ this.updateSearch }
-				noCurrencyPress={ this.addNewCurrencyAndGoBack }
+				onCurrencyPress={ this.addNewCurrencyAndGoBack }
 			/>
 		);
 	}
@@ -63,5 +63,5 @@ const mapDispatchToProps = ( dispatch ) => {
 
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
 )( NewCurrencyScreen );

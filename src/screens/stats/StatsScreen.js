@@ -4,7 +4,7 @@
 import React, { Component } from 'react';
 import { Button, View, Text, ScrollView, StyleSheet, Platform } from 'react-native';
 import { connect } from 'react-redux';
-import { ListItem } from 'react-native-elements';
+import { ListItem } from '@rneui/themed';
 
 class StatsScreen extends Component {
 	static navigationOptions = ( { navigation } ) => {
@@ -57,7 +57,7 @@ export const mapDispatchToProps = ( dispatch ) => {
 
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
 )( StatsScreen );
 
 const styles = StyleSheet.create( {

@@ -3,7 +3,7 @@
  */
 import { createStore, applyMiddleware } from 'redux';
 import { persistStore, persistReducer } from 'redux-persist';
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import thunk from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
@@ -18,7 +18,6 @@ import { snapshotCalculator } from './stats-middleware';
 const persistConfig = {
 	key: 'root',
 	storage: AsyncStorage,
-	timeout: 10000,
 };
 
 const persistedReducer = persistReducer( persistConfig, rootReducer );
@@ -34,15 +33,15 @@ export default () => {
 	// store.dispatch( { type: 'PURGE_DATA' } );
 
 	const persistor = persistStore( store );
-	persistor.purge();
-	persistor.flush();
+	// persistor.purge();
+	// persistor.flush();
 
 	// const persistor = persistStore( store, { manualPersist: true } );
 	// persistor.purge();
 	// persistor.flush();
 	// hydrateState( store.dispatch );
 
-	persistor.persist();
+	// persistor.persist();
 	// persistor.purge();
 	// persistor.flush();
 

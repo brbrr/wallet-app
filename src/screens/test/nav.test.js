@@ -4,7 +4,7 @@
 import React from 'react';
 import { Button, Text, View } from 'react-native';
 import { createAppContainer, withNavigation } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import { render, fireEvent } from 'react-native-testing-library';
 

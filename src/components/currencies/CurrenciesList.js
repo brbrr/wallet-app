@@ -3,23 +3,50 @@
  */
 import React from 'react';
 import { StyleSheet, ScrollView, Platform } from 'react-native';
-import { ListItem, SearchBar } from 'react-native-elements';
+import { ListItem, SearchBar } from '@rneui/themed';
+import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
+import { addNewCurrency } from '../../actions';
 import currenciesListData from '../../utils/currenciesListData';
 
-const CurrencyList = ( { searchTerm, updateSearch, noCurrencyPress, currencies } ) => {
-	const addedCurrenciesList = Object.values( currencies.byId );
-	const currencyItems = Object.entries( currenciesListData )
-		.filter( ( [ code ] ) => ! addedCurrenciesList.find( ( c ) => c.code === code ) )
-		.filter( ( [ code, name ] ) => {
-			if ( searchTerm.length > 1 ) {
-				return code.toLowerCase().includes( searchTerm.toLowerCase() ) || name.toLowerCase().includes( searchTerm.toLowerCase() );
-			}
-			return true;
-		} )
-		.map( ( [ code, name ], id ) => (
+class CurrencyList extends React.Component {
+	constructor( props ) {
+		super( props );
+		this.state = {
+			searchTerm: '',
+		};
+	}
+
+	updateSearch = ( searchTerm ) => {
+		this.setState( { searchTerm } );
+	};
+
+	addNewCurrencyAndNavigate = ( code, name ) => {
+		const { navigation, _addNewCurrency } = this.props;
+		_addNewCurrency( { code, name } );
+		navigation.navigate( 'AddAccount' );
+	};
+
+	filterAvailableCurrencies() {
+		const { searchTerm } = this.state;
+		const addedCurrenciesList = Object.values( this.props.currencies.byId );
+
+		return Object.entries( currenciesListData )
+			.filter( ( [ code ] ) => ! addedCurrenciesList.find( ( c ) => c.code === code ) )
+			.filter( ( [ code, name ] ) => {
+				if ( searchTerm.length > 1 ) {
+					return code.toLowerCase().includes( searchTerm.toLowerCase() ) || name.toLowerCase().includes( searchTerm.toLowerCase() );
+				}
+				return true;
+			} );
+	}
+
+	renderCurrencyItems() {
+		const availableCurrencies = this.filterAvailableCurrencies();
+
+		return availableCurrencies.map( ( [ code, name ], id ) => (
 			<ListItem
 				key={ id }
 				containerStyle={ styles.listItemContainer }
@@ -29,24 +56,37 @@ const CurrencyList = ( { searchTerm, updateSearch, noCurrencyPress, currencies }
 				rightTitle={ code }
 				bottomDivider={ true }
 				topDivider={ true }
-				onPress={ () => noCurrencyPress( code, name ) }
+				onPress={ () => this.addNewCurrencyAndNavigate( code, name ) }
 			/>
 		) );
+	}
 
-	return (
-		<ScrollView style={ styles.container } keyboardShouldPersistTaps="always" >
-			<SearchBar
-				placeholder="Type Here..."
-				onChangeText={ updateSearch }
-				value={ searchTerm }
-				platform={ Platform.OS }
-			/>
-			{ currencyItems }
-		</ScrollView>
-	);
+	render() {
+		return (
+			<ScrollView style={ styles.container } keyboardShouldPersistTaps="always" >
+				<SearchBar
+					placeholder="Type Here..."
+					onChangeText={ this.updateSearch }
+					value={ this.state.searchTerm }
+					platform={ Platform.OS }
+				/>
+				{ this.renderCurrencyItems() }
+			</ScrollView>
+		);
+	}
+}
+
+const mapStateToProps = ( { currencies } ) => ( { currencies } );
+const mapDispatchToProps = ( dispatch ) => {
+	return {
+		_addNewCurrency: ( currency ) => dispatch( addNewCurrency( currency ) ),
+	};
 };
 
-export default CurrencyList;
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)( CurrencyList );
 
 const styles = StyleSheet.create( {
 	container: { backgroundColor: '#f9f9f9', flex: 1 },

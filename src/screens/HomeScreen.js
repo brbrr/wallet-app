@@ -13,6 +13,8 @@ import { RecordsList } from '../components/records/RecordsList';
 import Overview from '../components/Overview';
 import { logComponentUpdates } from '../utils/debug-utils';
 import { getAccountsListById, getRecordsListById } from '../selectors';
+import { StatusBar } from 'expo-status-bar';
+import withStatusBar from './Screen';
 
 class HomeScreen extends React.Component {
 	static navigationOptions = {
@@ -126,4 +128,4 @@ const mapDispatchToProps = () => ( {} );
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps
-)( HomeScreen );
+)( withStatusBar( HomeScreen, '#e3eef2' ) );

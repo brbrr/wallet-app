@@ -4,7 +4,7 @@
 import React from 'react';
 import { Button, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
-import { ListItem } from 'react-native-elements';
+import { ListItem } from '@rneui/themed';
 import { ScrollView } from 'react-native-gesture-handler';
 import fx from 'money';
 import { round } from 'lodash';
@@ -45,13 +45,13 @@ class CurrencyScreen extends React.Component {
 		this.state = currency;
 
 		this.props.navigation.setParams(
-			{ saveCurrency: this.saveCurrency }
+			{ saveCurrency: this.saveCurrency },
 		);
 	}
 
 	saveCurrency = () => {
 		console.log( 'SAVE CURRENCY!' );
-	}
+	};
 
 	render() {
 		const { code } = this.state;
@@ -93,7 +93,7 @@ const mapDispatchToProps = () => ( {} );
 
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	mapDispatchToProps,
 )( CurrencyScreen );
 
 const styles = StyleSheet.create( {

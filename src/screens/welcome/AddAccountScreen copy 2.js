@@ -2,20 +2,22 @@
  * External dependencies
  */
 import React from 'react';
-import { Button } from 'react-native';
+import { StyleSheet, Platform, Text, View, Button } from 'react-native';
 import { connect } from 'react-redux';
 /**
  * Internal dependencies
  */
-import { addNewAccount, updateAccount } from '../actions/accounts';
-import { getCurrencyById } from '../selectors';
-import AccountInfo from '../components/accounts/AccountInfo';
-class NewAccountScreen extends React.Component {
+import { addNewAccount, updateAccount } from '../../actions/accounts';
+/**
+ * Internal dependencies
+ */
+import AccountInfo from '../../components/accounts/AccountInfo';
+import { getCurrencyById } from '../../selectors';
+
+export class AddAccountScreen extends React.Component {
 	constructor( props ) {
 		super( props );
-		const isEdit = props.route.params?.isEdit;
 		this.state = {
-			isEdit,
 			name: '',
 			balance: 0,
 			colorCode: 'blue',
@@ -37,7 +39,7 @@ class NewAccountScreen extends React.Component {
 		} );
 	}
 
-	persistAccountAndNavigate = () => {
+	persistAccountAndNavigate() {
 		this.persistAccount();
 		this.props.navigation.navigate( 'AppTabsScreen' );
 	}
@@ -64,40 +66,44 @@ class NewAccountScreen extends React.Component {
 		}
 	}
 
-	renderAccountInfo() {
+	render() {
 		const { name, balance, colorCode, iconName, currencyId } = this.state;
 		const currency = getCurrencyById( this.props, currencyId );
 
 		return (
-			<AccountInfo
-				name={ name }
-				balance={ balance.toString() }
-				colorCode={ colorCode }
-				iconName={ iconName }
-				currencyCode={ currency.code }
-				navigate={ this.props.navigation.navigate }
-				onStateChange={ this.onStateChange }
-				currencyScreen={ this.currencyScreen }
-			/>
-		);
-	}
+			<View style={ styles.container }>
+				<Text>O, Hi!</Text>
+				<Text>Welcome to this new fancy app!</Text>
 
-	render() {
-		return (
-			<>
-				{ this.renderAccountInfo() }
-				{ this.props.postAccountInfo && this.props.postAccountInfo( this.persistAccountAndNavigate ) }
-			</>
+				<AccountInfo
+					name={ name }
+					balance={ balance.toString() }
+					colorCode={ colorCode }
+					iconName={ iconName }
+					currencyCode={ currency.code }
+					navigate={ this.props.navigation.navigate }
+					onStateChange={ this.onStateChange }
+					currencyScreen={ this.state.currencyScreen }
+				/>
+
+				<Button title="Solid Button" onPress={ () => this.persistAccountAndNavigate() } />
+			</View>
 		);
 	}
 }
 
-class SNewAccountsScreen extends NewAccountScreen {
-	constructor( props ) {
-		super( props );
-		this.currencyScreen = 'SettingsCurrencies';
-	}
-}
+const styles = StyleSheet.create( {
+	container: {
+		flex: 1,
+		backgroundColor: '#eee',
+
+		...Platform.select( {
+			ios: {
+				paddingTop: 20,
+			},
+		} ),
+	},
+} );
 
 const mapStateToProps = ( state ) => {
 	const { currencies, accounts } = state;
@@ -117,9 +123,4 @@ const mapDispatchToProps = ( dispatch ) => {
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps,
-)( NewAccountScreen );
-
-export const SettingsNewAccountsScreen = connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)( SNewAccountsScreen );
+)( AddAccountScreen );
